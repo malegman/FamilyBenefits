@@ -736,7 +736,7 @@ components:
           description: Токен пользователя, позволяющий работать с ресурсами сервиса в рамках своего профиля
           type: string
           example: token
-        name:
+        userName:
           description: Имя пользователя
           type: string
           example: name
@@ -782,7 +782,7 @@ components:
           type: string
           example: token
     UserInfo:
-      description: Инфрмация о пользователе, без пароля
+      description: Информация о пользователе
       properties:
         id:
           description: ID пользователя
@@ -802,12 +802,7 @@ components:
           description: Список критерий пользователя
           type: array
           items:
-            $ref: '#/components/schemas/CriterionInfo'
-        benefitList:
-          description: Список подобранных пособий для данного пользователя
-          type: array
-          items:
-            $ref: '#/components/schemas/BenefitShortInfo'
+            $ref: '#/components/schemas/CriterionShortInfo'
         birthDateChildren:
           description: Список дат рождений детей пользователя
           type: array
@@ -821,7 +816,7 @@ components:
           format: date
           example: 01-01-2022
     CityShortInfo:
-      description: Минимальная информация о городе
+      description: Краткая информация о городе
       properties:
         id:
           description: ID города
@@ -843,9 +838,9 @@ components:
           type: string
           example: name
         type:
-          $ref: "#/components/schemas/CriterionTypeInfo"
+          $ref: "#/components/schemas/CriterionTypeShortInfo"
     CriterionTypeInfo:
-      description: Данные типа критерия
+      description: Информация о типе критерия
       properties:
         id:
           description: ID типа критерия
@@ -856,11 +851,11 @@ components:
           type: string
           example: name
         info:
-          description: Информация о типе критерия
+          description: Информация типа критерия
           type: string
           example: info
     BenefitShortInfo:
-      description: Минимальная информация о пособии
+      description: Краткая информация о пособии
       properties:
         id:
           description: ID пособия
@@ -892,10 +887,10 @@ components:
         city:
           $ref: '#/components/schemas/CityShortInfo'
         criterionList:
-          description: Список критерий пользователя
+          description: Список критериев пользователя
           type: array
           items:
-            $ref: '#/components/schemas/CriterionInfo'
+            $ref: '#/components/schemas/CriterionShortInfo'
         birthDateChildren:
           description: Список дат рождений детей пользователя
           type: array
@@ -925,7 +920,7 @@ components:
           items:
             $ref: '#/components/schemas/InstitutionShortInfo'
     InstitutionShortInfo:
-      description: Минимальная информация об учреждении
+      description: Краткая информация об учреждении
       properties:
         id:
           description: ID учреждения
@@ -943,7 +938,7 @@ components:
           type: string
           example: Курган
     BenefitInfo:
-      description: Данные пособия
+      description: Информация о пособии
       properties:
         id:
           description: ID пособия
@@ -954,7 +949,7 @@ components:
           type: string
           example: name
         info:
-          description: Информация о пособии
+          description: Информация пособия
           type: string
           example: info
         documents:
@@ -967,7 +962,7 @@ components:
           description: Список критериев пособия
           type: array
           items:
-            $ref: '#/components/schemas/CriterionInfo'
+            $ref: '#/components/schemas/CriterionShortInfo'
         institutionList:
           description: Список учреждений пособия
           type: array
@@ -981,7 +976,7 @@ components:
           type: string
           example: name
         info:
-          description: Информация о пособии
+          description: Информация пособия
           type: string
           example: info
         documents:
@@ -994,14 +989,14 @@ components:
           description: Список критериев пособия
           type: array
           items:
-            $ref: '#/components/schemas/CriterionInfo'
+            $ref: '#/components/schemas/CriterionShortInfo'
         institutionList:
           description: Список учреждений пособия
           type: array
           items:
             $ref: '#/components/schemas/InstitutionShortInfo'
     InstitutionInfo:
-      description: Данные учреждения
+      description: Информация об учреждении
       properties:
         id:
           description: ID учреждения
@@ -1012,7 +1007,7 @@ components:
           type: string
           example: name
         city:
-          $ref: '#/components/schemas/CityInfo'
+          $ref: '#/components/schemas/CityShortInfo'
         address:
           description: Адрес учреждения
           type: string
@@ -1037,7 +1032,7 @@ components:
           type: string
           example: name
         city:
-          $ref: '#/components/schemas/CityInfo'
+          $ref: '#/components/schemas/CityShortInfo'
         address:
           description: Адрес учреждения
           type: string
@@ -1055,7 +1050,7 @@ components:
           type: string
           example: График
     CriterionShortInfo:
-      description: Минимальная информация о критерии
+      description: Краткая информация о критерии
       properties:
         id:
           description: ID критерия
@@ -1075,7 +1070,7 @@ components:
         type:
           $ref: "#/components/schemas/CriterionTypeInfo"
     CriterionTypeShortInfo:
-      description: Минимальная информация о типе критерия
+      description: Краткая информация о типе критерия
       properties:
         id:
           description: ID типа критерия
@@ -1093,7 +1088,7 @@ components:
           type: string
           example: name
         info:
-          description: Информация о типе критерия
+          description: Информация типа критерия
           type: string
           example: info
 
