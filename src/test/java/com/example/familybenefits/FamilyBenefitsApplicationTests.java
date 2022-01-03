@@ -1,0 +1,13 @@
+package com.example.familybenefits;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class FamilyBenefitsApplicationTests {
+
+  @Test
+  void contextLoads() {
+  }
+
+}
