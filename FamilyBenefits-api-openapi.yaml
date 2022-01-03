@@ -284,7 +284,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateCityRequest'
+              $ref: '#/components/schemas/CityShortInfo'
         required: true
       responses:
         '200':
@@ -938,17 +938,6 @@ components:
     AddCityRequest:
       description: Объект запроса на добавление города в систему
       properties:
-        name:
-          description: Название города
-          type: string
-          example: Курган
-    UpdateCityRequest:
-      description: Объект запроса на обновление города
-      properties:
-        id:
-          description: ID города
-          type: integer
-          example: 4842129
         name:
           description: Название города
           type: string
