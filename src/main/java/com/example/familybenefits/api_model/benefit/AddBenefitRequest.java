@@ -29,9 +29,9 @@ public class AddBenefitRequest {
   private String documents;
 
   /**
-   * Краткая информация о городе
+   * Список городов пособия
    */
-  private CityShortInfo city;
+  private List<CityShortInfo> cityList;
 
   /**
    * Список критериев пособия

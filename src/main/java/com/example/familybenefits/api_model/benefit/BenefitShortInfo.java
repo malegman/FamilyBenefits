@@ -2,7 +2,7 @@ package com.example.familybenefits.api_model.benefit;
 
 import lombok.Data;
 
-import java.util.UUID;
+import java.math.BigInteger;
 
 /**
  * Краткая информация о пособии
@@ -13,7 +13,7 @@ public class BenefitShortInfo {
   /**
    * ID пособия
    */
-  private UUID id;
+  private BigInteger id;
 
   /**
    * Название пособия

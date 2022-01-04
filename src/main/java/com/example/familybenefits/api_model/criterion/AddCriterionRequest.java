@@ -15,6 +15,11 @@ public class AddCriterionRequest {
   private String name;
 
   /**
+   * Информация критерия
+   */
+  private String info;
+
+  /**
    * Краткая информация о типе критерия
    */
   private CriterionTypeShortInfo type;

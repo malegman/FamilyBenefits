@@ -3,7 +3,7 @@ package com.example.familybenefits.api_model.institution;
 import com.example.familybenefits.api_model.city.CityShortInfo;
 import lombok.Data;
 
-import java.util.UUID;
+import java.math.BigInteger;
 
 /**
  * Информация об учреждении
@@ -14,7 +14,7 @@ public class InstitutionInfo {
   /**
    * ID учреждения
    */
-  private UUID id;
+  private BigInteger id;
 
   /**
    * Название учреждения

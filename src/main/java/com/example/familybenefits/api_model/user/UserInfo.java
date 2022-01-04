@@ -5,7 +5,7 @@ import com.example.familybenefits.api_model.criterion.CriterionShortInfo;
 import lombok.Data;
 
 import java.util.List;
-import java.util.UUID;
+import java.math.BigInteger;
 
 /**
  * Информация о пользователе
@@ -16,7 +16,7 @@ public class UserInfo {
   /**
    * ID пользователя
    */
-  private UUID id;
+  private BigInteger id;
 
   /**
    * Имя пользователя

@@ -837,6 +837,10 @@ components:
           description: Название критерия
           type: string
           example: name
+        info:
+          description: Информация критерия
+          type: string
+          example: info
         type:
           $ref: "#/components/schemas/CriterionTypeShortInfo"
     CriterionTypeInfo:
@@ -956,8 +960,11 @@ components:
           description: Документы для получения пособия
           type: string
           example: documents
-        city:
-          $ref: '#/components/schemas/CityShortInfo'
+        cityList:
+          description: Список городов пособия
+          type: array
+          items:
+            $ref: '#/components/schemas/CityShortInfo'
         criterionList:
           description: Список критериев пособия
           type: array
@@ -983,8 +990,11 @@ components:
           description: Документы для получения пособия
           type: string
           example: documents
-        city:
-          $ref: '#/components/schemas/CityShortInfo'
+        cityList:
+          description: Список городов пособия
+          type: array
+          items:
+            $ref: '#/components/schemas/CityShortInfo'
         criterionList:
           description: Список критериев пособия
           type: array
@@ -1067,6 +1077,10 @@ components:
           description: Название критерия
           type: string
           example: name
+        info:
+          description: Информация критерия
+          type: string
+          example: info
         type:
           $ref: "#/components/schemas/CriterionTypeInfo"
     CriterionTypeShortInfo:

@@ -6,7 +6,7 @@ import com.example.familybenefits.api_model.institution.InstitutionShortInfo;
 import lombok.Data;
 
 import java.util.List;
-import java.util.UUID;
+import java.math.BigInteger;
 
 /**
  * Информация о пособии
@@ -17,7 +17,7 @@ public class BenefitInfo {
   /**
    * ID пособия
    */
-  private UUID id;
+  private BigInteger id;
 
   /**
    * Название пособия
@@ -35,9 +35,9 @@ public class BenefitInfo {
   private String documents;
 
   /**
-   * Краткая информация о городе
+   * Список городов пособия
    */
-  private CityShortInfo city;
+  private List<CityShortInfo> cityList;
 
   /**
    * Список критериев пособия

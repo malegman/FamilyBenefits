@@ -10,6 +10,12 @@ spring:
         dialect: 'org.hibernate.dialect.PostgreSQLDialect'
     hibernate:
       ddl-auto: validate
+  flyway:
+    locations: 'classpath:db/migration'
+    default-schema: 'familybenefit'
+    schemas: 'familybenefit'
+    create-schemas: false
+    out-of-order: true
 
 server:
   port: 443

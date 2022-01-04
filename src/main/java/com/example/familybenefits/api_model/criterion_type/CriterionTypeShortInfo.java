@@ -2,7 +2,7 @@ package com.example.familybenefits.api_model.criterion_type;
 
 import lombok.Data;
 
-import java.util.UUID;
+import java.math.BigInteger;
 
 /**
  * Краткая информация о типе критерия
@@ -13,7 +13,7 @@ public class CriterionTypeShortInfo {
   /**
    * ID типа критерия
    */
-  private UUID id;
+  private BigInteger id;
 
   /**
    * Название типа критерия

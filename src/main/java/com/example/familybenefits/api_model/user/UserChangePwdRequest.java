@@ -2,7 +2,7 @@ package com.example.familybenefits.api_model.user;
 
 import lombok.Data;
 
-import java.util.UUID;
+import java.math.BigInteger;
 
 /**
  * Объект запроса для изменения пароля пользователя
@@ -13,7 +13,7 @@ public class UserChangePwdRequest {
   /**
    * ID пользователя
    */
-  private UUID userID;
+  private BigInteger userID;
 
   /**
    * Токен пользователя, позволяющий работать с ресурсами сервиса в рамках своего профиля

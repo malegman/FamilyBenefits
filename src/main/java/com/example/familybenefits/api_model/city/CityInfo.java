@@ -5,7 +5,7 @@ import com.example.familybenefits.api_model.institution.InstitutionShortInfo;
 import lombok.Data;
 
 import java.util.List;
-import java.util.UUID;
+import java.math.BigInteger;
 
 /**
  * Информация о городе
@@ -16,7 +16,7 @@ public class CityInfo {
   /**
    * ID города
    */
-  private UUID id;
+  private BigInteger id;
 
   /**
    * Название города
