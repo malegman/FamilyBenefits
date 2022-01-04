@@ -18,7 +18,7 @@ public class UserLoginResponse {
   /**
    * Токен пользователя, позволяющий работать с ресурсами сервиса в рамках своего профиля
    */
-  private String resourceToken;
+  private BigInteger resourceToken;
 
   /**
    * Имя пользователя

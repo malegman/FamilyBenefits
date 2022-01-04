@@ -390,6 +390,34 @@ paths:
         '404':
           description: Не найдено пособие с указанными данными
           content: { }
+  /benefit/allex:
+    get:
+      tags:
+        - benefit
+      summary: Получение списка всех пособий
+      description: Получение списка всех пособий, в том числе без города, учреждения или критериев
+      operationId: getAllExBenefits
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceUserRequest'
+        required: true
+      responses:
+        '200':
+          description: Список всех пособий получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BenefitShortInfo'
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Пособия не найдены
+          content: { }
   /institution/{id}:
     get:
       tags:
@@ -598,11 +626,39 @@ paths:
         '404':
           description: Критерий с указанным ID не найден
           content: { }
+  /criterion/allex:
+    get:
+      tags:
+        - benefit
+      summary: Получение списка всех критериев
+      description: Получение списка всех критериев, в том числе без типа
+      operationId: getAllExCriterions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceUserRequest'
+        required: true
+      responses:
+        '200':
+          description: Список всех критериев получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CriterionShortInfo'
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Критерия не найдены
+          content: { }
   /criterion/type/all:
     get:
       tags:
         - criterion type
-      summary: Получние списка типов критериев
+      summary: Получение списка типов критериев
       description: Получние списка типов критериев
       operationId: getCriterionTypes
       responses:
@@ -734,8 +790,8 @@ components:
           example: 421476
         resourceToken:
           description: Токен пользователя, позволяющий работать с ресурсами сервиса в рамках своего профиля
-          type: string
-          example: token
+          type: integer
+          example: 1037348
         userName:
           description: Имя пользователя
           type: string
@@ -749,8 +805,8 @@ components:
           example: 421476
         resourceToken:
           description: Токен пользователя, позволяющий работать с ресурсами сервиса в рамках своего профиля
-          type: string
-          example: token
+          type: integer
+          example: 6481025
         oldPassword:
           description: Старый пароль пользователя
           type: string
@@ -779,8 +835,8 @@ components:
           example: 421476
         resourceToken:
           description: Токен пользователя, позволяющий работать с ресурсами сервиса в рамках своего профиля
-          type: string
-          example: token
+          type: integer
+          example: 2471024
     UserInfo:
       description: Информация о пользователе
       properties:
