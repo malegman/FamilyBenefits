@@ -11,11 +11,6 @@ import java.math.BigInteger;
 public class CriterionTypeInfo {
 
   /**
-   * ID типа критерия
-   */
-  private BigInteger id;
-
-  /**
    * Название типа критерия
    */
   private String name;

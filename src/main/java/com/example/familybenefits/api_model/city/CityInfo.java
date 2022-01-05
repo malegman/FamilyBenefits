@@ -1,7 +1,6 @@
 package com.example.familybenefits.api_model.city;
 
-import com.example.familybenefits.api_model.benefit.BenefitShortInfo;
-import com.example.familybenefits.api_model.institution.InstitutionShortInfo;
+import com.example.familybenefits.api_model.common.ShortInfo;
 import lombok.Data;
 
 import java.util.List;
@@ -26,10 +25,10 @@ public class CityInfo {
   /**
    * Список пособий города
    */
-  private List<BenefitShortInfo> benefitList;
+  private List<ShortInfo> benefitList;
 
   /**
    * Список учреждений города
    */
-  private List<InstitutionShortInfo> institutionList;
+  private List<ShortInfo> institutionList;
 }

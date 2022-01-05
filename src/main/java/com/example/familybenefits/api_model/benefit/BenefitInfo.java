@@ -1,23 +1,15 @@
 package com.example.familybenefits.api_model.benefit;
 
-import com.example.familybenefits.api_model.city.CityShortInfo;
-import com.example.familybenefits.api_model.criterion.CriterionShortInfo;
-import com.example.familybenefits.api_model.institution.InstitutionShortInfo;
+import com.example.familybenefits.api_model.common.ShortInfo;
 import lombok.Data;
 
 import java.util.List;
-import java.math.BigInteger;
 
 /**
  * Информация о пособии
  */
 @Data
 public class BenefitInfo {
-
-  /**
-   * ID пособия
-   */
-  private BigInteger id;
 
   /**
    * Название пособия
@@ -37,15 +29,15 @@ public class BenefitInfo {
   /**
    * Список городов пособия
    */
-  private List<CityShortInfo> cityList;
+  private List<ShortInfo> cityList;
 
   /**
    * Список критериев пособия
    */
-  private List<CriterionShortInfo> criterionList;
+  private List<ShortInfo> criterionList;
 
   /**
    * Список учреждений пособия
    */
-  private List<InstitutionShortInfo> institutionList;
+  private List<ShortInfo> institutionList;
 }

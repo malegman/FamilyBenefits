@@ -1,7 +1,6 @@
 package com.example.familybenefits.api_model.user;
 
-import com.example.familybenefits.api_model.city.CityShortInfo;
-import com.example.familybenefits.api_model.criterion.CriterionShortInfo;
+import com.example.familybenefits.api_model.common.ShortInfo;
 import lombok.Data;
 
 import java.util.List;
@@ -35,12 +34,12 @@ public class AddUserRequest {
   /**
    * Краткая информация о городе пользователя
    */
-  private CityShortInfo city;
+  private ShortInfo city;
 
   /**
    * Список критериев пользователя
    */
-  private List<CriterionShortInfo> criterionList;
+  private List<ShortInfo> criterionList;
 
   /**
    * Список дат рождений детей пользователя

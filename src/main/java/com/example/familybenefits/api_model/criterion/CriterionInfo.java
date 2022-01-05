@@ -1,20 +1,13 @@
 package com.example.familybenefits.api_model.criterion;
 
-import com.example.familybenefits.api_model.criterion_type.CriterionTypeShortInfo;
+import com.example.familybenefits.api_model.common.ShortInfo;
 import lombok.Data;
-
-import java.math.BigInteger;
 
 /**
  * Критерий для подбора пособий
  */
 @Data
 public class CriterionInfo {
-
-  /**
-   * ID критерия
-   */
-  private BigInteger id;
 
   /**
    * Название критерия
@@ -29,5 +22,5 @@ public class CriterionInfo {
   /**
    * Краткая информация о типе критерия
    */
-  private CriterionTypeShortInfo type;
+  private ShortInfo type;
 }

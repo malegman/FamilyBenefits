@@ -1,6 +1,6 @@
 package com.example.familybenefits.api_model.institution;
 
-import com.example.familybenefits.api_model.city.CityShortInfo;
+import com.example.familybenefits.api_model.common.ShortInfo;
 import lombok.Data;
 
 import java.math.BigInteger;
@@ -12,11 +12,6 @@ import java.math.BigInteger;
 public class InstitutionInfo {
 
   /**
-   * ID учреждения
-   */
-  private BigInteger id;
-
-  /**
    * Название учреждения
    */
   private String name;
@@ -24,7 +19,7 @@ public class InstitutionInfo {
   /**
    * Краткая информация о городе
    */
-  private CityShortInfo city;
+  private ShortInfo city;
 
   /**
    * Адрес учреждения

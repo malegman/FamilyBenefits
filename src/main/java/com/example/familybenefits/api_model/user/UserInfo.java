@@ -1,7 +1,6 @@
 package com.example.familybenefits.api_model.user;
 
-import com.example.familybenefits.api_model.city.CityShortInfo;
-import com.example.familybenefits.api_model.criterion.CriterionShortInfo;
+import com.example.familybenefits.api_model.common.ShortInfo;
 import lombok.Data;
 
 import java.util.List;
@@ -12,11 +11,6 @@ import java.math.BigInteger;
  */
 @Data
 public class UserInfo {
-
-  /**
-   * ID пользователя
-   */
-  private BigInteger id;
 
   /**
    * Имя пользователя
@@ -31,12 +25,12 @@ public class UserInfo {
   /**
    * Краткая информация о городе
    */
-  private CityShortInfo city;
+  private ShortInfo city;
 
   /**
    * Список критерий пользователя
    */
-  private List<CriterionShortInfo> criterionList;
+  private List<ShortInfo> criterionList;
 
   /**
    * Список дат рождений детей пользователя

@@ -8,83 +8,6 @@ info:
 servers:
   - url: https://localhost:443
 paths:
-  /user/login:
-    post:
-      tags:
-        - user
-      summary: Вход в систему
-      description: Вход зарегистрированного пользователя в систему
-      operationId: loginUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserLoginRequest'
-        required: true
-      responses:
-        '200':
-          description: Вход в систему выполнен
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserLoginResponse'
-        '404':
-          description: Не найден пользователь с указанными данными
-          content: { }
-  /user/logout:
-    get:
-      tags:
-        - user
-      summary: Выход из системы
-      description: Выход зарегистрированного пользователя из системы
-      operationId: logoutUser
-      responses:
-        '200':
-          description: Выход из системы выполнен
-          content: { }
-  /user/changePassword:
-    put:
-      tags:
-        - user
-      summary: Изменение пароля пользователя
-      description: Изменение пароля пользователя
-      operationId: changePassword
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserChangePwdRequest'
-        required: true
-      responses:
-        '200':
-          description: Пароль изменен
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Не найден пользователь с указанными данными
-          content: { }
-  /user/recoveryPassword:
-    post:
-      tags:
-        - user
-      summary: Восстановление пароля пользователя
-      description: Восстановление пароля пользователя. В результате восстановления на почту пользователя будет выслан сгенерированный пароль
-      operationId: recoveryPassword
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserRecoverPwdRequest'
-        required: true
-      responses:
-        '200':
-          description: Запрос на восстановление принят. Выслано письмо на почту
-          content: { }
-        '404':
-          description: Не найден пользователь с указанными данными
-          content: { }
   /user:
     get:
       tags:
@@ -154,6 +77,85 @@ paths:
         '400':
           description: Пользователь с данным email уже существует
           content: { }
+  /user/login:
+    post:
+      tags:
+        - user
+      summary: Вход в систему
+      description: Вход зарегистрированного пользователя в систему
+      operationId: loginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Вход в систему выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+        '404':
+          description: Не найден пользователь с указанными данными
+          content: { }
+  /user/logout:
+    get:
+      tags:
+        - user
+      summary: Выход из системы
+      description: Выход зарегистрированного пользователя из системы
+      operationId: logoutUser
+      responses:
+        '200':
+          description: Выход из системы выполнен
+          content: { }
+  /user/changePassword:
+    put:
+      tags:
+        - user
+      summary: Изменение пароля пользователя
+      description: Изменение пароля пользователя
+      operationId: changePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserChangePwdRequest'
+        required: true
+      responses:
+        '200':
+          description: Пароль изменен
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Не найден пользователь с указанными данными
+          content: { }
+  /user/recoveryPassword:
+    post:
+      tags:
+        - user
+      summary: Восстановление пароля пользователя
+      description: Восстановление пароля пользователя. В результате восстановления на почту пользователя будет выслан сгенерированный пароль
+      operationId: recoveryPassword
+      requestBody:
+        description: email пользователя
+        content:
+          application/json:
+            schema:
+              type: string
+
+        required: true
+      responses:
+        '200':
+          description: Запрос на восстановление принят. Выслано письмо на почту
+          content: { }
+        '404':
+          description: Не найден пользователь с указанными данными
+          content: { }
   /user/benefits:
     get:
       tags:
@@ -176,31 +178,57 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/BenefitShortInfo'
+                  $ref: '#/components/schemas/ShortInfo'
         '403':
           description: Нет доступа
           content: { }
         '404':
           description: Не найден пользователь с указанными данными
           content: { }
-  /city/all:
-    get:
+  /city:
+    post:
       tags:
         - city
-      summary: Получние списка городов
-      description: Получние списка городов
-      operationId: getCities
+      summary: Добавление нового города
+      description: Добавление нового города
+      operationId: addCity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CityInfo'
+        required: true
       responses:
         '200':
-          description: Список городов получен
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CityShortInfo'
+          description: Город добавлен
+          content: { }
+        '400':
+          description: Город с указанными данными уже существует
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+    put:
+      tags:
+        - city
+      summary: Обновление названия города
+      description: Обновление названия города
+      operationId: updateCity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShortInfo'
+        required: true
+      responses:
+        '200':
+          description: Город обновлен
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
         '404':
-          description: Города не найдены
+          description: Город с указанными данными не найден
           content: { }
   /city/{id}:
     get:
@@ -251,50 +279,69 @@ paths:
         '404':
           description: Город с указанным ID не найден
           content: { }
-  /city:
-    post:
+  /city/all:
+    get:
       tags:
         - city
-      summary: Добавление нового города
-      description: Добавление нового города
-      operationId: addCity
+      summary: Получние списка городов
+      description: Получние списка городов
+      operationId: getCities
+      responses:
+        '200':
+          description: Список городов получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShortInfo'
+        '404':
+          description: Города не найдены
+          content: { }
+  /benefit:
+    post:
+      tags:
+        - benefit
+      summary: Добавление нового пособия
+      description: Добавление нового пособия
+      operationId: addBenefit
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddCityRequest'
+              $ref: '#/components/schemas/BenefitInfo'
         required: true
       responses:
         '200':
-          description: Город добавлен
+          description: Пособие добавлено
           content: { }
         '400':
-          description: Город с указанными данными уже существует
+          description: Пособие с указанными данными уже существует
           content: { }
         '403':
           description: Нет доступа
           content: { }
     put:
       tags:
-        - city
-      summary: Обновление названия города
-      description: Обновление названия города
-      operationId: updateCity
+        - benefit
+      summary: Обновление данных пособия
+      description: Обновление данных пособия
+      operationId: updateBenefit
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CityShortInfo'
+              $ref: '#/components/schemas/BenefitInfo'
         required: true
       responses:
         '200':
-          description: Город обновлен
+          description: Пособие обновлено
           content: { }
         '403':
           description: Нет доступа
           content: { }
         '404':
-          description: Город с указанными данными не найден
+          description: Не найдено пособие с указанными данными
           content: { }
   /benefit/{id}:
     get:
@@ -345,51 +392,6 @@ paths:
         '404':
           description: Пособие с указанным ID не найдено
           content: { }
-  /benefit:
-    post:
-      tags:
-        - benefit
-      summary: Добавление нового пособия
-      description: Добавление нового пособия
-      operationId: addBenefit
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AddBenefitRequest'
-        required: true
-      responses:
-        '200':
-          description: Пособие добавлено
-          content: { }
-        '400':
-          description: Пособие с указанными данными уже существует
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-    put:
-      tags:
-        - benefit
-      summary: Обновление данных пособия
-      description: Обновление данных пособия
-      operationId: updateBenefit
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BenefitInfo'
-        required: true
-      responses:
-        '200':
-          description: Пособие обновлено
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Не найдено пособие с указанными данными
-          content: { }
   /benefit/allex:
     get:
       tags:
@@ -411,12 +413,57 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/BenefitShortInfo'
+                  $ref: '#/components/schemas/ShortInfo'
         '403':
           description: Нет доступа
           content: { }
         '404':
           description: Пособия не найдены
+          content: { }
+  /institution:
+    post:
+      tags:
+        - institution
+      summary: Добавление нового учреждения
+      description: Добавление нового учреждения
+      operationId: addInsitution
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstitutionInfo'
+        required: true
+      responses:
+        '200':
+          description: Учреждение добавлено
+          content: { }
+        '400':
+          description: Учреждение с указанными данными уже существует
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+    put:
+      tags:
+        - institution
+      summary: Обновление данных учреждения
+      description: Обновление данных учреждения
+      operationId: updateInstitution
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstitutionInfo'
+        required: true
+      responses:
+        '200':
+          description: Учреждение обновлено
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Учреждение с указанными данными не найдено
           content: { }
   /institution/{id}:
     get:
@@ -468,70 +515,6 @@ paths:
         '404':
           description: Учреждение с указанным ID не найдено
           content: { }
-  /institution:
-    post:
-      tags:
-        - institution
-      summary: Добавление нового учреждения
-      description: Добавление нового учреждения
-      operationId: addInsitution
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AddInstitutionRequest'
-        required: true
-      responses:
-        '200':
-          description: Учреждение добавлено
-          content: { }
-        '400':
-          description: Учреждение с указанными данными уже существует
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-    put:
-      tags:
-        - institution
-      summary: Обновление данных учреждения
-      description: Обновление данных учреждения
-      operationId: updateInstitution
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/InstitutionInfo'
-        required: true
-      responses:
-        '200':
-          description: Учреждение обновлено
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Учреждение с указанными данными не найдено
-          content: { }
-  /criterion/all:
-    get:
-      tags:
-        - criterion
-      summary: Получние списка критериев
-      description: Получние списка критериев
-      operationId: getCriterions
-      responses:
-        '200':
-          description: Список критериев получен
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CriterionShortInfo'
-        '404':
-          description: Критерии не найдены
-          content: { }
   /criterion:
     post:
       tags:
@@ -543,7 +526,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddCriterionRequest'
+              $ref: '#/components/schemas/CriterionInfo'
         required: true
       responses:
         '200':
@@ -626,10 +609,29 @@ paths:
         '404':
           description: Критерий с указанным ID не найден
           content: { }
+  /criterion/all:
+    get:
+      tags:
+        - criterion
+      summary: Получние списка критериев
+      description: Получние списка критериев
+      operationId: getCriterions
+      responses:
+        '200':
+          description: Список критериев получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShortInfo'
+        '404':
+          description: Критерии не найдены
+          content: { }
   /criterion/allex:
     get:
       tags:
-        - benefit
+        - criterion
       summary: Получение списка всех критериев
       description: Получение списка всех критериев, в том числе без типа
       operationId: getAllExCriterions
@@ -647,31 +649,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CriterionShortInfo'
+                  $ref: '#/components/schemas/ShortInfo'
         '403':
           description: Нет доступа
           content: { }
         '404':
           description: Критерия не найдены
-          content: { }
-  /criterion/type/all:
-    get:
-      tags:
-        - criterion type
-      summary: Получение списка типов критериев
-      description: Получние списка типов критериев
-      operationId: getCriterionTypes
-      responses:
-        '200':
-          description: Список типов критериев получен
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CriterionTypeShortInfo'
-        '404':
-          description: Типы критериев не найдены
           content: { }
   /criterion/type:
     post:
@@ -684,7 +667,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AddCriterionTypeRequest'
+              $ref: '#/components/schemas/CriterionTypeInfo'
         required: true
       responses:
         '200':
@@ -767,16 +750,98 @@ paths:
         '404':
           description: Тип критерия с указанным ID не найден
           content: { }
+  /criterion/type/all:
+    get:
+      tags:
+        - criterion type
+      summary: Получение списка типов критериев
+      description: Получние списка типов критериев
+      operationId: getCriterionTypes
+      responses:
+        '200':
+          description: Список типов критериев получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShortInfo'
+        '404':
+          description: Типы критериев не найдены
+          content: { }
 
 components:
   schemas:
+    UserInfo:
+      description: Информация о пользователе
+      properties:
+        name:
+          description: Имя пользователя
+          type: string
+          example: name
+        email:
+          description: Эл. почта пользователя
+          type: string
+          example: exmaple@mail.com
+        city:
+          $ref: '#/components/schemas/ShortInfo'
+        criterionList:
+          description: Список критерий пользователя
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortInfo'
+        birthDateChildren:
+          description: Список дат рождений детей пользователя
+          type: array
+          items:
+            type: string
+            format: date
+            example: 01-01-2022
+        dateRegistration:
+          description: Дата регистрации пользователя
+          type: string
+          format: date
+          example: 01-01-2022
+    AddUserRequest:
+      description: Объект запроса для добавления пользователя в систему
+      properties:
+        name:
+          description: Имя пользователя
+          type: string
+          example: name
+        email:
+          description: Эл. почта пользователя
+          type: string
+          example: example@mail.com
+        password:
+          description: Пароль пользователя
+          type: string
+          example: password
+        repeatPassword:
+          description: Повторно введенный пароль пользователя
+          type: string
+          example: password
+        city:
+          $ref: '#/components/schemas/ShortInfo'
+        criterionList:
+          description: Список критериев пользователя
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortInfo'
+        birthDateChildren:
+          description: Список дат рождений детей пользователя
+          type: array
+          items:
+            type: string
+            format: date
+            example: 01-01-2022
     UserLoginRequest:
       description: Объект запроса пользователя для входа в систему
       properties:
         email:
           description: Эл. почта пользователя
           type: string
-          example: exmaple@mail.com
+          example: example@mail.com
         password:
           description: Пароль пользователя
           type: string
@@ -819,13 +884,6 @@ components:
           description: Повторно введенный новый пароль пользователя
           type: string
           example: newPassword
-    UserRecoverPwdRequest:
-      description: Объект запроса для восстановления пароля пользователя
-      properties:
-        email:
-          description: Эл. почта пользователя
-          type: string
-          example: exmaple@mail.com
     ResourceUserRequest:
       description: Объект запроса для получения данных пользователя
       properties:
@@ -837,134 +895,9 @@ components:
           description: Токен пользователя, позволяющий работать с ресурсами сервиса в рамках своего профиля
           type: integer
           example: 2471024
-    UserInfo:
-      description: Информация о пользователе
-      properties:
-        id:
-          description: ID пользователя
-          type: integer
-          example: 4842129
-        name:
-          description: Имя пользователя
-          type: string
-          example: name
-        email:
-          description: Эл. почта пользователя
-          type: string
-          example: exmaple@mail.com
-        city:
-          $ref: '#/components/schemas/CityShortInfo'
-        criterionList:
-          description: Список критерий пользователя
-          type: array
-          items:
-            $ref: '#/components/schemas/CriterionShortInfo'
-        birthDateChildren:
-          description: Список дат рождений детей пользователя
-          type: array
-          items:
-            type: string
-            format: date
-            example: 01-01-2022
-        dateRegistration:
-          description: Дата регистрации пользователя
-          type: string
-          format: date
-          example: 01-01-2022
-    CityShortInfo:
-      description: Краткая информация о городе
-      properties:
-        id:
-          description: ID города
-          type: integer
-          example: 4842129
-        name:
-          description: Название города
-          type: string
-          example: Курган
-    CriterionInfo:
-      description: Критерий для подбора пособий
-      properties:
-        id:
-          description: ID критерия
-          type: integer
-          example: 4842129
-        name:
-          description: Название критерия
-          type: string
-          example: name
-        info:
-          description: Информация критерия
-          type: string
-          example: info
-        type:
-          $ref: "#/components/schemas/CriterionTypeShortInfo"
-    CriterionTypeInfo:
-      description: Информация о типе критерия
-      properties:
-        id:
-          description: ID типа критерия
-          type: integer
-          example: 4842129
-        name:
-          description: Название типа критерия
-          type: string
-          example: name
-        info:
-          description: Информация типа критерия
-          type: string
-          example: info
-    BenefitShortInfo:
-      description: Краткая информация о пособии
-      properties:
-        id:
-          description: ID пособия
-          type: integer
-          example: 4842129
-        name:
-          description: Название пособия
-          type: string
-          example: name
-    AddUserRequest:
-      description: Объект запроса для добавления пользователя в систему
-      properties:
-        name:
-          description: Имя пользователя
-          type: string
-          example: name
-        email:
-          description: Эл. почта пользователя
-          type: string
-          example: exmaple@mail.com
-        password:
-          description: Пароль пользователя
-          type: string
-          example: password
-        repeatPassword:
-          description: Повторно введенный пароль пользователя
-          type: string
-          example: password
-        city:
-          $ref: '#/components/schemas/CityShortInfo'
-        criterionList:
-          description: Список критериев пользователя
-          type: array
-          items:
-            $ref: '#/components/schemas/CriterionShortInfo'
-        birthDateChildren:
-          description: Список дат рождений детей пользователя
-          type: array
-          items:
-            type: string
-            format: date
-            example: 01-01-2022
     CityInfo:
       description: Информация о городе
       properties:
-        id:
-          description: ID города
-          type: integer
-          example: 4842129
         name:
           description: Название города
           type: string
@@ -973,37 +906,15 @@ components:
           description: Список пособий города
           type: array
           items:
-            $ref: '#/components/schemas/BenefitShortInfo'
+            $ref: '#/components/schemas/ShortInfo'
         institutionList:
           description: Список учреждений города
           type: array
           items:
-            $ref: '#/components/schemas/InstitutionShortInfo'
-    InstitutionShortInfo:
-      description: Краткая информация об учреждении
-      properties:
-        id:
-          description: ID учреждения
-          type: integer
-          example: 4842129
-        name:
-          description: Название учреждения
-          type: string
-          example: name
-    AddCityRequest:
-      description: Объект запроса на добавление города в систему
-      properties:
-        name:
-          description: Название города
-          type: string
-          example: Курган
+            $ref: '#/components/schemas/ShortInfo'
     BenefitInfo:
       description: Информация о пособии
       properties:
-        id:
-          description: ID пособия
-          type: integer
-          example: 4842129
         name:
           description: Название пособия
           type: string
@@ -1020,60 +931,26 @@ components:
           description: Список городов пособия
           type: array
           items:
-            $ref: '#/components/schemas/CityShortInfo'
+            $ref: '#/components/schemas/ShortInfo'
         criterionList:
           description: Список критериев пособия
           type: array
           items:
-            $ref: '#/components/schemas/CriterionShortInfo'
+            $ref: '#/components/schemas/ShortInfo'
         institutionList:
           description: Список учреждений пособия
           type: array
           items:
-            $ref: '#/components/schemas/InstitutionShortInfo'
-    AddBenefitRequest:
-      description: Объект запроса на добавление пособия в систему
-      properties:
-        name:
-          description: Название пособия
-          type: string
-          example: name
-        info:
-          description: Информация пособия
-          type: string
-          example: info
-        documents:
-          description: Документы для получения пособия
-          type: string
-          example: documents
-        cityList:
-          description: Список городов пособия
-          type: array
-          items:
-            $ref: '#/components/schemas/CityShortInfo'
-        criterionList:
-          description: Список критериев пособия
-          type: array
-          items:
-            $ref: '#/components/schemas/CriterionShortInfo'
-        institutionList:
-          description: Список учреждений пособия
-          type: array
-          items:
-            $ref: '#/components/schemas/InstitutionShortInfo'
+            $ref: '#/components/schemas/ShortInfo'
     InstitutionInfo:
       description: Информация об учреждении
       properties:
-        id:
-          description: ID учреждения
-          type: integer
-          example: 4842129
         name:
           description: Название учреждения
           type: string
           example: name
         city:
-          $ref: '#/components/schemas/CityShortInfo'
+          $ref: '#/components/schemas/ShortInfo'
         address:
           description: Адрес учреждения
           type: string
@@ -1090,44 +967,8 @@ components:
           description: График работы учреждения
           type: string
           example: График
-    AddInstitutionRequest:
-      description: Объект запроса на добавление учреждения в систему
-      properties:
-        name:
-          description: Название учреждения
-          type: string
-          example: name
-        city:
-          $ref: '#/components/schemas/CityShortInfo'
-        address:
-          description: Адрес учреждения
-          type: string
-          example: address
-        phone:
-          description: Телефон учреждения
-          type: string
-          example: 8-888-888-88-88
-        email:
-          description: Электронная почта учржедения
-          type: string
-          example: example@mail.com
-        schedule:
-          description: График работы учреждения
-          type: string
-          example: График
-    CriterionShortInfo:
-      description: Краткая информация о критерии
-      properties:
-        id:
-          description: ID критерия
-          type: integer
-          example: 4842129
-        name:
-          description: Название критерия
-          type: string
-          example: name
-    AddCriterionRequest:
-      description: Объект запроса на добавление критерия в систему
+    CriterionInfo:
+      description: Критерий для подбора пособий
       properties:
         name:
           description: Название критерия
@@ -1138,20 +979,9 @@ components:
           type: string
           example: info
         type:
-          $ref: "#/components/schemas/CriterionTypeInfo"
-    CriterionTypeShortInfo:
-      description: Краткая информация о типе критерия
-      properties:
-        id:
-          description: ID типа критерия
-          type: integer
-          example: 4842129
-        name:
-          description: Название типа критерия
-          type: string
-          example: name
-    AddCriterionTypeRequest:
-      description: Объект запроса на добавление типа критерия в систему
+          $ref: "#/components/schemas/ShortInfo"
+    CriterionTypeInfo:
+      description: Информация о типе критерия
       properties:
         name:
           description: Название типа критерия
@@ -1161,4 +991,14 @@ components:
           description: Информация типа критерия
           type: string
           example: info
-
+    ShortInfo:
+      description: Краткая информация об объекте, состоящая из его ID и названия
+      properties:
+        id:
+          description: ID объекта
+          type: integer
+          example: 4842129
+        name:
+          description: Название объекта
+          type: string
+          example: name
