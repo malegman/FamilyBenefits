@@ -6,7 +6,7 @@ info:
   contact:
     email: smegovic@gmail.com
 servers:
-  - url: https://localhost:443
+  - url: https://localhost
 paths:
   /user:
     get:
