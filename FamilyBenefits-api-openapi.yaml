@@ -515,6 +515,35 @@ paths:
         '404':
           description: Учреждение с указанным ID не найдено
           content: { }
+  /institution/{id}/benefits:
+    get:
+      tags:
+        - institution
+        - benefit
+      summary: Получение списка названий пособий учреждения
+      description: Получение списка названий пособий учреждения
+      operationId: getInstitutionBenefits
+      parameters:
+        - name: id
+          in: path
+          description: ID учреждения
+          schema:
+            type: integer
+            format: integer
+            example: 0123456789
+          required: true
+      responses:
+        '200':
+          description: Список пособий учреждения получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShortInfo'
+        '404':
+          description: Пособия указанного учреждения не найдены
+          content: { }
   /criterion:
     post:
       tags:
