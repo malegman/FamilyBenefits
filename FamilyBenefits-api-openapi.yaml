@@ -107,6 +107,12 @@ paths:
       summary: Выход из системы
       description: Выход зарегистрированного пользователя из системы
       operationId: logoutUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceUserRequest'
+        required: true
       responses:
         '200':
           description: Выход из системы выполнен
@@ -156,35 +162,6 @@ paths:
         '404':
           description: Не найден пользователь с указанными данными
           content: { }
-  /user/benefits:
-    get:
-      tags:
-        - user
-        - benefit
-      summary: Получение списка предложенных пособий
-      description: Получение списка предложенных пособий для данного пользователя
-      operationId: getUserBenefits
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ResourceUserRequest'
-        required: true
-      responses:
-        '200':
-          description: Список предложенных пособий получен
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ShortInfo'
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Не найден пользователь с указанными данными
-          content: { }
   /city:
     post:
       tags:
@@ -211,14 +188,14 @@ paths:
     put:
       tags:
         - city
-      summary: Обновление названия города
-      description: Обновление названия города
+      summary: Обновление города
+      description: Обновление города
       operationId: updateCity
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ShortInfo'
+              $ref: '#/components/schemas/CityInfo'
         required: true
       responses:
         '200':
@@ -229,6 +206,28 @@ paths:
           content: { }
         '404':
           description: Город с указанными данными не найден
+          content: { }
+    delete:
+      tags:
+        - city
+      summary: Удаление города
+      description: Удаление города
+      operationId: deleteCity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRequest'
+        required: true
+      responses:
+        '200':
+          description: Город удален
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Город с указанным ID не найден
           content: { }
   /city/{id}:
     get:
@@ -252,30 +251,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CityInfo'
-        '404':
-          description: Город с указанным ID не найден
-          content: { }
-    delete:
-      tags:
-        - city
-      summary: Удаление города
-      description: Удаление города по его ID
-      operationId: deleteCity
-      parameters:
-        - name: id
-          in: path
-          description: ID города
-          schema:
-            type: integer
-            example: 521498
-          required: true
-      responses:
-        '200':
-          description: Город удален
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
         '404':
           description: Город с указанным ID не найден
           content: { }
@@ -341,7 +316,29 @@ paths:
           description: Нет доступа
           content: { }
         '404':
-          description: Не найдено пособие с указанными данными
+          description: Пособие с указанными данными не найдено
+          content: { }
+    delete:
+      tags:
+        - benefit
+      summary: Удаление пособия
+      description: Удаление пособия
+      operationId: deleteBenefit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRequest'
+        required: true
+      responses:
+        '200':
+          description: Пособие удалено
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Пособие с указанными данными не найдено
           content: { }
   /benefit/{id}:
     get:
@@ -365,30 +362,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BenefitInfo'
-        '404':
-          description: Пособие с указанным ID не найдено
-          content: { }
-    delete:
-      tags:
-        - benefit
-      summary: Удаление пособия
-      description: Удаление пособия по его ID
-      operationId: deleteBenefit
-      parameters:
-        - name: id
-          in: path
-          description: ID пособия
-          schema:
-            type: integer
-            example: 8741287
-          required: true
-      responses:
-        '200':
-          description: Пособие удалено
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
         '404':
           description: Пособие с указанным ID не найдено
           content: { }
@@ -419,6 +392,63 @@ paths:
           content: { }
         '404':
           description: Пособия не найдены
+          content: { }
+  /user/benefits:
+    get:
+      tags:
+        - user
+        - benefit
+      summary: Получение списка предложенных пособий
+      description: Получение списка предложенных пособий для данного пользователя
+      operationId: getUserBenefits
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceUserRequest'
+        required: true
+      responses:
+        '200':
+          description: Список предложенных пособий получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShortInfo'
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Не найден пользователь с указанными данными
+          content: { }
+  /institution/{id}/benefits:
+    get:
+      tags:
+        - institution
+        - benefit
+      summary: Получение списка названий пособий учреждения
+      description: Получение списка названий пособий учреждения
+      operationId: getInstitutionBenefits
+      parameters:
+        - name: id
+          in: path
+          description: ID учреждения
+          schema:
+            type: integer
+            example: 523576
+          required: true
+      responses:
+        '200':
+          description: Список пособий учреждения получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShortInfo'
+        '404':
+          description: Пособия указанного учреждения не найдены
           content: { }
   /institution:
     post:
@@ -465,6 +495,28 @@ paths:
         '404':
           description: Учреждение с указанными данными не найдено
           content: { }
+    delete:
+      tags:
+        - institution
+      summary: Удаление учреждения
+      description: Удаление учреждения по его ID
+      operationId: deleteInstitution
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRequest'
+        required: true
+      responses:
+        '200':
+          description: Учреждение удалено
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Учреждение с указанными данными не найдено
+          content: { }
   /institution/{id}:
     get:
       tags:
@@ -489,58 +541,6 @@ paths:
                 $ref: '#/components/schemas/InstitutionInfo'
         '404':
           description: Учреждение с указанным ID не найдено
-          content: { }
-    delete:
-      tags:
-        - institution
-      summary: Удаление учреждения
-      description: Удаление учреждения по его ID
-      operationId: deleteInstitution
-      parameters:
-        - name: id
-          in: path
-          description: ID учреждения
-          schema:
-            type: integer
-            example: 967274
-          required: true
-      responses:
-        '200':
-          description: Учреждение удалено
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Учреждение с указанным ID не найдено
-          content: { }
-  /institution/{id}/benefits:
-    get:
-      tags:
-        - institution
-        - benefit
-      summary: Получение списка названий пособий учреждения
-      description: Получение списка названий пособий учреждения
-      operationId: getInstitutionBenefits
-      parameters:
-        - name: id
-          in: path
-          description: ID учреждения
-          schema:
-            type: integer
-            example: 523576
-          required: true
-      responses:
-        '200':
-          description: Список пособий учреждения получен
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ShortInfo'
-        '404':
-          description: Пособия указанного учреждения не найдены
           content: { }
   /criterion:
     post:
@@ -587,6 +587,28 @@ paths:
         '404':
           description: Не найден критерий с указанными данными
           content: { }
+    delete:
+      tags:
+        - criterion
+      summary: Удаление критерия
+      description: Удаление критерия по его ID
+      operationId: deleteCriterion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRequest'
+        required: true
+      responses:
+        '200':
+          description: Критерий удален
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Критерий с указанным ID не найден
+          content: { }
   /criterion/{id}:
     get:
       tags:
@@ -609,30 +631,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CriterionInfo'
-        '404':
-          description: Критерий с указанным ID не найден
-          content: { }
-    delete:
-      tags:
-        - criterion
-      summary: Удаление критерия
-      description: Удаление критерия по его ID
-      operationId: deleteCriterion
-      parameters:
-        - name: id
-          in: path
-          description: ID критерия
-          schema:
-            type: integer
-            example: 74845584
-          required: true
-      responses:
-        '200':
-          description: Критерий удален
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
         '404':
           description: Критерий с указанным ID не найден
           content: { }
@@ -728,6 +726,28 @@ paths:
         '404':
           description: Не найден тип критерия с указанными данными
           content: { }
+    delete:
+      tags:
+        - criterion type
+      summary: Удаление типа критерия
+      description: Удаление типа критерия по его ID
+      operationId: deleteCriterionType
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteRequest'
+        required: true
+      responses:
+        '200':
+          description: Тип критерия удален
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Тип критерия с указанным ID не найден
+          content: { }
   /criterion/type/{id}:
     get:
       tags:
@@ -750,30 +770,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CriterionTypeInfo'
-        '404':
-          description: Тип критерия с указанным ID не найден
-          content: { }
-    delete:
-      tags:
-        - criterion type
-      summary: Удаление типа критерия
-      description: Удаление типа критерия по его ID
-      operationId: deleteCriterionType
-      parameters:
-        - name: id
-          in: path
-          description: ID типа критерия
-          schema:
-            type: integer
-            example: 74845584
-          required: true
-      responses:
-        '200':
-          description: Тип критерия удален
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
         '404':
           description: Тип критерия с указанным ID не найден
           content: { }
@@ -876,7 +872,7 @@ components:
     UserLoginResponse:
       description: Объект ответа пользователю на вход в систему
       properties:
-        userID:
+        idUser:
           description: ID пользователя
           type: integer
           example: 421476
@@ -891,7 +887,7 @@ components:
     UserChangePwdRequest:
       description: Объект запроса для изменения пароля пользователя
       properties:
-        userID:
+        idUser:
           description: ID пользователя
           type: integer
           example: 421476
@@ -914,7 +910,7 @@ components:
     ResourceUserRequest:
       description: Объект запроса для получения данных пользователя
       properties:
-        userID:
+        idUser:
           description: ID пользователя
           type: integer
           example: 421476
@@ -1029,3 +1025,19 @@ components:
           description: Название объекта
           type: string
           example: name
+    DeleteRequest:
+      description: Запрос от пользователя на удаление объекта
+      properties:
+        idObject:
+          description: ID удаляемого объекта
+          type: integer
+          example: 36356
+        idUser:
+          description: ID пользователя, который отправил запрос на удаление
+          type: integer
+          example: 345643
+        resourceToken:
+          description: Токен пользователя, позволяющий работать с ресурсами сервиса в рамках своего профиля
+          type: integer
+          example: 2471024
+

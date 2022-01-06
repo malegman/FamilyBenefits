@@ -13,7 +13,7 @@ public class UserLoginResponse {
   /**
    * ID пользователя
    */
-  private BigInteger userID;
+  private BigInteger idUser;
 
   /**
    * Токен пользователя, позволяющий работать с ресурсами сервиса в рамках своего профиля
