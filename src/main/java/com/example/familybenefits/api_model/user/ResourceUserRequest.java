@@ -1,5 +1,6 @@
 package com.example.familybenefits.api_model.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.math.BigInteger;
@@ -18,5 +19,6 @@ public class ResourceUserRequest {
   /**
    * Токен пользователя, позволяющий работать с ресурсами сервиса в рамках своего профиля
    */
+  @JsonProperty("resource_token")
   private BigInteger resourceToken;
 }

@@ -1,6 +1,7 @@
 package com.example.familybenefits.api_model.user;
 
 import com.example.familybenefits.api_model.common.ShortInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class AddUserRequest {
   /**
    * Повторно введенный пароль пользователя
    */
+  @JsonProperty("repeat_password")
   private String repeatPassword;
 
   /**
@@ -39,10 +41,12 @@ public class AddUserRequest {
   /**
    * Список критериев пользователя
    */
+  @JsonProperty("criterion_list")
   private List<ShortInfo> criterionList;
 
   /**
    * Список дат рождений детей пользователя
    */
+  @JsonProperty("birth_date_children")
   private List<String> birthDateChildren;
 }
