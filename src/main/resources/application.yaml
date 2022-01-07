@@ -11,11 +11,13 @@ spring:
     hibernate:
       ddl-auto: validate
   flyway:
+    enabled: true
     locations: 'classpath:db/migration'
     default-schema: 'familybenefit'
     schemas: 'familybenefit'
-    create-schemas: false
+    create-schemas: true
     out-of-order: true
+
 
 server:
   port: 443

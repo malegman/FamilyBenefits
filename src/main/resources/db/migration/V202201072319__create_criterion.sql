@@ -1,9 +1,9 @@
 CREATE TABLE familybenefit.criterion (
 
-  "id" BIGINT NOT NULL,
+  "id" NUMERIC NOT NULL,
   "name" TEXT NOT NULL,
   "info" TEXT NOT NULL,
-  "id_type" BIGINT NULL,
+  "id_type" NUMERIC NULL,
 
   CONSTRAINT criterion_pk PRIMARY KEY ("id"),
   CONSTRAINT criterion_uniq_name UNIQUE ("name"),

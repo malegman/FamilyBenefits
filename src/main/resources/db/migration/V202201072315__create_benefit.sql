@@ -1,6 +1,6 @@
 CREATE TABLE familybenefit.benefit (
 
-  "id" BIGINT NOT NULL,
+  "id" NUMERIC NOT NULL,
   "name" TEXT NOT NULL,
   "info" TEXT NOT NULL,
   "documents" TEXT NULL,

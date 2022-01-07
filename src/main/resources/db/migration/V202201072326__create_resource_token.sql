@@ -1,7 +1,7 @@
 CREATE TABLE familybenefit.resource_token (
 
-  "id_user" BIGINT NOT NULL,
-  "token" BIGINT NOT NULL,
+  "id_user" NUMERIC NOT NULL,
+  "token" NUMERIC NOT NULL,
 
   CONSTRAINT resource_token_pk PRIMARY KEY ("id_user"),
   CONSTRAINT resource_token_uniq_token UNIQUE ("token"),
@@ -12,4 +12,4 @@ CREATE TABLE familybenefit.resource_token (
 );
 
 COMMENT ON COLUMN familybenefit.resource_token.id_user IS 'ID пользователя';
-COMMENT ON COLUMN familybenefit.resource_token.token IS 'Токен';
+COMMENT ON COLUMN familybenefit.resource_token.token IS 'Токен ресурсов';

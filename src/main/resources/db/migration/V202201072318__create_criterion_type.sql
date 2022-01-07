@@ -1,6 +1,6 @@
 CREATE TABLE familybenefit.criterion_type (
 
-  "id" BIGINT NOT NULL,
+  "id" NUMERIC NOT NULL,
   "name" TEXT NOT NULL,
   "info" TEXT NOT NULL,
 

@@ -1,6 +1,6 @@
 CREATE TABLE familybenefit.role (
 
-  "id" BIGINT NOT NULL,
+  "id" NUMERIC NOT NULL,
   "name" TEXT NOT NULL,
   "priority" INT NOT NULL,
 

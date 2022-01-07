@@ -1,14 +1,15 @@
 CREATE TABLE familybenefit.institution (
 
-  "id" BIGINT NOT NULL,
+  "id" NUMERIC NOT NULL,
   "name" TEXT NOT NULL,
   "address" TEXT NOT NULL,
   "phone" TEXT NULL,
   "email" TEXT NULL,
   "schedule" TEXT NULL,
-  "id_city" BIGINT NOT NULL,
+  "id_city" NUMERIC NOT NULL,
 
   CONSTRAINT institution_pk PRIMARY KEY ("id"),
+  CONSTRAINT child_uniq_name UNIQUE ("name"),
   CONSTRAINT institution_fk_city FOREIGN KEY ("id_city")
     REFERENCES familybenefit.city("id")
     ON DELETE CASCADE

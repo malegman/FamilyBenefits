@@ -1,7 +1,7 @@
 CREATE TABLE familybenefit.users_children (
 
-  "id_user" BIGINT NOT NULL,
-  "id_child" BIGINT NOT NULL,
+  "id_user" NUMERIC NOT NULL,
+  "id_child" NUMERIC NOT NULL,
 
   CONSTRAINT users_children_pk PRIMARY KEY ("id_user", "id_child"),
   CONSTRAINT users_children_fk_user FOREIGN KEY ("id_user")

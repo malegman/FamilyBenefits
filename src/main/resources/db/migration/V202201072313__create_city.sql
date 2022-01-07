@@ -1,6 +1,6 @@
 CREATE TABLE familybenefit.city (
 
-  "id" BIGINT NOT NULL,
+  "id" NUMERIC NOT NULL,
   "name" TEXT NOT NULL,
 
   CONSTRAINT city_pk PRIMARY KEY ("id"),

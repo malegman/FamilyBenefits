@@ -1,7 +1,7 @@
 CREATE TABLE familybenefit.benefits_cities (
 
-  "id_benefit" BIGINT NOT NULL,
-  "id_city" BIGINT NOT NULL,
+  "id_benefit" NUMERIC NOT NULL,
+  "id_city" NUMERIC NOT NULL,
 
   CONSTRAINT benefits_cities_pk PRIMARY KEY ("id_benefit", "id_city"),
   CONSTRAINT benefits_cities_fk_benefit FOREIGN KEY ("id_benefit")
