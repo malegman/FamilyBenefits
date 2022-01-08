@@ -1,6 +1,6 @@
 package com.example.familybenefits.api_model.benefit;
 
-import com.example.familybenefits.api_model.common.ShortInfo;
+import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -15,33 +15,30 @@ public class BenefitInfo {
   /**
    * Название пособия
    */
+  @JsonProperty("name")
   private String name;
 
   /**
    * Информация пособия
    */
+  @JsonProperty("info")
   private String info;
 
   /**
    * Документы для получения пособия
    */
+  @JsonProperty("documents")
   private String documents;
 
   /**
-   * Список городов пособия
+   * Список кратких информаций о городах пособия
    */
-  @JsonProperty("city_list")
-  private List<ShortInfo> cityList;
+  @JsonProperty("short_city_list")
+  private List<ShortObjectInfo> shortCityList;
 
   /**
-   * Список критериев пособия
+   * Список кратких информаций об учреждениях пособия
    */
-  @JsonProperty("criterion_list")
-  private List<ShortInfo> criterionList;
-
-  /**
-   * Список учреждений пособия
-   */
-  @JsonProperty("institution_list")
-  private List<ShortInfo> institutionList;
+  @JsonProperty("short_institution_list")
+  private List<ShortObjectInfo> shortInstitutionList;
 }

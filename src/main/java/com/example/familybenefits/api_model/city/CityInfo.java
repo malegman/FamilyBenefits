@@ -1,10 +1,9 @@
 package com.example.familybenefits.api_model.city;
 
-import com.example.familybenefits.api_model.common.ShortInfo;
+import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -14,24 +13,26 @@ import java.util.List;
 public class CityInfo {
 
   /**
-   * ID города
-   */
-  private BigInteger id;
-
-  /**
    * Название города
    */
+  @JsonProperty("name")
   private String name;
 
   /**
-   * Список пособий города
+   * Информация города
    */
-  @JsonProperty("benefit_list")
-  private List<ShortInfo> benefitList;
+  @JsonProperty("info")
+  private String info;
 
   /**
-   * Список учреждений города
+   * Список кратких информаций о пособиях города
+   */
+  @JsonProperty("benefit_list")
+  private List<ShortObjectInfo> benefitList;
+
+  /**
+   * Список кратких информаций об учреждениях города
    */
   @JsonProperty("institution_list")
-  private List<ShortInfo> institutionList;
+  private List<ShortObjectInfo> institutionList;
 }

@@ -3,24 +3,17 @@ package com.example.familybenefits.api_model.user;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.math.BigInteger;
-
 /**
  * Объект запроса для изменения пароля пользователя
  */
 @Data
-public class UserChangePwdRequest {
+public class ChangePassword {
 
   /**
-   * ID пользователя
+   * Данные сессии пользователя для доступа к ресурсам
    */
-  private BigInteger idUser;
-
-  /**
-   * Токен пользователя, позволяющий работать с ресурсами сервиса в рамках своего профиля
-   */
-  @JsonProperty("resource_token")
-  private BigInteger resourceToken;
+  @JsonProperty("session_access")
+  private SessionAccess sessionAccess;
 
   /**
    * Старый пароль пользователя

@@ -7,6 +7,23 @@ info:
     email: smegovic@gmail.com
 servers:
   - url: https://localhost
+tags:
+  - name: user
+    description: Операции с объектом пользователя
+  - name: user service
+    description: Операции пользователя, связанные с системой и безопасностью
+  - name: user - admin
+    description: Операции с пользователем - администратором
+  - name: city
+    description: Операции с городом
+  - name: benefit
+    description: Операции с пособием
+  - name: institution
+    description: Операции с учреждением
+  - name: criterion
+    description: Операции с критерием
+  - name: criterion type
+    description: Операции с типом критерия
 paths:
   /user:
     get:
@@ -19,7 +36,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPermission'
+              $ref: '#/components/schemas/SessionAccess'
         required: true
       responses:
         '200':
@@ -63,7 +80,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateRequest'
+              $ref: '#/components/schemas/UpdateObjectRequest'
         required: true
       responses:
         '200':
@@ -85,7 +102,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeleteRequest'
+              $ref: '#/components/schemas/DeleteObjectRequest'
         required: true
       responses:
         '200':
@@ -108,7 +125,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPermission'
+              $ref: '#/components/schemas/SessionAccess'
         required: true
       responses:
         '200':
@@ -155,7 +172,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateRequest'
+              $ref: '#/components/schemas/UpdateObjectRequest'
         required: true
       responses:
         '200':
@@ -177,7 +194,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeleteRequest'
+              $ref: '#/components/schemas/DeleteObjectRequest'
         required: true
       responses:
         '200':
@@ -223,7 +240,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPermission'
+              $ref: '#/components/schemas/SessionAccess'
         required: true
       responses:
         '200':
@@ -246,7 +263,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChangePwdRequest'
+              $ref: '#/components/schemas/ChangePassword'
         required: true
       responses:
         '200':
@@ -269,7 +286,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPermission'
+              $ref: '#/components/schemas/SessionAccess'
         required: true
       responses:
         '200':
@@ -294,7 +311,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerifyEmailRequest'
+              $ref: '#/components/schemas/VerifyEmail'
         required: true
       responses:
         '200':
@@ -385,7 +402,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResetSessionRequest'
+              $ref: '#/components/schemas/ResetSession'
         required: true
       responses:
         '200':
@@ -427,7 +444,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateRequest'
+              $ref: '#/components/schemas/UpdateObjectRequest'
         required: true
       responses:
         '200':
@@ -449,7 +466,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeleteRequest'
+              $ref: '#/components/schemas/DeleteObjectRequest'
         required: true
       responses:
         '200':
@@ -501,7 +518,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ShortInfo'
+                  $ref: '#/components/schemas/ShortObjectInfo'
         '404':
           description: Города не найдены
           content: { }
@@ -538,7 +555,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateRequest'
+              $ref: '#/components/schemas/UpdateObjectRequest'
         required: true
       responses:
         '200':
@@ -560,7 +577,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeleteRequest'
+              $ref: '#/components/schemas/DeleteObjectRequest'
         required: true
       responses:
         '200':
@@ -608,7 +625,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPermission'
+              $ref: '#/components/schemas/SessionAccess'
         required: true
       responses:
         '200':
@@ -618,7 +635,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ShortInfo'
+                  $ref: '#/components/schemas/ShortObjectInfo'
         '403':
           description: Нет доступа
           content: { }
@@ -637,7 +654,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPermission'
+              $ref: '#/components/schemas/SessionAccess'
         required: true
       responses:
         '200':
@@ -647,7 +664,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ShortInfo'
+                  $ref: '#/components/schemas/ShortObjectInfo'
         '403':
           description: Нет доступа
           content: { }
@@ -687,7 +704,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateRequest'
+              $ref: '#/components/schemas/UpdateObjectRequest'
         required: true
       responses:
         '200':
@@ -709,7 +726,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeleteRequest'
+              $ref: '#/components/schemas/DeleteObjectRequest'
         required: true
       responses:
         '200':
@@ -779,7 +796,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateRequest'
+              $ref: '#/components/schemas/UpdateObjectRequest'
         required: true
       responses:
         '200':
@@ -801,7 +818,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeleteRequest'
+              $ref: '#/components/schemas/DeleteObjectRequest'
         required: true
       responses:
         '200':
@@ -849,7 +866,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPermission'
+              $ref: '#/components/schemas/SessionAccess'
         required: true
       responses:
         '200':
@@ -859,7 +876,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ShortInfo'
+                  $ref: '#/components/schemas/ShortObjectInfo'
         '403':
           description: Нет доступа
           content: { }
@@ -899,7 +916,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateRequest'
+              $ref: '#/components/schemas/UpdateObjectRequest'
         required: true
       responses:
         '200':
@@ -921,7 +938,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeleteRequest'
+              $ref: '#/components/schemas/DeleteObjectRequest'
         required: true
       responses:
         '200':
@@ -973,7 +990,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ShortInfo'
+                  $ref: '#/components/schemas/ShortObjectInfo'
         '404':
           description: Типы критериев не найдены
           content: { }
@@ -996,12 +1013,12 @@ components:
           type: boolean
           example: false
         shortCity:
-          $ref: '#/components/schemas/ShortInfo'
+          $ref: '#/components/schemas/ShortObjectInfo'
         shortCriterionList:
           description: Список критерий пользователя
           type: array
           items:
-            $ref: '#/components/schemas/ShortInfo'
+            $ref: '#/components/schemas/ShortObjectInfo'
         birthDateChildren:
           description: Список дат рождений детей пользователя
           type: array
@@ -1017,8 +1034,8 @@ components:
     SaveUserRequest:
       description: Объект запроса для сохранения пользователя в системе
       properties:
-        userPermission:
-          $ref: '#/components/schemas/UserPermission'
+        sessionAccess:
+          $ref: '#/components/schemas/SessionAccess'
         name:
           description: Имя пользователя
           type: string
@@ -1067,17 +1084,17 @@ components:
     LoginResponse:
       description: Объект ответа пользователю на вход в систему
       properties:
-        userPermission:
-          $ref: '#/components/schemas/UserPermission'
+        sessionAccess:
+          $ref: '#/components/schemas/SessionAccess'
         userName:
           description: Имя пользователя
           type: string
           example: name
-    ChangePwdRequest:
+    ChangePassword:
       description: Объект запроса для изменения пароля пользователя
       properties:
-        userPermission:
-          $ref: '#/components/schemas/UserPermission'
+        sessionAccess:
+          $ref: '#/components/schemas/SessionAccess'
         oldPassword:
           description: Старый пароль пользователя
           type: string
@@ -1090,8 +1107,8 @@ components:
           description: Повторно введенный новый пароль пользователя
           type: string
           example: newPassword
-    UserPermission:
-      description: Объект запроса для получения данных пользователя
+    SessionAccess:
+      description: Данные сессии пользователя для доступа к ресурсам
       properties:
         idUser:
           description: ID пользователя
@@ -1105,13 +1122,13 @@ components:
           description: Токен восстановления токена доступа
           type: integer
           example: 1222333
-    VerifyEmailRequest:
+    VerifyEmail:
       description: Объект для подтверждения почты
       properties:
-        userPermission:
-          $ref: '#/components/schemas/UserPermission'
+        sessionAccess:
+          $ref: '#/components/schemas/SessionAccess'
         verifyEmailCode:
-          description: Токен пользователя, необходимый для подтверждения почты
+          description: Код пользователя, необходимый для подтверждения почты
           type: integer
           example: 1222333
     RecoveryPwdRequest:
@@ -1122,7 +1139,7 @@ components:
           type: string
           example: example@mail.com
         recoveryPwdCode:
-          description: Токен пользователя, необходимый для восстановления пароля
+          description: Код пользователя, необходимый для восстановления пароля
           type: integer
           example: 1222333
         newPassword:
@@ -1133,7 +1150,7 @@ components:
           description: Повторно введенный новый пароль пользователя
           type: string
           example: newPassword
-    ResetSessionRequest:
+    ResetSession:
       description: Объект запроса на сброс сессии пользователя
       properties:
         idUser:
@@ -1160,7 +1177,7 @@ components:
           type: boolean
           example: false
         shortCity:
-          $ref: '#/components/schemas/ShortInfo'
+          $ref: '#/components/schemas/ShortObjectInfo'
         dateRegistration:
           description: Дата регистрации администратора
           type: string
@@ -1169,8 +1186,8 @@ components:
     SaveAdminRequest:
       description: Объект запроса для сохранения администратора в системе
       properties:
-        userPermission:
-          $ref: '#/components/schemas/UserPermission'
+        sessionAccess:
+          $ref: '#/components/schemas/SessionAccess'
         name:
           description: Имя администратора
           type: string
@@ -1206,12 +1223,12 @@ components:
           description: Список кратких информаций о критериях
           type: array
           items:
-            $ref: '#/components/schemas/ShortInfo'
+            $ref: '#/components/schemas/ShortObjectInfo'
     SaveCriterionTypeRequest:
       description: Объект запроса для сохранения типа критерия в системе
       properties:
-        userPermission:
-          $ref: '#/components/schemas/UserPermission'
+        sessionAccess:
+          $ref: '#/components/schemas/SessionAccess'
         name:
           description: Название типа критерия
           type: string
@@ -1232,12 +1249,12 @@ components:
           type: string
           example: info
         shortCriterionType:
-          $ref: "#/components/schemas/ShortInfo"
+          $ref: "#/components/schemas/ShortObjectInfo"
     SaveCriterionRequest:
       description: Объект запроса для сохранения криетрия в системе
       properties:
-        userPermission:
-          $ref: '#/components/schemas/UserPermission'
+        sessionAccess:
+          $ref: '#/components/schemas/SessionAccess'
         name:
           description: Название критерия
           type: string
@@ -1265,17 +1282,17 @@ components:
           description: Список кратких информаций о пособиях города
           type: array
           items:
-            $ref: '#/components/schemas/ShortInfo'
+            $ref: '#/components/schemas/ShortObjectInfo'
         shortInstitutionList:
           description: Список кратких информаций об учреждениях города
           type: array
           items:
-            $ref: '#/components/schemas/ShortInfo'
+            $ref: '#/components/schemas/ShortObjectInfo'
     SaveCityRequest:
-      description: Информация о городе
+      description: Объект запроса для сохранения города в системе
       properties:
-        userPermission:
-          $ref: '#/components/schemas/UserPermission'
+        sessionAccess:
+          $ref: '#/components/schemas/SessionAccess'
         name:
           description: Название города
           type: string
@@ -1312,17 +1329,17 @@ components:
           type: string
           example: График
         shortCity:
-          $ref: '#/components/schemas/ShortInfo'
+          $ref: '#/components/schemas/ShortObjectInfo'
         shortBenefitList:
           description: Список кратких информаций о пособиях учреждения
           type: array
           items:
-            $ref: '#/components/schemas/ShortInfo'
+            $ref: '#/components/schemas/ShortObjectInfo'
     SaveInstitutionRequest:
-      description: Информация об учреждении
+      description: Объект запроса для сохранения учреждения в системе
       properties:
-        userPermission:
-          $ref: '#/components/schemas/UserPermission'
+        sessionAccess:
+          $ref: '#/components/schemas/SessionAccess'
         name:
           description: Название учреждения
           type: string
@@ -1377,17 +1394,17 @@ components:
           description: Список кратких информаций о городах пособия
           type: array
           items:
-            $ref: '#/components/schemas/ShortInfo'
+            $ref: '#/components/schemas/ShortObjectInfo'
         shortInstitutionList:
           description: Список кратких информаций об учреждениях пособия
           type: array
           items:
-            $ref: '#/components/schemas/ShortInfo'
+            $ref: '#/components/schemas/ShortObjectInfo'
     SaveBenefitRequest:
-      description: Информация о пособии
+      description: Объект запроса для сохранения пособия в системе
       properties:
-        userPermission:
-          $ref: '#/components/schemas/UserPermission'
+        sessionAccess:
+          $ref: '#/components/schemas/SessionAccess'
         name:
           description: Название пособия
           type: string
@@ -1414,7 +1431,7 @@ components:
             description: ID учреждения
             type: integer
             example: 6574893
-    ShortInfo:
+    ShortObjectInfo:
       description: Краткая информация об объекте
       properties:
         idObject:
@@ -1425,20 +1442,20 @@ components:
           description: Название объекта
           type: string
           example: name
-    DeleteRequest:
+    DeleteObjectRequest:
       description: Объект запроса на удаление объекта
       properties:
-        userPermission:
-          $ref: '#/components/schemas/UserPermission'
+        sessionAccess:
+          $ref: '#/components/schemas/SessionAccess'
         idObject:
           description: ID удаляемого объекта
           type: integer
           example: 36356
-    UpdateRequest:
+    UpdateObjectRequest:
       description: Объект запроса на обновление объекта
       properties:
         idObject:
-          description: ID удаляемого объекта
+          description: ID обновляемого объекта
           type: integer
           example: 1222333444
         saveObjectRequest:
