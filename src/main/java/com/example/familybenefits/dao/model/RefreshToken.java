@@ -12,17 +12,17 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- * Модель таблицы "verify_token"
+ * Модель таблицы "refresh_token"
  */
 @Entity
-@Table(name = "verify_token", schema = "familybenefit")
+@Table(name = "refresh_token", schema = "familybenefit")
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class VerifyToken {
+public class RefreshToken {
 
   /**
    * ID пользователя
@@ -32,7 +32,7 @@ public class VerifyToken {
   private BigInteger idUser;
 
   /**
-   * Токен подтверждения
+   * Токен обновления токена доступа
    */
   @Column(name = "token")
   private BigInteger token;
@@ -47,7 +47,7 @@ public class VerifyToken {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    VerifyToken that = (VerifyToken) o;
+    RefreshToken that = (RefreshToken) o;
     return idUser != null && Objects.equals(idUser, that.idUser);
   }
 

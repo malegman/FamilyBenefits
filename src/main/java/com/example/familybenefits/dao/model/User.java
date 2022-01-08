@@ -71,13 +71,6 @@ public class User {
     inverseJoinColumns = @JoinColumn(name = "id_role"))
   private List<Role> role;
 
-  /**
-   * Токен пользователя
-   */
-  @OneToOne
-  @JoinColumn(name = "id")
-  private ResourceToken token;
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
