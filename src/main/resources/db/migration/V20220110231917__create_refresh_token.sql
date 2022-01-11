@@ -1,7 +1,7 @@
 CREATE TABLE familybenefit.refresh_token (
 
   "id_user" NUMERIC NOT NULL,
-  "token" NUMERIC NOT NULL,
+  "token" TEXT NOT NULL,
   "date_expiration" TIMESTAMP NOT NULL,
 
   CONSTRAINT refresh_token_pk PRIMARY KEY ("id_user"),

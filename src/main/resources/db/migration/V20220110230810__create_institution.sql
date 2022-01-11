@@ -1,7 +1,9 @@
 CREATE TABLE familybenefit.institution (
 
-  "id" NUMERIC NOT NULL,
+  -- Диапазон ID [1 000 000 000; 9 999 999 999]
+  "id" NUMERIC NOT NULL DEFAULT (10000000000 - 1000000000) * random() + 1000000000,
   "name" TEXT NOT NULL,
+  "info" TEXT NULL,
   "address" TEXT NOT NULL,
   "phone" TEXT NULL,
   "email" TEXT NULL,
@@ -18,6 +20,7 @@ CREATE TABLE familybenefit.institution (
 
 COMMENT ON COLUMN familybenefit.institution.id IS 'ID учреждения';
 COMMENT ON COLUMN familybenefit.institution.name IS 'Название учреждения';
+COMMENT ON COLUMN familybenefit.institution.info IS 'Информация учреждения';
 COMMENT ON COLUMN familybenefit.institution.address IS 'Адрес учреждения';
 COMMENT ON COLUMN familybenefit.institution.phone IS 'Телефон учреждения';
 COMMENT ON COLUMN familybenefit.institution.email IS 'Эл. почта учржедения';

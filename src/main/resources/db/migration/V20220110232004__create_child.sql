@@ -1,6 +1,7 @@
 CREATE TABLE familybenefit.child (
 
-  "id" NUMERIC NOT NULL,
+  -- Диапазон ID [1 000 000 000; 9 999 999 999]
+  "id" NUMERIC NOT NULL DEFAULT (10000000000 - 1000000000) * random() + 1000000000,
   "date_birth" TIMESTAMP NOT NULL,
 
   CONSTRAINT child_pk PRIMARY KEY ("id"),

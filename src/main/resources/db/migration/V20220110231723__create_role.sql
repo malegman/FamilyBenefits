@@ -1,8 +1,8 @@
 CREATE TABLE familybenefit.role (
 
-  "id" NUMERIC NOT NULL,
+  -- Диапазон ID [1 000 000 000; 9 999 999 999]
+  "id" NUMERIC NOT NULL DEFAULT (10000000000 - 1000000000) * random() + 1000000000,
   "name" TEXT NOT NULL,
-  "priority" INT NOT NULL,
 
   CONSTRAINT role_pk PRIMARY KEY ("id"),
   CONSTRAINT role_uniq_name UNIQUE ("name")
@@ -10,4 +10,3 @@ CREATE TABLE familybenefit.role (
 
 COMMENT ON COLUMN familybenefit.role.id IS 'ID роли';
 COMMENT ON COLUMN familybenefit.role.name IS 'Название роли';
-COMMENT ON COLUMN familybenefit.role.priority IS 'Приоритет роли';
