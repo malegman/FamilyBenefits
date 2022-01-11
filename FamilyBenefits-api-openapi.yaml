@@ -117,7 +117,7 @@ paths:
   /user/admin:
     get:
       tags:
-        - user admin
+        - user - admin
       summary: Получение информации об администраторе
       description: Получение информации об администраторе
       operationId: getAdmin
@@ -142,7 +142,7 @@ paths:
           content: { }
     post:
       tags:
-        - user admin
+        - user - admin
       summary: Добавление нового администратора
       description: Добавление нового администратора
       operationId: addAdmin
@@ -164,7 +164,7 @@ paths:
           content: { }
     put:
       tags:
-        - user admin
+        - user - admin
       summary: Обновление данных администратора
       description: Обновление данных администратора
       operationId: updateAdmin
@@ -186,7 +186,7 @@ paths:
           content: { }
     delete:
       tags:
-        - user admin
+        - user - admin
       summary: Удаление администратора
       description: Удаление администратора
       operationId: deleteAdmin
@@ -358,7 +358,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RecoveryPwdRequest'
+              $ref: '#/components/schemas/RecoveryPassword'
         required: true
       responses:
         '200':
@@ -425,7 +425,7 @@ paths:
               $ref: '#/components/schemas/SaveCityRequest'
         required: true
       responses:
-        '200':
+        '201':
           description: Город добавлен
           content: { }
         '400':
@@ -512,7 +512,7 @@ paths:
       operationId: getCities
       responses:
         '200':
-          description: Список городов получен
+          description: Множество городов получен
           content:
             application/json:
               schema:
@@ -629,7 +629,7 @@ paths:
         required: true
       responses:
         '200':
-          description: Список всех пособий получен
+          description: Множество всех пособий получен
           content:
             application/json:
               schema:
@@ -658,7 +658,7 @@ paths:
         required: true
       responses:
         '200':
-          description: Список предложенных пособий получен
+          description: Множество предложенных пособий получен
           content:
             application/json:
               schema:
@@ -682,7 +682,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InstitutionInfo'
+              $ref: '#/components/schemas/SaveInstitutionRequest'
         required: true
       responses:
         '200':
@@ -870,7 +870,7 @@ paths:
         required: true
       responses:
         '200':
-          description: Список всех критериев получен
+          description: Множество всех критериев получен
           content:
             application/json:
               schema:
@@ -984,7 +984,7 @@ paths:
       operationId: getCriterionTypes
       responses:
         '200':
-          description: Список типов критериев получен
+          description: Множество типов критериев получен
           content:
             application/json:
               schema:
@@ -1000,6 +1000,10 @@ components:
     UserInfo:
       description: Информация о пользователе
       properties:
+        id:
+          description: ID пользователя
+          type: integer
+          example: 1222333444
         name:
           description: Имя пользователя
           type: string
@@ -1012,15 +1016,12 @@ components:
           description: Статус почты, true, если подтверждена
           type: boolean
           example: false
-        shortCity:
-          $ref: '#/components/schemas/ShortObjectInfo'
-        shortCriterionList:
-          description: Список критерий пользователя
-          type: array
-          items:
-            $ref: '#/components/schemas/ShortObjectInfo'
+        nameCity:
+          description: Название города пользователя
+          type: string
+          example: name
         birthDateChildren:
-          description: Список дат рождений детей пользователя
+          description: Множество дат рождений детей пользователя
           type: array
           items:
             type: string
@@ -1031,11 +1032,9 @@ components:
           type: string
           format: date
           example: 01-01-2022
-    SaveUserRequest:
-      description: Объект запроса для сохранения пользователя в системе
+    UserAdd:
+      description: Объект запроса для добавления пользователя
       properties:
-        sessionAccess:
-          $ref: '#/components/schemas/SessionAccess'
         name:
           description: Имя пользователя
           type: string
@@ -1043,7 +1042,7 @@ components:
         email:
           description: Электронная почта пользователя
           type: string
-          example: example@mail.com
+          example: exmaple@mail.com
         password:
           description: Пароль пользователя
           type: string
@@ -1052,24 +1051,64 @@ components:
           description: Повторно введенный пароль пользователя
           type: string
           example: password
-        idCity:
-          description: ID города
-          type: integer
-          example: 1222333444
-        idCriterionList:
-          description: Список ID критериев пользователя
+        shortCity:
+          $ref: '#/components/schemas/ShortObjectInfo'
+        shortCriterionSet:
+          description: Множество кратких информаций о критериях
           type: array
           items:
-            description: ID критерия
-            type: integer
-            example: 1222333444
+            $ref: '#/components/schemas/ShortObjectInfo'
         birthDateChildren:
-          description: Список дат рождений детей пользователя
+          description: Множество дат рождений детей пользователя
           type: array
           items:
             type: string
             format: date
             example: 01-01-2022
+    UserUpdate:
+      description: Объект запроса для обновления пользователя
+      properties:
+        id:
+          description: ID пользователя
+          type: integer
+          example: 1222333444
+        name:
+          description: Имя пользователя
+          type: string
+          example: name
+        email:
+          description: Электронная почта пользователя
+          type: string
+          example: exmaple@mail.com
+        shortCity:
+          $ref: '#/components/schemas/ShortObjectInfo'
+        shortCriterionSet:
+          description: Множество кратких информаций о критериях пользователя
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortObjectInfo'
+        birthDateChildren:
+          description: Множество дат рождений детей пользователя
+          type: array
+          items:
+            type: string
+            format: date
+            example: 01-01-2022
+    UserInitData:
+      description: Дополнительные данные для добавления или обновления пользователя
+      properties:
+        shortCitySet:
+          description: Множество кратких информаций о городах
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortObjectInfo'
+        criterionSet:
+          description: Множество информаций о критериях
+          type: array
+          items:
+            $ref: '#/components/schemas/CriterionInfo'
+
+
     LoginRequest:
       description: Объект запроса пользователя для входа в систему
       properties:
@@ -1084,8 +1123,18 @@ components:
     LoginResponse:
       description: Объект ответа пользователю на вход в систему
       properties:
-        sessionAccess:
-          $ref: '#/components/schemas/SessionAccess'
+        jwt:
+          description: Токен доступа jwt
+          type: string
+          example: zjhd623u.734f9ik.f20fkj8
+        refreshToken:
+          description: Токен восстановления токена доступа
+          type: integer
+          example: 1222333444
+        userId:
+          description: ID пользователя
+          type: integer
+          example: 1222333444
         userName:
           description: Имя пользователя
           type: string
@@ -1093,8 +1142,6 @@ components:
     ChangePassword:
       description: Объект запроса для изменения пароля пользователя
       properties:
-        sessionAccess:
-          $ref: '#/components/schemas/SessionAccess'
         oldPassword:
           description: Старый пароль пользователя
           type: string
@@ -1107,31 +1154,7 @@ components:
           description: Повторно введенный новый пароль пользователя
           type: string
           example: newPassword
-    SessionAccess:
-      description: Данные сессии пользователя для доступа к ресурсам
-      properties:
-        idUser:
-          description: ID пользователя
-          type: integer
-          example: 1222333444
-        jwt:
-          description: Токен доступа jwt
-          type: string
-          example: zjhd623u.734f9ik.f20fkj8
-        refreshToken:
-          description: Токен восстановления токена доступа
-          type: integer
-          example: 1222333
-    VerifyEmail:
-      description: Объект для подтверждения почты
-      properties:
-        sessionAccess:
-          $ref: '#/components/schemas/SessionAccess'
-        verifyEmailCode:
-          description: Код пользователя, необходимый для подтверждения почты
-          type: integer
-          example: 1222333
-    RecoveryPwdRequest:
+    RecoveryPassword:
       description: Объект запроса на восстановление пароля
       properties:
         email:
@@ -1150,20 +1173,26 @@ components:
           description: Повторно введенный новый пароль пользователя
           type: string
           example: newPassword
-    ResetSession:
-      description: Объект запроса на сброс сессии пользователя
+    AuthData:
+      description: Данные, необходимые для авторизации пользователя
       properties:
-        idUser:
-          description: ID пользователя
+        jwt:
+          description: Токен доступа jwt
+          type: string
+          example: zjhd623u.734f9ik.f20fkj8
+        refreshToken:
+          description: Токен восстановления токена доступа
           type: integer
           example: 1222333444
-        resetCode:
-          description: Код сброса сессии
-          type: integer
-          example: 1222333
+
+
     AdminInfo:
       description: Информация об администраторе
       properties:
+        id:
+          description: ID администратор
+          type: integer
+          example: 1222333444
         name:
           description: Имя администратора
           type: string
@@ -1176,18 +1205,18 @@ components:
           description: Статус почты, true, если подтверждена
           type: boolean
           example: false
-        shortCity:
-          $ref: '#/components/schemas/ShortObjectInfo'
+        nameCity:
+          description: Название города администратора
+          type: string
+          example: name
         dateRegistration:
           description: Дата регистрации администратора
           type: string
           format: date
           example: 01-01-2022
-    SaveAdminRequest:
-      description: Объект запроса для сохранения администратора в системе
+    AdminAdd:
+      description: Объект запроса для добавления администратора
       properties:
-        sessionAccess:
-          $ref: '#/components/schemas/SessionAccess'
         name:
           description: Имя администратора
           type: string
@@ -1195,7 +1224,7 @@ components:
         email:
           description: Электронная почта администратора
           type: string
-          example: example@mail.com
+          example: exmaple@mail.com
         password:
           description: Пароль администратора
           type: string
@@ -1204,31 +1233,42 @@ components:
           description: Повторно введенный пароль администратора
           type: string
           example: password
-        idCity:
-          description: ID города
+        shortCity:
+          $ref: '#/components/schemas/ShortObjectInfo'
+    AdminUpdate:
+      description: Объект запроса для обновления администратора
+      properties:
+        id:
+          description: ID администратора
           type: integer
           example: 1222333444
-    CriterionTypeInfo:
-      description: Информация о типе критерия
-      properties:
         name:
-          description: Название типа критерия
+          description: Имя администратора
           type: string
           example: name
-        info:
-          description: Информация типа критерия
+        email:
+          description: Электронная почта администратора
           type: string
-          example: info
-        shortCriterionList:
-          description: Список кратких информаций о критериях
+          example: exmaple@mail.com
+        shortCity:
+          $ref: '#/components/schemas/ShortObjectInfo'
+    AdminInitData:
+      description: Дополнительные данные для добавления или обновления администратора
+      properties:
+        shortCitySet:
+          description: Множество кратких информаций о городах
           type: array
           items:
             $ref: '#/components/schemas/ShortObjectInfo'
-    SaveCriterionTypeRequest:
-      description: Объект запроса для сохранения типа критерия в системе
+
+
+    CriterionTypeInfo:
+      description: Информация о типе критерия
       properties:
-        sessionAccess:
-          $ref: '#/components/schemas/SessionAccess'
+        id:
+          description: ID типа критерия
+          type: integer
+          example: 1222333444
         name:
           description: Название типа критерия
           type: string
@@ -1237,8 +1277,55 @@ components:
           description: Информация типа критерия
           type: string
           example: info
+    CriterionTypeAdd:
+      description: Объект запроса для добавления типа критерия
+      properties:
+        name:
+          description: Название типа критерия
+          type: string
+          example: name
+        info:
+          description: Информация типа критерия
+          type: string
+          example: info
+    CriterionTypeUpdate:
+      description: Объект запроса для обновления типа критерия
+      properties:
+        id:
+          description: ID типа критерия
+          type: integer
+          example: 1222333444
+        name:
+          description: Название типа критерия
+          type: string
+          example: name
+        info:
+          description: Информация типа критерия
+          type: string
+          example: info
+
+
     CriterionInfo:
       description: Информация о критерии для подбора пособий
+      properties:
+        id:
+          description: ID критерия
+          type: integer
+          example: 1222333444
+        name:
+          description: Название критерия
+          type: string
+          example: name
+        info:
+          description: Информация критерия
+          type: string
+          example: info
+        nameCriterionType:
+          description: Название типа критерия критерия
+          type: string
+          example: name
+    CriterionAdd:
+      description: Объект запроса для добавления критерия
       properties:
         name:
           description: Название критерия
@@ -1249,12 +1336,14 @@ components:
           type: string
           example: info
         shortCriterionType:
-          $ref: "#/components/schemas/ShortObjectInfo"
-    SaveCriterionRequest:
-      description: Объект запроса для сохранения криетрия в системе
+          $ref: '#/components/schemas/ShortObjectInfo'
+    CriterionUpdate:
+      description: Объект запроса для обновления критерия
       properties:
-        sessionAccess:
-          $ref: '#/components/schemas/SessionAccess'
+        id:
+          description: ID критерия
+          type: integer
+          example: 1222333444
         name:
           description: Название критерия
           type: string
@@ -1263,55 +1352,99 @@ components:
           description: Информация критерия
           type: string
           example: info
-        idCriterionType:
-          description: ID типа критерия
-          type: integer
-          example: 1222333444
+        shortCriterionType:
+          $ref: '#/components/schemas/ShortObjectInfo'
+    CriterionInitData:
+      description: Дополнительные данные для добавления или обновления критерия
+      properties:
+        shortCriterionTypeSet:
+          description: Множество кратких информаций о типах критерия
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortObjectInfo'
+
+
     CityInfo:
       description: Информация о городе
       properties:
+        id:
+          description: ID города
+          type: integer
+          example: 1222333444
         name:
           description: Название города
           type: string
-          example: Курган
+          example: name
         info:
           description: Информация города
           type: string
           example: info
-        shortBenefitList:
-          description: Список кратких информаций о пособиях города
-          type: array
-          items:
-            $ref: '#/components/schemas/ShortObjectInfo'
-        shortInstitutionList:
-          description: Список кратких информаций об учреждениях города
-          type: array
-          items:
-            $ref: '#/components/schemas/ShortObjectInfo'
-    SaveCityRequest:
-      description: Объект запроса для сохранения города в системе
+    CityAdd:
+      description: Объект запроса для добавления города
       properties:
-        sessionAccess:
-          $ref: '#/components/schemas/SessionAccess'
         name:
           description: Название города
           type: string
-          example: Курган
+          example: name
         info:
           description: Информация города
           type: string
           example: info
+    CityUpdate:
+      description: Объект запроса для обновления города
+      properties:
+        id:
+          description: ID города
+          type: integer
+          example: 1222333444
+        name:
+          description: Название города
+          type: string
+          example: name
+        info:
+          description: Информация города
+          type: string
+          example: info
+
+
     InstitutionInfo:
       description: Информация об учреждении
+      properties:
+        id:
+          description: ID учреждения
+          type: integer
+          example: 1222333444
+        name:
+          description: Название учреждения
+          type: string
+          example: name
+        address:
+          description: Адрес учреждения
+          type: string
+          example: address
+        phone:
+          description: Телефон учреждения
+          type: string
+          example: 8-888-888-88-88
+        email:
+          description: Электронная почта учржедения
+          type: string
+          example: example@mail.com
+        schedule:
+          description: График работы учреждения
+          type: string
+          example: График
+        nameCity:
+          description: Название города учреждения
+          type: string
+          example: name
+    InstitutionAdd:
+      description: Объект запроса для добавления города
       properties:
         name:
           description: Название учреждения
           type: string
           example: name
-        info:
-          description: Информация учреждения
-          type: string
-          example: info
         address:
           description: Адрес учреждения
           type: string
@@ -1330,24 +1463,17 @@ components:
           example: График
         shortCity:
           $ref: '#/components/schemas/ShortObjectInfo'
-        shortBenefitList:
-          description: Список кратких информаций о пособиях учреждения
-          type: array
-          items:
-            $ref: '#/components/schemas/ShortObjectInfo'
-    SaveInstitutionRequest:
-      description: Объект запроса для сохранения учреждения в системе
+    InstitutionUpdate:
+      description: Объект запроса для обновления города
       properties:
-        sessionAccess:
-          $ref: '#/components/schemas/SessionAccess'
+        id:
+          description: ID учреждения
+          type: integer
+          example: 1222333444
         name:
           description: Название учреждения
           type: string
           example: name
-        info:
-          description: Информация учреждения
-          type: string
-          example: info
         address:
           description: Адрес учреждения
           type: string
@@ -1364,20 +1490,25 @@ components:
           description: График работы учреждения
           type: string
           example: График
-        idCity:
-          description: ID города учреждения
-          type: integer
-          example: 1222333444
-        idBenefitList:
-          description: Список ID пособий учреждения
+        shortCity:
+          $ref: '#/components/schemas/ShortObjectInfo'
+    InstitutionInitData:
+      description: Дополнительные данные для добавления или обновления учреждения
+      properties:
+        shortCitySet:
+          description: Множество кратких информаций о городах
           type: array
           items:
-            description: ID пособия
-            type: integer
-            example: 1222333444
+            $ref: '#/components/schemas/ShortObjectInfo'
+    
+    
     BenefitInfo:
       description: Информация о пособии
       properties:
+        id:
+          description: ID пособия
+          type: integer
+          example: 1222333444
         name:
           description: Название пособия
           type: string
@@ -1390,21 +1521,9 @@ components:
           description: Документы для получения пособия
           type: string
           example: documents
-        shortCityList:
-          description: Список кратких информаций о городах пособия
-          type: array
-          items:
-            $ref: '#/components/schemas/ShortObjectInfo'
-        shortInstitutionList:
-          description: Список кратких информаций об учреждениях пособия
-          type: array
-          items:
-            $ref: '#/components/schemas/ShortObjectInfo'
-    SaveBenefitRequest:
-      description: Объект запроса для сохранения пособия в системе
+    BenefitAdd:
+      description: Объект запроса для добавления пособия
       properties:
-        sessionAccess:
-          $ref: '#/components/schemas/SessionAccess'
         name:
           description: Название пособия
           type: string
@@ -1417,20 +1536,75 @@ components:
           description: Документы для получения пособия
           type: string
           example: documents
-        idCityList:
-          description: Список ID городов пособия
+        shortCitySet:
+          description: Множество кратких информаций о городах пособия
           type: array
           items:
-            description: ID города
-            type: integer
-            example: 1222333444
-        idInstitutionList:
-          description: Список ID учреждений пособия
+            $ref: '#/components/schemas/ShortObjectInfo'
+        shortInstitutionSet:
+          description: Множество кратких информаций об учреждениях пособия
           type: array
           items:
-            description: ID учреждения
-            type: integer
-            example: 6574893
+            $ref: '#/components/schemas/ShortObjectInfo'
+        shortCriterionSet:
+          description: Множество кратких информаций о критериях пособия
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortObjectInfo'
+    BenefitUpdate:
+      description: Объект запроса для обновления пособия
+      properties:
+        id:
+          description: ID пособия
+          type: integer
+          example: 1222333444
+        name:
+          description: Название пособия
+          type: string
+          example: name
+        info:
+          description: Информация пособия
+          type: string
+          example: info
+        documents:
+          description: Документы для получения пособия
+          type: string
+          example: documents
+        shortCitySet:
+          description: Множество кратких информаций о городах пособия
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortObjectInfo'
+        shortInstitutionSet:
+          description: Множество кратких информаций об учреждениях пособия
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortObjectInfo'
+        shortCriterionSet:
+          description: Множество кратких информаций о критериях пособия
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortObjectInfo'
+    BenefitInitData:
+      description: Дополнительные данные для добавления или обновления пособия
+      properties:
+        shortCitySet:
+          description: Множество кратких информаций о городах
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortObjectInfo'
+        shortInstitutionSet:
+          description: Множество кратких информаций об учреждениях
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortObjectInfo'
+        shortCriterionSet:
+          description: Множество кратких информаций о критериях
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortObjectInfo'
+    
+    
     ShortObjectInfo:
       description: Краткая информация об объекте
       properties:
@@ -1442,29 +1616,3 @@ components:
           description: Название объекта
           type: string
           example: name
-    DeleteObjectRequest:
-      description: Объект запроса на удаление объекта
-      properties:
-        sessionAccess:
-          $ref: '#/components/schemas/SessionAccess'
-        idObject:
-          description: ID удаляемого объекта
-          type: integer
-          example: 36356
-    UpdateObjectRequest:
-      description: Объект запроса на обновление объекта
-      properties:
-        idObject:
-          description: ID обновляемого объекта
-          type: integer
-          example: 1222333444
-        saveObjectRequest:
-          description: Объект запроса на сохранение обновляемого объекта
-          anyOf:
-            - $ref: '#/components/schemas/SaveUserRequest'
-            - $ref: '#/components/schemas/SaveAdminRequest'
-            - $ref: '#/components/schemas/SaveBenefitRequest'
-            - $ref: '#/components/schemas/SaveCityRequest'
-            - $ref: '#/components/schemas/SaveCriterionRequest'
-            - $ref: '#/components/schemas/SaveCriterionTypeRequest'
-            - $ref: '#/components/schemas/SaveInstitutionRequest'
