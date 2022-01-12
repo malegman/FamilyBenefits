@@ -8,12 +8,12 @@ info:
 servers:
   - url: https://localhost
 tags:
+  - name: service
+    description: Операции, связанные с системой и безопасностью
   - name: user
-    description: Операции с объектом пользователя
-  - name: user service
-    description: Операции пользователя, связанные с системой и безопасностью
-  - name: user - admin
-    description: Операции с пользователем - администратором
+    description: Операции с пользователем
+  - name: admin
+    description: Операции с администратором
   - name: city
     description: Операции с городом
   - name: benefit
@@ -25,194 +25,15 @@ tags:
   - name: criterion type
     description: Операции с типом критерия
 paths:
-  /user:
-    get:
-      tags:
-        - user
-      summary: Получение информации о пользователе
-      description: Получение информации о пользователе
-      operationId: getUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SessionAccess'
-        required: true
-      responses:
-        '200':
-          description: Данные о пользователе получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserInfo'
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
-          content: { }
+  /login:
     post:
       tags:
-        - user
-      summary: Добавление нового пользователя
-      description: Добавление нового пользователя, регистрация
-      operationId: addUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SaveUserRequest'
-        required: true
-      responses:
-        '200':
-          description: Пользователь зарегистрирован
-          content: { }
-        '400':
-          description: Пользователь с данным email уже существует
-          content: { }
-    put:
-      tags:
-        - user
-      summary: Обновление данных пользователя
-      description: Обновление данных пользователя
-      operationId: updateUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateObjectRequest'
-        required: true
-      responses:
-        '200':
-          description: Пользователь обновлен
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
-          content: { }
-    delete:
-      tags:
-        - user
-      summary: Удаление пользователя
-      description: Удаление пользователя
-      operationId: deleteUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeleteObjectRequest'
-        required: true
-      responses:
-        '200':
-          description: Пользователь удален
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
-          content: { }
-  /user/admin:
-    get:
-      tags:
-        - user - admin
-      summary: Получение информации об администраторе
-      description: Получение информации об администраторе
-      operationId: getAdmin
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SessionAccess'
-        required: true
-      responses:
-        '200':
-          description: Данные об администраторе получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AdminInfo'
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Администратор с указанными данными не найден
-          content: { }
-    post:
-      tags:
-        - user - admin
-      summary: Добавление нового администратора
-      description: Добавление нового администратора
-      operationId: addAdmin
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SaveAdminRequest'
-        required: true
-      responses:
-        '200':
-          description: Администратор добавлен
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '400':
-          description: Администратор с данным email уже существует
-          content: { }
-    put:
-      tags:
-        - user - admin
-      summary: Обновление данных администратора
-      description: Обновление данных администратора
-      operationId: updateAdmin
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateObjectRequest'
-        required: true
-      responses:
-        '200':
-          description: Администратор обновлен
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Администратор с указанными данными не найден
-          content: { }
-    delete:
-      tags:
-        - user - admin
-      summary: Удаление администратора
-      description: Удаление администратора
-      operationId: deleteAdmin
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeleteObjectRequest'
-        required: true
-      responses:
-        '200':
-          description: Администратор удален
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Администратор с указанными данными не найден
-          content: { }
-  /user/login:
-    post:
-      tags:
-        - user service
+        - service
       summary: Вход в систему
-      description: Вход зарегистрированного пользователя в систему
-      operationId: loginUser
+      description:
+        Вход в систему.
+        Для администратора. Для пользователя.
+      operationId: login
       requestBody:
         content:
           application/json:
@@ -222,29 +43,37 @@ paths:
       responses:
         '200':
           description: Вход в систему выполнен
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=1222333444; httpOnly;
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LoginResponse'
+                type: string
+                example: jwt=d6tefy0.fh3653.26r3fyg
         '404':
           description: Пользователь с указанными данными не найден
           content: { }
-  /user/logout:
+      security: [ ]
+  /logout:
     post:
       tags:
-        - user service
+        - service
       summary: Выход из системы
-      description: Выход пользователя из системы
-      operationId: logoutUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SessionAccess'
-        required: true
+      description:
+        Выход из системы.
+        О запросившем клиенте.
+        Для администратора. Для пользователя.
+        Необходима авторизация.
+      operationId: logout
       responses:
         '200':
           description: Выход из системы выполнен
+          content: { }
+        '401':
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -252,12 +81,55 @@ paths:
         '404':
           description: Пользователь с указанными данными не найден
           content: { }
-  /user/changePassword:
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /refresh:
+    post:
+      tags:
+        - service
+      summary: Обновляет токены сессии
+      description:
+        Обновляет токены доступа и обновления.
+        О запросившем клиенте.
+        Для администратора. Для пользователя.
+        Необходима авторизация.
+      operationId: refresh
+      responses:
+        '201':
+          description: Токены обновлены
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=1222333444; httpOnly;
+          content:
+            application/json:
+              schema:
+                type: string
+                example: jwt=d6tefy0.fh3653.26r3fyg
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Пользователь с указанными данными не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /changepwd:
     put:
       tags:
-        - user service
-      summary: Изменение пароля пользователя
-      description: Изменение пароля пользователя
+        - service
+      summary: Изменяет пароль
+      description:
+        Изменяет пароль.
+        О запросившем клиенте.
+        Для администратора. Для пользователя.
+        Необходима авторизация.
       operationId: changePassword
       requestBody:
         content:
@@ -266,8 +138,11 @@ paths:
               $ref: '#/components/schemas/ChangePassword'
         required: true
       responses:
-        '200':
+        '201':
           description: Пароль изменен
+          content: { }
+        '401':
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -275,19 +150,20 @@ paths:
         '404':
           description: Пользователь с указанными данными не найден
           content: { }
-  /user/verification:
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /verifemail:
     post:
       tags:
-        - user service
-      summary: Запрос на подтверждение почты
-      description: Запрос на подтверждение почты
+        - service
+      summary: Принимает запрос на подтверждение почты
+      description:
+        Принимает запрос на подтверждение почты. Отправляет на почту код подтверждения.
+        О запросившем клиенте.
+        Для администратора. Для пользователя.
+        Необходима авторизация.
       operationId: verifyEmailRequest
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SessionAccess'
-        required: true
       responses:
         '200':
           description: Письмо с кодом подтверждения отправлено на email
@@ -295,27 +171,42 @@ paths:
         '400':
           description: Почта уже подтверждена
           content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
         '403':
           description: Нет доступа
           content: { }
         '404':
           description: Пользователь с указанными данными не найден
           content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
     put:
       tags:
-        - user service
-      summary: Подтверждение почты
-      description: Подтверждение почты
+        - service
+      summary: Подтверждает почту
+      description:
+        Подтверждает почту.
+        О запросившем клиенте.
+        Для администратора. Для пользователя.
+        Необходима авторизация.
       operationId: verifyEmail
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerifyEmail'
+              description: Код подтверждения почты
+              type: integer
+              example: 1222333
         required: true
       responses:
-        '200':
+        '201':
           description: Email подтвержден
+          content: { }
+        '401':
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -323,18 +214,23 @@ paths:
         '404':
           description: Пользователь с указанными данными не найден
           content: { }
-  /user/recoveryPassword:
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /recoverpwd:
     post:
       tags:
-        - user service
-      summary: Запрос на восстановление пароля пользователя
-      description: Запрос на восстановление пароля пользователя.
+        - service
+      summary: Принимает запрос на восстановление пароля
+      description:
+        Принимает запрос на восстановление пароля. Отправляет на почту код восстановления.
+        Для администратора. Для пользователя.
       operationId: recoveryPasswordRequest
       requestBody:
-        description: Подтвержденный email пользователя
         content:
           application/json:
             schema:
+              description: Подтвержденный email пользователя
               type: string
               example: example@email.com
         required: true
@@ -345,14 +241,21 @@ paths:
         '400':
           description: Невозможно восстановить пароль. Email не подтвержден
           content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
         '404':
           description: Пользователь с указанными данными не найден
           content: { }
+      security: [ ]
     put:
       tags:
-        - user service
-      summary: Восстановление пароля пользователя
-      description: Восстановление пароля пользователя
+        - service
+      summary: Восстановливает пароль
+      description:
+        Восстановливает пароль.
+        О запросившем клиенте.
+        Для администратора. Для пользователя.
       operationId: recoveryPassword
       requestBody:
         content:
@@ -361,68 +264,387 @@ paths:
               $ref: '#/components/schemas/RecoveryPassword'
         required: true
       responses:
-        '200':
+        '201':
           description: Пароль изменен
           content: { }
         '400':
           description: Невозможно восстановить пароль. Email не подтвержден
           content: { }
+        '403':
+          description: Нет доступа
+          content: { }
         '404':
           description: Пользователь с указанными данными не найден
           content: { }
-  /user/resetSession:
+      security: [ ]
+
+
+  /user:
     post:
       tags:
-        - user service
-      summary: Запрос на сброс сессии
-      description: Запрос на сброс сессии
-      operationId: resetSessionRequest
+        - user
+      summary: Добавляет нового пользователя. Регистрация гостя
+      description:
+        Добавляет нового пользователя. Регистрация гостя.
+      operationId: addUser
       requestBody:
         content:
           application/json:
             schema:
-              description: ID пользователя
-              type: integer
-              example: 1222333444
+              $ref: '#/components/schemas/UserAdd'
         required: true
       responses:
-        '200':
-          description: Код сброса отправлен на почту
+        '201':
+          description: Пользователь зарегистрирован
           content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
+        '400':
+          description: Пользователь с данным email уже существует
           content: { }
+      security: [ ]
     put:
       tags:
-        - user service
-      summary: Сброс сессии
-      description: Сброс сессии
-      operationId: resetSession
+        - user
+      summary: Обновляет данные пользователя
+      description:
+        Обновляет данные пользователя.
+        О запросившем клиенте.
+        Для пользователя.
+        Необходима авторизация.
+      operationId: updateUser
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ResetSession'
+              $ref: '#/components/schemas/UserUpdate'
         required: true
       responses:
-        '200':
-          description: Сессия сброшена
+        '201':
+          description: Пользователь обновлен
+          content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
           content: { }
         '404':
           description: Пользователь с указанными данными не найден
           content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /user/{id}:
+    get:
+      tags:
+        - user
+      summary: Возвращает информацию о пользователе по ID
+      description:
+        Возвращает информацию о пользователе по ID.
+        О запросившем клиенте.
+        Для пользователя.
+        Необходима авторизация.
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Данные о пользователе получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Пользователь с указанными данными не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - user
+      summary: Удаляет пользователя по ID
+      description:
+        Удаляет пользователя по ID.
+        О запросившем клиенте.
+        Для пользователя.
+        Необходима авторизация.
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '201':
+          description: Пользователь удален
+          content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Пользователь с указанными данными не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /user/initdata:
+    get:
+      tags:
+        - user
+      summary: Возвращает дополнительные данные для пользователя
+      description:
+        Возвращает дополнительные данные для добавления или обновления пользователя.
+      responses:
+        '200':
+          description: Дополнительные данные пользователя получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInitData'
+        '404':
+          description: Дополнительные данные пользователя не найдены
+          content: { }
+      security: [ ]
+  /user/{id}/benefits:
+    get:
+      tags:
+        - user
+      summary: Возвращает множество предложенных пособий пользователя
+      description:
+        Возвращает множество предложенных пособий.
+        Для пользователя.
+        Необходима авторизация.
+      operationId: getUserBenefits
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Множество предложенных пособий получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShortObjectInfo'
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Не найден пользователь с указанными данными
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+
+
+  /admin:
+    post:
+      tags:
+        - admin
+      summary: Добавляет нового администратора
+      description:
+        Добавляет нового администратора. Добавить может только существующий администратор.
+        Для администратора.
+        Необходима авторизация.
+      operationId: addAdmin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminAdd'
+        required: true
+      responses:
+        '201':
+          description: Администратор добавлен
+          content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '400':
+          description: Администратор с данным email уже существует
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+    put:
+      tags:
+        - admin
+      summary: Обновляет данные администратора
+      description:
+        Обновляет данные администратора.
+        О запросившем клиенте.
+        Для администратора.
+        Необходима авторизация.
+      operationId: updateAdmin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUpdate'
+        required: true
+      responses:
+        '201':
+          description: Администратор обновлен
+          content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Администратор с указанными данными не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /admin/{id}:
+    get:
+      tags:
+        - admin
+      summary: Возвращает информацию об администраторе по ID
+      description:
+        Возвращает информацию об администраторе по ID.
+        О запросившем клиенте.
+        Для администратора.
+        Необходима авторизация.
+      operationId: getAdmin
+      parameters:
+        - name: id
+          in: path
+          description: ID администратора
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Данные об администраторе получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInfo'
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Администратор с указанными данными не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - admin
+      summary: Удаляет администратора по ID
+      description:
+        Удаление администратора по ID.
+        О запросившем клиенте.
+        Для администратора.
+        Необходима авторизация.
+      operationId: deleteAdmin
+      parameters:
+        - name: id
+          in: path
+          description: ID администратора
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '201':
+          description: Администратор удален
+          content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Администратор с указанными данными не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /admin/initdata:
+    get:
+      tags:
+        - admin
+      summary: Возвращает дополнительные данные для администратора
+      description:
+        Возвращает дополнительные данные для добавления или обновления администратора.
+        Для администратора.
+        Необходима авторизация.
+      responses:
+        '200':
+          description: Дополнительные данные администратора получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInitData'
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Дополнительные данные администратора не найдены
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+
+
   /city:
     post:
       tags:
         - city
-      summary: Добавление нового города
-      description: Добавление нового города
+      summary: Добавляет новый город
+      description:
+        Добавляет новый город.
+        Для администратора.
+        Необходима авторизация.
       operationId: addCity
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SaveCityRequest'
+              $ref: '#/components/schemas/CityAdd'
         required: true
       responses:
         '201':
@@ -431,46 +653,36 @@ paths:
         '400':
           description: Город с указанными данными уже существует
           content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
         '403':
           description: Нет доступа
           content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
     put:
       tags:
         - city
-      summary: Обновление города
-      description: Обновление города
+      summary: Обновляет город
+      description:
+        Обновляет город.
+        Для администратора.
+        Необходима авторизация.
       operationId: updateCity
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateObjectRequest'
+              $ref: '#/components/schemas/CityUpdate'
         required: true
       responses:
-        '200':
+        '201':
           description: Город обновлен
           content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Город с указанными данными не найден
-          content: { }
-    delete:
-      tags:
-        - city
-      summary: Удаление города
-      description: Удаление города
-      operationId: deleteCity
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeleteObjectRequest'
-        required: true
-      responses:
-        '200':
-          description: Город удален
+        '401':
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -478,12 +690,16 @@ paths:
         '404':
           description: Город с указанными данными не найден
           content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
   /city/{id}:
     get:
       tags:
         - city
-      summary: Получение информации о городе
-      description: Получение информации о городе по его ID, включая пособия и учреждения города
+      summary: Возвращает информацию о городе
+      description:
+        Возвращает информацию о городе.
       operationId: getCity
       parameters:
         - name: id
@@ -503,85 +719,174 @@ paths:
         '404':
           description: Город с указанным ID не найден
           content: { }
+      security: [ ]
+    delete:
+      tags:
+        - city
+      summary: Удаляет город
+      description:
+        Удаляет город.
+        Для администратора.
+        Необходима авторизация.
+      operationId: deleteCity
+      parameters:
+        - name: id
+          in: path
+          description: ID города
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '201':
+          description: Город удален
+          content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Город с указанными данными не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
   /city/all:
     get:
       tags:
         - city
-      summary: Получние списка городов
-      description: Получние списка городов
+      summary: Возвращает множество всех городов
+      description:
+        Возвращает множество всех городов.
       operationId: getCities
       responses:
         '200':
-          description: Множество городов получен
+          description: Множество городов получено
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ShortObjectInfo'
+                  $ref: '#/components/schemas/CityInfo'
         '404':
           description: Города не найдены
           content: { }
+      security: [ ]
+  /city/{id}/institutions:
+    get:
+      tags:
+        - city
+      summary: Возвращает множество учреждений города
+      description:
+        Возвращает множество учреждений города.
+      operationId: getCityInstitutions
+      parameters:
+        - name: id
+          in: path
+          description: ID города
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Множество учреждений города получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InstitutionInfo'
+        '404':
+          description: Учреждения не найдены
+          content: { }
+      security: [ ]
+  /city/{id}/benefits:
+    get:
+      tags:
+        - city
+      summary: Возвращает множество пособий города
+      description:
+        Возвращает множество пособий города.
+      operationId: getCityBenefits
+      parameters:
+        - name: id
+          in: path
+          description: ID города
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Множество пособий города получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InstitutionInfo'
+        '404':
+          description: Пособия не найдены
+          content: { }
+      security: [ ]
+
+
   /benefit:
     post:
       tags:
         - benefit
-      summary: Добавление нового пособия
-      description: Добавление нового пособия
+      summary: Добавляет новое пособие
+      description:
+        Добавляет новое пособие.
+        Для администратора.
+        Необходима авторизация.
       operationId: addBenefit
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SaveBenefitRequest'
+              $ref: '#/components/schemas/BenefitAdd'
         required: true
       responses:
-        '200':
+        '201':
           description: Пособие добавлено
           content: { }
         '400':
           description: Пособие с указанными данными уже существует
           content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
         '403':
           description: Нет доступа
           content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
     put:
       tags:
         - benefit
-      summary: Обновление данных пособия
-      description: Обновление данных пособия
+      summary: Обновляет пособие
+      description:
+        Обновляет пособие.
+        Для администратора.
+        Необходима авторизация.
       operationId: updateBenefit
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateObjectRequest'
+              $ref: '#/components/schemas/BenefitUpdate'
         required: true
       responses:
-        '200':
+        '201':
           description: Пособие обновлено
           content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пособие с указанными данными не найдено
-          content: { }
-    delete:
-      tags:
-        - benefit
-      summary: Удаление пособия
-      description: Удаление пособия
-      operationId: deleteBenefit
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeleteObjectRequest'
-        required: true
-      responses:
-        '200':
-          description: Пособие удалено
+        '401':
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -589,12 +894,16 @@ paths:
         '404':
           description: Пособие с указанными данными не найдено
           content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
   /benefit/{id}:
     get:
       tags:
         - benefit
-      summary: Получение информации о пособии
-      description: Получение информации о пособии по его ID, включая города и учреждения пособия
+      summary: Возвращает информацию о пособии
+      description:
+        Возвращает информацию о пособии.
       operationId: getBenefit
       parameters:
         - name: id
@@ -614,79 +923,210 @@ paths:
         '404':
           description: Пособие с указанным ID не найдено
           content: { }
+      security: [ ]
+    delete:
+      tags:
+        - benefit
+      summary: Удаляет пособие
+      description:
+        Удаляет пособие.
+        Для администратора.
+        Необходима авторизация.
+      operationId: deleteBenefit
+      parameters:
+        - name: id
+          in: path
+          description: ID пособия
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '201':
+          description: Пособие удалено
+          content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Пособие с указанными данными не найдено
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /benefit/initdata:
+    get:
+      tags:
+        - benefit
+      summary: Возвращает дополнительные данные для пособия
+      description:
+        Возвращает дополнительные данные для добавления или обновления пособия.
+        Для администратора.
+        Необходима авторизация.
+      responses:
+        '200':
+          description: Дополнительные данные пособия получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BenefitInitData'
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Дополнительные данные пособия не найдены
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
   /benefit/allex:
     get:
       tags:
         - benefit
-      summary: Получение списка всех пособий
-      description: Получение списка всех пособий, в том числе без города, учреждения или критериев
+      summary: Возвращает множество всех пособий
+      description:
+        Возвращает множество всех пособий. В том числе без города, учреждения или критериев
+        Для администратора.
+        Необходима авторизация.
       operationId: getAllExBenefits
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SessionAccess'
-        required: true
       responses:
         '200':
-          description: Множество всех пособий получен
+          description: Множество всех пособий получено
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ShortObjectInfo'
+                  $ref: '#/components/schemas/BenefitInfo'
+        '401':
+          description: Клиент не авторизован
+          content: { }
         '403':
           description: Нет доступа
           content: { }
         '404':
           description: Пособия не найдены
           content: { }
-  /user/benefits:
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /benefit/{id}/cities:
     get:
       tags:
-        - user
         - benefit
-      summary: Получение списка предложенных пособий
-      description: Получение списка предложенных пособий для данного пользователя
-      operationId: getUserBenefits
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SessionAccess'
-        required: true
+      summary: Возвращает множество городов пособия
+      description:
+        Возвращает множество городов пособия.
+      operationId: getBenefitCitites
+      parameters:
+        - name: id
+          in: path
+          description: ID пособия
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
       responses:
         '200':
-          description: Множество предложенных пособий получен
+          description: Множество городов пособия получено
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ShortObjectInfo'
-        '403':
-          description: Нет доступа
-          content: { }
+                  $ref: '#/components/schemas/CityInfo'
         '404':
-          description: Не найден пользователь с указанными данными
+          description: Города не найдены
           content: { }
+      security: [ ]
+  /benefit/{id}/institutions:
+    get:
+      tags:
+        - benefit
+      summary: Возвращает множество учреждений пособия
+      description:
+        Возвращает множество учреждений пособия.
+      operationId: getBenefitInstitutions
+      parameters:
+        - name: id
+          in: path
+          description: ID пособия
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Множество учреждений пособия получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InstitutionInfo'
+        '404':
+          description: Учреждения не найдены
+          content: { }
+      security: [ ]
+  /benefit/{id}/criterions:
+    get:
+      tags:
+        - benefit
+      summary: Возвращает множество критерий пособия
+      description:
+        Возвращает множество учреждений пособия.
+      operationId: getBenefitCriterions
+      parameters:
+        - name: id
+          in: path
+          description: ID пособия
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Множество критерий пособия получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CriterionInfo'
+        '404':
+          description: Критерии не найдены
+          content: { }
+      security: [ ]
+
+
   /institution:
     post:
       tags:
         - institution
-      summary: Добавление нового учреждения
-      description: Добавление нового учреждения
+      summary: Добавляет новое учреждение
+      description:
+        Добавляет новое учреждение.
+        Для администратора.
+        Необходима авторизация.
       operationId: addInsitution
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SaveInstitutionRequest'
+              $ref: '#/components/schemas/InstitutionAdd'
         required: true
       responses:
-        '200':
+        '201':
           description: Учреждение добавлено
+          content: { }
+        '401':
+          description: Клиент не авторизован
           content: { }
         '400':
           description: Учреждение с указанными данными уже существует
@@ -694,43 +1134,30 @@ paths:
         '403':
           description: Нет доступа
           content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
     put:
       tags:
         - institution
-      summary: Обновление данных учреждения
-      description: Обновление данных учреждения
+      summary: Обновляет данные учреждения
+      description:
+        Обновляет данные учреждения.
+        Для администратора.
+        Необходима авторизация.
       operationId: updateInstitution
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateObjectRequest'
+              $ref: '#/components/schemas/InstitutionUpdate'
         required: true
       responses:
-        '200':
+        '201':
           description: Учреждение обновлено
           content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Учреждение с указанными данными не найдено
-          content: { }
-    delete:
-      tags:
-        - institution
-      summary: Удаление учреждения
-      description: Удаление учреждения
-      operationId: deleteInstitution
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeleteObjectRequest'
-        required: true
-      responses:
-        '200':
-          description: Учреждение удалено
+        '401':
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -738,12 +1165,16 @@ paths:
         '404':
           description: Учреждение с указанными данными не найдено
           content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
   /institution/{id}:
     get:
       tags:
         - institution
-      summary: Получение информации об учреждении
-      description: Получение информации об учреждении по его ID, включая пособия учреждения
+      summary: Возвращает информацию об учреждении
+      description:
+        Возвращает информацию об учреждении.
       operationId: getInstitution
       parameters:
         - name: id
@@ -763,44 +1194,179 @@ paths:
         '404':
           description: Учреждение с указанным ID не найдено
           content: { }
+      security: [ ]
+    delete:
+      tags:
+        - institution
+      summary: Удаляет учреждение
+      description:
+        Удаляет учреждение.
+        Для администратора.
+        Необходима авторизация.
+      operationId: deleteInstitution
+      parameters:
+        - name: id
+          in: path
+          description: ID учреждения
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '201':
+          description: Учреждение удалено
+          content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Учреждение с указанными данными не найдено
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /institution/initdata:
+    get:
+      tags:
+        - institution
+      summary: Возвращает дополнительные данные для учреждения
+      description:
+        Возвращает дополнительные данные для добавления или обновления учреждения.
+        Для администратора.
+        Необходима авторизация.
+      responses:
+        '200':
+          description: Дополнительные данные учреждения получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionInitData'
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Дополнительные данные учреждения не найдены
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /institution/{id}/city:
+    get:
+      tags:
+        - institution
+      summary: Возвращает информацию о городе учреждения
+      description:
+        Возвращает информацию о городе учреждения.
+      operationId: getInstitutionCity
+      parameters:
+        - name: id
+          in: path
+          description: ID учреждения
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Информация о городе учреждения получена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CityInfo'
+        '404':
+          description: Информация о городе учреждения не найдена
+          content: { }
+      security: [ ]
+  /institution/{id}/benefits:
+    get:
+      tags:
+        - institution
+      summary: Возвращает множество пособий учреждения
+      description:
+        Возвращает множество пособийх учреждения.
+      operationId: getInstitutionBenefits
+      parameters:
+        - name: id
+          in: path
+          description: ID учреждения
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Множество пособий учреждения получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BenefitInfo'
+        '404':
+          description: Множество пособий учреждения не найдено
+          content: { }
+      security: [ ]
+
+
   /criterion:
     post:
       tags:
         - criterion
-      summary: Добавление нового критерия
-      description: Добавление нового критерия
+      summary: Добавляет новый критерий
+      description:
+        Добавляет новый критерий.
+        Для администратора.
+        Необходима авторизация.
       operationId: addCriterion
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SaveCriterionRequest'
+              $ref: '#/components/schemas/CriterionAdd'
         required: true
       responses:
-        '200':
+        '201':
           description: Критерий добавлен
           content: { }
         '400':
           description: Критерий с указанными данными уже существует
           content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
         '403':
           description: Нет доступа
           content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
     put:
       tags:
         - criterion
-      summary: Обновление данных критерия
-      description: Обновление данных критерия
+      summary: Обновляет данные критерия
+      description:
+        Обновляет данные критерия.
+        Для администратора.
+        Необходима авторизация.
       operationId: updateCriterion
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateObjectRequest'
+              $ref: '#/components/schemas/CriterionUpdate'
         required: true
       responses:
-        '200':
+        '201':
           description: Критерий обновлен
+          content: { }
+        '401':
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -808,34 +1374,16 @@ paths:
         '404':
           description: Не найден критерий с указанными данными
           content: { }
-    delete:
-      tags:
-        - criterion
-      summary: Удаление критерия
-      description: Удаление критерия
-      operationId: deleteCriterion
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeleteObjectRequest'
-        required: true
-      responses:
-        '200':
-          description: Критерий удален
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Критерий с указанными данными не найден
-          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
   /criterion/{id}:
     get:
       tags:
         - criterion
-      summary: Получение информации о критерии
-      description: Получение информации о критерии по его ID
+      summary: Возвращает информацию о критерии
+      description:
+        Возвращает информацию о критерии.
       operationId: getCriterion
       parameters:
         - name: id
@@ -855,72 +1403,202 @@ paths:
         '404':
           description: Критерий с указанным ID не найден
           content: { }
-  /criterion/allex:
+      security: [ ]
+    delete:
+      tags:
+        - criterion
+      summary: Удаляет критерий
+      description:
+        Удаляет критерий.
+        Для администратора.
+        Необходима авторизация.
+      operationId: deleteCriterion
+      parameters:
+        - name: id
+          in: path
+          description: ID критерия
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '201':
+          description: Критерий удален
+          content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Критерий с указанными данными не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /criterion/initdata:
     get:
       tags:
         - criterion
-      summary: Получение списка всех критериев
-      description: Получение списка всех критериев, в том числе без типа
-      operationId: getAllExCriterions
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SessionAccess'
-        required: true
+      summary: Возвращает дополнительные данные для критерия
+      description:
+        Возвращает дополнительные данные для добавления или обновления критерия.
+        Для администратора.
+        Необходима авторизация.
       responses:
         '200':
-          description: Множество всех критериев получен
+          description: Дополнительные данные критерия получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CriterionInitData'
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Дополнительные данные критерия не найдены
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /criterion/all:
+    get:
+      tags:
+        - criterion
+      summary: Возвращает множество критериев
+      description:
+        Возвращает множество критериев.
+      operationId: getCriterions
+      responses:
+        '200':
+          description: Множество всех критериев получено
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ShortObjectInfo'
+                  $ref: '#/components/schemas/CriterionInfo'
+        '404':
+          description: Критерия не найдены
+          content: { }
+      security: [ ]
+  /criterion/allex:
+    get:
+      tags:
+        - criterion
+      summary: Возвращает множество всех критериев
+      description:
+        Возвращает множество всех критериев. В том числе без типа критерия.
+        Для администратора.
+        Необходима авторизация.
+      operationId: getAllExCriterions
+      responses:
+        '200':
+          description: Множество всех критериев получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CriterionInfo'
+        '401':
+          description: Клиент не авторизован
+          content: { }
         '403':
           description: Нет доступа
           content: { }
         '404':
           description: Критерия не найдены
           content: { }
-  /criterion/type:
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /criterion/{id}/criteriontype:
+    get:
+      tags:
+        - criterion
+      summary: Возвращает информацию о типе критерия критерия
+      description:
+        Возвращает информацию о типе критерия критерия.
+      operationId: getCriterionCriterionType
+      parameters:
+        - name: id
+          in: path
+          description: ID критерия
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Информация о типе критерия критерия получена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CityInfo'
+        '404':
+          description: Информация о типе критерия критерия не найдена
+          content: { }
+      security: [ ]
+
+
+  /criteriontype:
     post:
       tags:
         - criterion type
-      summary: Добавление нового типа критерия
-      description: Добавление нового типа критерия
+      summary: Добавляет новый тип критерия
+      description:
+        Добавляет новый тип критерия.
+        Для администратора.
+        Необходима авторизация.
       operationId: addCriterionType
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SaveCriterionTypeRequest'
+              $ref: '#/components/schemas/CriterionTypeAdd'
         required: true
       responses:
-        '200':
+        '201':
           description: Тип критерия добавлен
           content: { }
         '400':
           description: Тип критерия с указанными данными уже существует
           content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
         '403':
           description: Нет доступа
           content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
     put:
       tags:
         - criterion type
-      summary: Обновление данных типа критерия
-      description: Обновление данных типа критерия
+      summary: Обновляет данные типа критерия
+      description:
+        Обновляет данные типа критерия.
+        Для администратора.
+        Необходима авторизация.
       operationId: updateCriterionType
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateObjectRequest'
+              $ref: '#/components/schemas/CriterionTypeUpdate'
         required: true
       responses:
-        '200':
+        '201':
           description: Тип критерия обновлен
+          content: { }
+        '401':
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -928,34 +1606,16 @@ paths:
         '404':
           description: Не найден тип критерия с указанными данными
           content: { }
-    delete:
-      tags:
-        - criterion type
-      summary: Удаление типа критерия
-      description: Удаление типа критерия
-      operationId: deleteCriterionType
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeleteObjectRequest'
-        required: true
-      responses:
-        '200':
-          description: Тип критерия удален
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Тип критерия с указанными данными не найден
-          content: { }
-  /criterion/type/{id}:
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /criteriontype/{id}:
     get:
       tags:
         - criterion type
-      summary: Получение информации о типе критерия
-      description: Получение информации о типе критерия по его ID, включая критерии типа
+      summary: Возвращает информацию о типе критерия
+      description:
+        Возвращает информацию о типе критерия.
       operationId: getCriterionType
       parameters:
         - name: id
@@ -975,16 +1635,51 @@ paths:
         '404':
           description: Тип критерия с указанным ID не найден
           content: { }
-  /criterion/type/all:
+      security: [ ]
+    delete:
+      tags:
+        - criterion type
+      summary: Удаляет тип критерия
+      description:
+        Удаляет тип критерия.
+        Для администратора.
+        Необходима авторизация.
+      operationId: deleteCriterionType
+      parameters:
+        - name: id
+          in: path
+          description: ID типа критерия
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '201':
+          description: Тип критерия удален
+          content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Тип критерия с указанным ID не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /criteriontype/all:
     get:
       tags:
         - criterion type
-      summary: Получение списка типов критериев
-      description: Получние списка типов критериев
+      summary: Возвращает множество типов критериев
+      description:
+        Возвращает множество типов критериев
       operationId: getCriterionTypes
       responses:
         '200':
-          description: Множество типов критериев получен
+          description: Множество типов критериев получено
           content:
             application/json:
               schema:
@@ -994,8 +1689,48 @@ paths:
         '404':
           description: Типы критериев не найдены
           content: { }
+      security: [ ]
+  /criteriontype/{id}/criterions:
+    get:
+      tags:
+        - criterion type
+      summary: Возвращает множество критерий типа критерия
+      description:
+        Возвращает множество критерий типа критерия.
+      operationId: getCriterionTypeCriterions
+      parameters:
+        - name: id
+          in: path
+          description: ID типа критерия
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Множество критерий типа критерия получено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CityInfo'
+        '404':
+          description: Критерии не найдены
+          content: { }
+      security: [ ]
+
 
 components:
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     UserInfo:
       description: Информация о пользователе
@@ -1120,25 +1855,6 @@ components:
           description: Пароль пользователя
           type: string
           example: password
-    LoginResponse:
-      description: Объект ответа пользователю на вход в систему
-      properties:
-        jwt:
-          description: Токен доступа jwt
-          type: string
-          example: zjhd623u.734f9ik.f20fkj8
-        refreshToken:
-          description: Токен восстановления токена доступа
-          type: integer
-          example: 1222333444
-        userId:
-          description: ID пользователя
-          type: integer
-          example: 1222333444
-        userName:
-          description: Имя пользователя
-          type: string
-          example: name
     ChangePassword:
       description: Объект запроса для изменения пароля пользователя
       properties:
@@ -1173,17 +1889,6 @@ components:
           description: Повторно введенный новый пароль пользователя
           type: string
           example: newPassword
-    AuthData:
-      description: Данные, необходимые для авторизации пользователя
-      properties:
-        jwt:
-          description: Токен доступа jwt
-          type: string
-          example: zjhd623u.734f9ik.f20fkj8
-        refreshToken:
-          description: Токен восстановления токена доступа
-          type: integer
-          example: 1222333444
 
 
     AdminInfo:
