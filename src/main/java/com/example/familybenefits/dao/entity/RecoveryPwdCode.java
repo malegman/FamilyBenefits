@@ -1,28 +1,25 @@
-package com.example.familybenefits.dao.model;
+package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Objects;
 
 /**
- * Модель таблицы "verify_email_code"
+ * Модель таблицы "recovery_pwd_code"
  */
 @Entity
-@Table(name = "verify_email_code", schema = "familybenefit")
+@Table(name = "recovery_pwd_code", schema = "familybenefit")
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class VerifyEmailCode {
+public class RecoveryPwdCode {
 
   /**
    * ID пользователя
@@ -32,7 +29,7 @@ public class VerifyEmailCode {
   private BigInteger idUser;
 
   /**
-   * Код подтверждения почты
+   * Код восстановления пароля
    */
   @Column(name = "code")
   private BigInteger code;
@@ -47,7 +44,7 @@ public class VerifyEmailCode {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    VerifyEmailCode that = (VerifyEmailCode) o;
+    RecoveryPwdCode that = (RecoveryPwdCode) o;
     return idUser != null && Objects.equals(idUser, that.idUser);
   }
 

@@ -1,4 +1,4 @@
-package com.example.familybenefits.dao.model;
+package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -32,6 +32,12 @@ public class Institution {
    */
   @Column(name = "name")
   private String name;
+
+  /**
+   * Информация учреждения
+   */
+  @Column(name = "info")
+  private String info;
 
   /**
    * Адрес учреждения

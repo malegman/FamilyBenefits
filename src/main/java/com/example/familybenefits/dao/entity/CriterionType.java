@@ -1,59 +1,53 @@
-package com.example.familybenefits.dao.model;
+package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Objects;
 
 /**
- * Модель таблицы "city"
+ * Модель таблицы "criterion_type"
  */
 @Entity
-@Table(name = "city", schema = "familybenefit")
+@Table(name = "criterion_type", schema = "familybenefit")
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class City {
+public class CriterionType {
 
   /**
-   * ID города
+   * ID типа критерия
    */
   @Id
   @Column(name = "id")
   private BigInteger id;
 
   /**
-   * Название города
+   * Название типа критерия
    */
   @Column(name = "name")
   private String name;
 
   /**
-   * Учреждения города
+   * Информация типа критерия
    */
-  @ToString.Exclude
-  @OneToMany(mappedBy = "city")
-  private List<Institution> institutionList;
-
-  /**
-   * Пособия города
-   */
-  @ToString.Exclude
-  @ManyToMany(mappedBy = "cityList")
-  private List<Benefit> benefitList;
+  @Column(name = "info")
+  private String info;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    City city = (City) o;
-    return id != null && Objects.equals(id, city.id);
+    CriterionType that = (CriterionType) o;
+    return id != null && Objects.equals(id, that.id);
   }
 
   @Override
@@ -61,3 +55,4 @@ public class City {
     return getClass().hashCode();
   }
 }
+

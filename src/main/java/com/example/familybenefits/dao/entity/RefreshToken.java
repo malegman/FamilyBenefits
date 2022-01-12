@@ -1,4 +1,4 @@
-package com.example.familybenefits.dao.model;
+package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -12,17 +12,17 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- * Модель таблицы "recovery_pwd_code"
+ * Модель таблицы "refresh_token"
  */
 @Entity
-@Table(name = "recovery_pwd_code", schema = "familybenefit")
+@Table(name = "refresh_token", schema = "familybenefit")
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class RecoveryPwdCode {
+public class RefreshToken {
 
   /**
    * ID пользователя
@@ -32,13 +32,13 @@ public class RecoveryPwdCode {
   private BigInteger idUser;
 
   /**
-   * Код восстановления пароля
+   * Токен обновления токена доступа
    */
-  @Column(name = "code")
-  private BigInteger code;
+  @Column(name = "token")
+  private BigInteger token;
 
   /**
-   * Время истечения срока кода
+   * Время истечения срока токена
    */
   @Column(name = "date_expiration")
   private Date dateExpiration;
@@ -47,7 +47,7 @@ public class RecoveryPwdCode {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    RecoveryPwdCode that = (RecoveryPwdCode) o;
+    RefreshToken that = (RefreshToken) o;
     return idUser != null && Objects.equals(idUser, that.idUser);
   }
 

@@ -1,12 +1,12 @@
-package com.example.familybenefits.dao.model;
+package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Модель таблицы "benefit"
@@ -47,7 +47,7 @@ public class Benefit {
   private String documents;
 
   /**
-   * Города пособия
+   * Множество городов пособия
    */
   @ToString.Exclude
   @ManyToMany
@@ -55,10 +55,21 @@ public class Benefit {
     name = "benefits_cities", schema = "familybenefit",
     joinColumns = @JoinColumn(name = "id_benefit"),
     inverseJoinColumns = @JoinColumn(name = "id_city"))
-  private List<City> cityList;
+  private Set<City> citySet;
 
   /**
-   * Критерии пособия
+   * Множество учреждений пособия
+   */
+  @ToString.Exclude
+  @ManyToMany
+  @JoinTable(
+      name = "benefits_institutions", schema = "familybenefit",
+      joinColumns = @JoinColumn(name = "id_benefit"),
+      inverseJoinColumns = @JoinColumn(name = "id_institution"))
+  private Set<Institution> institutionSet;
+
+  /**
+   * Множество критерий пособия
    */
   @ToString.Exclude
   @ManyToMany
@@ -66,18 +77,7 @@ public class Benefit {
     name = "benefits_criterions", schema = "familybenefit",
     joinColumns = @JoinColumn(name = "id_benefit"),
     inverseJoinColumns = @JoinColumn(name = "id_criterion"))
-  private List<City> criterionList;
-
-  /**
-   * Учреждения пособия
-   */
-  @ToString.Exclude
-  @ManyToMany
-  @JoinTable(
-    name = "benefits_institutions", schema = "familybenefit",
-    joinColumns = @JoinColumn(name = "id_benefit"),
-    inverseJoinColumns = @JoinColumn(name = "id_institution"))
-  private List<City> institutionList;
+  private Set<Criterion> criterionSet;
 
   @Override
   public boolean equals(Object o) {

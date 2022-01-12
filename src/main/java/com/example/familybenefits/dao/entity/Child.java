@@ -1,4 +1,4 @@
-package com.example.familybenefits.dao.model;
+package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -8,46 +8,41 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.Objects;
 
 /**
- * Модель таблицы "role"
+ * Модель таблицы "child"
  */
 @Entity
-@Table(name = "role", schema = "familybenefit")
+@Table(name = "child", schema = "familybenefit")
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Role {
+public class Child {
 
   /**
-   * ID роли
+   * ID ребенка
    */
   @Id
   @Column(name = "id")
   private BigInteger id;
 
   /**
-   * Название роли
+   * Дата рождения ребенка
    */
-  @Column(name = "name")
-  private String name;
-
-  /**
-   * Приоритет роли
-   */
-  @Column(name = "priority")
-  private int priority;
+  @Column(name = "date_birth")
+  private Date dateBirth;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    Role role = (Role) o;
-    return id != null && Objects.equals(id, role.id);
+    Child child = (Child) o;
+    return id != null && Objects.equals(id, child.id);
   }
 
   @Override

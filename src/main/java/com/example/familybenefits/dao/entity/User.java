@@ -1,4 +1,4 @@
-package com.example.familybenefits.dao.model;
+package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -6,8 +6,8 @@ import org.hibernate.Hibernate;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Модель таблицы "user"
@@ -61,7 +61,7 @@ public class User {
   private City city;
 
   /**
-   * Роль пользователя
+   * Множество ролей пользователя
    */
   @ToString.Exclude
   @ManyToMany
@@ -69,7 +69,18 @@ public class User {
     name = "users_roles", schema = "familybenefit",
     joinColumns = @JoinColumn(name = "id_user"),
     inverseJoinColumns = @JoinColumn(name = "id_role"))
-  private List<Role> role;
+  private Set<Role> roleSet;
+
+  /**
+   * Множество детей пользователя
+   */
+  @ToString.Exclude
+  @ManyToMany
+  @JoinTable(
+      name = "users_children", schema = "familybenefit",
+      joinColumns = @JoinColumn(name = "id_user"),
+      inverseJoinColumns = @JoinColumn(name = "id_child"))
+  private Set<Child> childSet;
 
   @Override
   public boolean equals(Object o) {

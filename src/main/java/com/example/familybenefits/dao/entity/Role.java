@@ -1,57 +1,47 @@
-package com.example.familybenefits.dao.model;
+package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigInteger;
 import java.util.Objects;
 
 /**
- * Модель таблицы "criterion"
+ * Модель таблицы "role"
  */
 @Entity
-@Table(name = "criterion", schema = "familybenefit")
+@Table(name = "role", schema = "familybenefit")
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Criterion {
+public class Role {
 
   /**
-   * ID критерия
+   * ID роли
    */
   @Id
   @Column(name = "id")
   private BigInteger id;
 
   /**
-   * Название критерия
+   * Название роли
    */
   @Column(name = "name")
   private String name;
-
-  /**
-   * Информация критерия
-   */
-  @Column(name = "info")
-  private String info;
-
-  /**
-   * Тип критерия
-   */
-  @ManyToOne
-  @JoinColumn(name = "id_type")
-  private CriterionType type;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    Criterion criterion = (Criterion) o;
-    return id != null && Objects.equals(id, criterion.id);
+    Role role = (Role) o;
+    return id != null && Objects.equals(id, role.id);
   }
 
   @Override
