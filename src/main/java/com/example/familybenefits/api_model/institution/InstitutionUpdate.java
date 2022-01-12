@@ -6,14 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigInteger;
-import java.util.List;
 
 /**
- * Информация об учреждении
+ * Объект запроса для обновления учреждения
  */
 @Data
 @Builder
-public class InstitutionInfo {
+public class InstitutionUpdate {
 
   /**
    * ID учреждения
@@ -58,8 +57,8 @@ public class InstitutionInfo {
   private String schedule;
 
   /**
-   * Название города учреждения
+   * Краткая информация о городе учреждения
    */
-  @JsonProperty("name_city")
-  private String nameCity;
+  @JsonProperty("short_city")
+  private ShortObjectInfo shortCity;
 }

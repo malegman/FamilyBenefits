@@ -1,5 +1,6 @@
 package com.example.familybenefits.api_model.user;
 
+import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -8,11 +9,11 @@ import java.math.BigInteger;
 import java.util.Set;
 
 /**
- * Информация о пользователе
+ * Объект запроса для обновления пользователя
  */
 @Data
 @Builder
-public class UserInfo {
+public class UserUpdate {
 
   /**
    * ID пользователя
@@ -33,26 +34,20 @@ public class UserInfo {
   private String email;
 
   /**
-   * Статус почты, true, если подтверждена
+   * Краткая информация о городе пользователя
    */
-  @JsonProperty("is_verified_email")
-  private boolean isVerifiedEmail;
+  @JsonProperty("short_city")
+  private ShortObjectInfo shortCity;
 
   /**
-   * Название города пользователя
+   * Множество кратких информаций о критериях пользователя
    */
-  @JsonProperty("name_city")
-  private String nameCity;
+  @JsonProperty("short_criterion_set")
+  private Set<ShortObjectInfo> shortCriterionSet;
 
   /**
    * Множество дат рождений детей пользователя
    */
   @JsonProperty("birth_date_children")
   private Set<String> birthDateChildren;
-
-  /**
-   * Дата регистрации пользователя
-   */
-  @JsonProperty("date_registration")
-  private String dateRegistration;
 }

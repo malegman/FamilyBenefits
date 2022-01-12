@@ -1,22 +1,18 @@
 package com.example.familybenefits.api_model.user;
 
+import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigInteger;
-import java.util.List;
+import java.util.Set;
 
 /**
- * Объект запроса для сохранения пользователя в системе
+ * Объект запроса для добавления пользователя
  */
 @Data
-public class SaveUserRequest {
-
-  /**
-   * Данные сессии пользователя для доступа к ресурсам
-   */
-  @JsonProperty("session_access")
-  private SessionAccess sessionAccess;
+@Builder
+public class UserAdd {
 
   /**
    * Имя пользователя
@@ -43,20 +39,20 @@ public class SaveUserRequest {
   private String repeatPassword;
 
   /**
-   * ID города
+   * Краткая информация о городе пользователя
    */
-  @JsonProperty("id_city")
-  private BigInteger idCity;
+  @JsonProperty("short_city")
+  private ShortObjectInfo shortCity;
 
   /**
-   * Список ID критериев пользователя
+   * Множество кратких информаций о критериях пользователя
    */
-  @JsonProperty("id_criterion_list")
-  private List<BigInteger> criterionList;
+  @JsonProperty("short_criterion_set")
+  private Set<ShortObjectInfo> shortCriterionSet;
 
   /**
-   * Список дат рождений детей пользователя
+   * Множество дат рождений детей пользователя
    */
   @JsonProperty("birth_date_children")
-  private List<String> birthDateChildren;
+  private Set<String> birthDateChildren;
 }

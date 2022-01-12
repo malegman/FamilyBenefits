@@ -1,6 +1,7 @@
-package com.example.familybenefits.api_model.user;
+package com.example.familybenefits.api_model.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigInteger;
@@ -9,6 +10,7 @@ import java.math.BigInteger;
  * Объект запроса на восстановление пароля
  */
 @Data
+@Builder
 public class RecoveryPassword {
 
   /**

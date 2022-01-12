@@ -1,6 +1,7 @@
 package com.example.familybenefits.api_model.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigInteger;
@@ -9,6 +10,7 @@ import java.math.BigInteger;
  * Краткая информация об объекте
  */
 @Data
+@Builder
 public class ShortObjectInfo {
 
   /**

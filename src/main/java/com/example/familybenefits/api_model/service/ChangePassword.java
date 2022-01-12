@@ -1,19 +1,15 @@
-package com.example.familybenefits.api_model.user;
+package com.example.familybenefits.api_model.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 
 /**
  * Объект запроса для изменения пароля пользователя
  */
 @Data
+@Builder
 public class ChangePassword {
-
-  /**
-   * Данные сессии пользователя для доступа к ресурсам
-   */
-  @JsonProperty("session_access")
-  private SessionAccess sessionAccess;
 
   /**
    * Старый пароль пользователя

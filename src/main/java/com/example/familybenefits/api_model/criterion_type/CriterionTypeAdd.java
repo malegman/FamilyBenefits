@@ -4,20 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigInteger;
-
 /**
- * Информация о типе критерия
+ * Объект запроса для добавления типа критерия
  */
 @Data
 @Builder
-public class CriterionTypeInfo {
-
-  /**
-   * ID типа критерия
-   */
-  @JsonProperty("id")
-  private BigInteger id;
+public class CriterionTypeAdd {
 
   /**
    * Название типа критерия

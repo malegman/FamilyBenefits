@@ -1,22 +1,16 @@
 package com.example.familybenefits.api_model.admin;
 
-import com.example.familybenefits.api_model.user.SessionAccess;
+import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigInteger;
-
 /**
- * Объект запроса для сохранения администратора в системе
+ * Объект запроса для добавления администратора
  */
 @Data
-public class SaveAdminRequest {
-
-  /**
-   * Данные сессии пользователя для доступа к ресурсам
-   */
-  @JsonProperty("session_access")
-  private SessionAccess sessionAccess;
+@Builder
+public class AdminAdd {
 
   /**
    * Имя администратора
@@ -43,8 +37,8 @@ public class SaveAdminRequest {
   private String repeatPassword;
 
   /**
-   * ID города
+   * Краткая информация о городе администратора
    */
-  @JsonProperty("id_city")
-  private BigInteger idCity;
+  @JsonProperty("short_city")
+  private ShortObjectInfo shortCity;
 }

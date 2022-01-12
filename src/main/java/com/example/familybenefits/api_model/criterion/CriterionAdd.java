@@ -1,23 +1,16 @@
 package com.example.familybenefits.api_model.criterion;
 
+import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigInteger;
-
 /**
- * Критерий для подбора пособий
+ * Объект запроса для добавления критерия
  */
 @Data
 @Builder
-public class CriterionInfo {
-
-  /**
-   * ID критерия
-   */
-  @JsonProperty("id")
-  private BigInteger id;
+public class CriterionAdd {
 
   /**
    * Название критерия
@@ -32,8 +25,8 @@ public class CriterionInfo {
   private String info;
 
   /**
-   * Название типа критерия критерия
+   * Краткая информация о типе критерия критерия
    */
-  @JsonProperty("name_criterion_type")
-  private String nameCriterionType;
+  @JsonProperty("short_criterion_type")
+  private ShortObjectInfo shortCriterionType;
 }

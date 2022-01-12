@@ -1895,7 +1895,7 @@ components:
       description: Информация об администраторе
       properties:
         id:
-          description: ID администратор
+          description: ID администратора
           type: integer
           example: 1222333444
         name:
@@ -2144,7 +2144,7 @@ components:
           type: string
           example: name
     InstitutionAdd:
-      description: Объект запроса для добавления города
+      description: Объект запроса для добавления учреждения
       properties:
         name:
           description: Название учреждения
@@ -2169,7 +2169,7 @@ components:
         shortCity:
           $ref: '#/components/schemas/ShortObjectInfo'
     InstitutionUpdate:
-      description: Объект запроса для обновления города
+      description: Объект запроса для обновления учреждения
       properties:
         id:
           description: ID учреждения

@@ -4,20 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigInteger;
-
 /**
- * Информация о городе
+ * Объект запроса для добавления города
  */
 @Data
 @Builder
-public class CityInfo {
-
-  /**
-   * ID города
-   */
-  @JsonProperty("id")
-  private BigInteger id;
+public class CityAdd {
 
   /**
    * Название города

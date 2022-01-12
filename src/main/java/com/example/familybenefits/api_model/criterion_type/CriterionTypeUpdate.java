@@ -1,20 +1,23 @@
 package com.example.familybenefits.api_model.criterion_type;
 
-import com.example.familybenefits.api_model.user.SessionAccess;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigInteger;
+
 /**
- * Объект запроса для сохранения типа критерия в системе
+ * Объект запроса для обновления типа критерия
  */
 @Data
-public class SaveCriterionTypeRequest {
+@Builder
+public class CriterionTypeUpdate {
 
   /**
-   * Данные сессии пользователя для доступа к ресурса
+   * ID типа критерия
    */
-  @JsonProperty("session_access")
-  private SessionAccess sessionAccess;
+  @JsonProperty("id")
+  private BigInteger id;
 
   /**
    * Название типа критерия

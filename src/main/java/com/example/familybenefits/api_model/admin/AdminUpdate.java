@@ -8,11 +8,11 @@ import lombok.Data;
 import java.math.BigInteger;
 
 /**
- * Информация об администраторе
+ * Объект запроса для обновления администратора
  */
 @Data
 @Builder
-public class AdminInfo {
+public class AdminUpdate {
 
   /**
    * ID администратора
@@ -33,20 +33,8 @@ public class AdminInfo {
   private String email;
 
   /**
-   * Статус почты, true, если подтверждена
+   * Краткая информация о городе администратора
    */
-  @JsonProperty("is_verified_email")
-  private boolean isVerifiedEmail;
-
-  /**
-   * Название города администратора
-   */
-  @JsonProperty("name_city")
-  private ShortObjectInfo nameCity;
-
-  /**
-   * Дата регистрации администратора
-   */
-  @JsonProperty("date_registration")
-  private String dateRegistration;
+  @JsonProperty("short_city")
+  private ShortObjectInfo shortCity;
 }

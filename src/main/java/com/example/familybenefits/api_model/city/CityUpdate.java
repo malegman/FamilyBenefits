@@ -7,11 +7,11 @@ import lombok.Data;
 import java.math.BigInteger;
 
 /**
- * Информация о городе
+ * Объект запроса для обновления города
  */
 @Data
 @Builder
-public class CityInfo {
+public class CityUpdate {
 
   /**
    * ID города

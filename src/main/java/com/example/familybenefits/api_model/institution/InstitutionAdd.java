@@ -1,23 +1,16 @@
 package com.example.familybenefits.api_model.institution;
 
-import com.example.familybenefits.api_model.user.SessionAccess;
+import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigInteger;
-import java.util.List;
-
 /**
- * Объект запроса для сохранения учреждения в системе
+ * Объект запроса для добавления учреждения
  */
 @Data
-public class SaveInstitutionRequest {
-
-  /**
-   * Данные сессии пользователя для доступа к ресурса
-   */
-  @JsonProperty("session_access")
-  private SessionAccess sessionAccess;
+@Builder
+public class InstitutionAdd {
 
   /**
    * Название учреждения
@@ -56,14 +49,8 @@ public class SaveInstitutionRequest {
   private String schedule;
 
   /**
-   * ID города учреждения
+   * Краткая информация о городе учреждения
    */
-  @JsonProperty("id_city")
-  private BigInteger idCity;
-
-  /**
-   * Список ID пособий учреждения
-   */
-  @JsonProperty("id_benefit_list")
-  private List<BigInteger> idBenefitList;
+  @JsonProperty("short_city")
+  private ShortObjectInfo shortCity;
 }
