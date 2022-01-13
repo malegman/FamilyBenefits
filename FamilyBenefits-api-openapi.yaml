@@ -46,13 +46,13 @@ paths:
           headers:
             Set-Cookie:
               schema:
+                description: Токен обновления токена доступа
                 type: string
                 example: refreshToken=1222333444; httpOnly;
           content:
             application/json:
               schema:
-                type: string
-                example: jwt=d6tefy0.fh3653.26r3fyg
+                $ref: '#/components/schemas/LoginResponse'
         '404':
           description: Пользователь с указанными данными не найден
           content: { }
@@ -1855,6 +1855,29 @@ components:
           description: Пароль пользователя
           type: string
           example: password
+    LoginResponse:
+      description: Объект ответа на вход в систему
+      properties:
+        idUser:
+          description: ID пользователя
+          type: integer
+          example: 1222333444
+        nameUser:
+          description: Имя пользователя
+          type: string
+          example: name
+        roleUserSet:
+          description: Множество ролей пользователя
+          type: array
+          items:
+            allOf:
+              - description: Роль пользователя
+                type: string
+                example: role
+        jwt:
+          description: Токен доступа в формате jwt
+          type: string
+          example: jwt=d6tefy0.fh3653.26r3fyg
     ChangePassword:
       description: Объект запроса для изменения пароля пользователя
       properties:
