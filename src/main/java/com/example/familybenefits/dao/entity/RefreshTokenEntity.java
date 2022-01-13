@@ -22,7 +22,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class RefreshToken {
+public class RefreshTokenEntity {
 
   /**
    * ID пользователя
@@ -47,7 +47,7 @@ public class RefreshToken {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    RefreshToken that = (RefreshToken) o;
+    RefreshTokenEntity that = (RefreshTokenEntity) o;
     return idUser != null && Objects.equals(idUser, that.idUser);
   }
 

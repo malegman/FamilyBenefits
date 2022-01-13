@@ -19,7 +19,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Benefit {
+public class BenefitEntity {
 
   /**
    * ID пособия
@@ -55,7 +55,7 @@ public class Benefit {
     name = "benefits_cities", schema = "familybenefit",
     joinColumns = @JoinColumn(name = "id_benefit"),
     inverseJoinColumns = @JoinColumn(name = "id_city"))
-  private Set<City> citySet;
+  private Set<CityEntity> cityEntitySet;
 
   /**
    * Множество учреждений пособия
@@ -66,7 +66,7 @@ public class Benefit {
       name = "benefits_institutions", schema = "familybenefit",
       joinColumns = @JoinColumn(name = "id_benefit"),
       inverseJoinColumns = @JoinColumn(name = "id_institution"))
-  private Set<Institution> institutionSet;
+  private Set<InstitutionEntity> institutionEntitySet;
 
   /**
    * Множество критерий пособия
@@ -77,14 +77,14 @@ public class Benefit {
     name = "benefits_criterions", schema = "familybenefit",
     joinColumns = @JoinColumn(name = "id_benefit"),
     inverseJoinColumns = @JoinColumn(name = "id_criterion"))
-  private Set<Criterion> criterionSet;
+  private Set<CriterionEntity> criterionEntitySet;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    Benefit benefit = (Benefit) o;
-    return id != null && Objects.equals(id, benefit.id);
+    BenefitEntity benefitEntity = (BenefitEntity) o;
+    return id != null && Objects.equals(id, benefitEntity.id);
   }
 
   @Override

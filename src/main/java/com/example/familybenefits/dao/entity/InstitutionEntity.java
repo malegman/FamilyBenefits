@@ -18,7 +18,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Institution {
+public class InstitutionEntity {
 
   /**
    * ID учреждения
@@ -68,13 +68,13 @@ public class Institution {
    */
   @ManyToOne
   @JoinColumn(name = "id_city")
-  private City city;
+  private CityEntity cityEntity;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    Institution that = (Institution) o;
+    InstitutionEntity that = (InstitutionEntity) o;
     return id != null && Objects.equals(id, that.id);
   }
 

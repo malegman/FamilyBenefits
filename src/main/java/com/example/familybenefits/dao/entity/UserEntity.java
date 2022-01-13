@@ -20,7 +20,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class User {
+public class UserEntity {
 
   /**
    * ID пользователя
@@ -58,7 +58,7 @@ public class User {
    */
   @ManyToOne
   @JoinColumn(name = "id_city")
-  private City city;
+  private CityEntity cityEntity;
 
   /**
    * Множество ролей пользователя
@@ -69,7 +69,7 @@ public class User {
     name = "users_roles", schema = "familybenefit",
     joinColumns = @JoinColumn(name = "id_user"),
     inverseJoinColumns = @JoinColumn(name = "id_role"))
-  private Set<Role> roleSet;
+  private Set<RoleEntity> roleEntitySet;
 
   /**
    * Множество детей пользователя
@@ -80,14 +80,14 @@ public class User {
       name = "users_children", schema = "familybenefit",
       joinColumns = @JoinColumn(name = "id_user"),
       inverseJoinColumns = @JoinColumn(name = "id_child"))
-  private Set<Child> childSet;
+  private Set<ChildEntity> childEntitySet;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    User user = (User) o;
-    return id != null && Objects.equals(id, user.id);
+    UserEntity userEntity = (UserEntity) o;
+    return id != null && Objects.equals(id, userEntity.id);
   }
 
   @Override

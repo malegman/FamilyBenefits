@@ -8,43 +8,50 @@ import java.math.BigInteger;
 import java.util.Objects;
 
 /**
- * Модель таблицы "city"
+ * Модель таблицы "criterion"
  */
 @Entity
-@Table(name = "city", schema = "familybenefit")
+@Table(name = "criterion", schema = "familybenefit")
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class City {
+public class CriterionEntity {
 
   /**
-   * ID города
+   * ID критерия
    */
   @Id
   @Column(name = "id")
   private BigInteger id;
 
   /**
-   * Название города
+   * Название критерия
    */
   @Column(name = "name")
   private String name;
 
   /**
-   * Информация города
+   * Информация критерия
    */
   @Column(name = "info")
   private String info;
+
+  /**
+   * Тип критерия критерия
+   */
+  @ManyToOne
+  @JoinColumn(name = "id_type")
+  private CriterionTypeEntity type;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    City city = (City) o;
-    return id != null && Objects.equals(id, city.id);
+    CriterionEntity criterionEntity = (CriterionEntity) o;
+    return id != null && Objects.equals(id, criterionEntity.id);
   }
 
   @Override

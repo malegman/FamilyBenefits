@@ -8,40 +8,47 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.Objects;
 
 /**
- * Модель таблицы "role"
+ * Модель таблицы "verify_email_code"
  */
 @Entity
-@Table(name = "role", schema = "familybenefit")
+@Table(name = "verify_email_code", schema = "familybenefit")
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Role {
+public class VerifyEmailCodeEntity {
 
   /**
-   * ID роли
+   * ID пользователя
    */
   @Id
-  @Column(name = "id")
-  private BigInteger id;
+  @Column(name = "id_user")
+  private BigInteger idUser;
 
   /**
-   * Название роли
+   * Код подтверждения почты
    */
-  @Column(name = "name")
-  private String name;
+  @Column(name = "code")
+  private BigInteger code;
+
+  /**
+   * Время истечения срока кода
+   */
+  @Column(name = "date_expiration")
+  private Date dateExpiration;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    Role role = (Role) o;
-    return id != null && Objects.equals(id, role.id);
+    VerifyEmailCodeEntity that = (VerifyEmailCodeEntity) o;
+    return idUser != null && Objects.equals(idUser, that.idUser);
   }
 
   @Override

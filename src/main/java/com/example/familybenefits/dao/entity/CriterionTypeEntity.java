@@ -21,7 +21,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class CriterionType {
+public class CriterionTypeEntity {
 
   /**
    * ID типа критерия
@@ -46,7 +46,7 @@ public class CriterionType {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    CriterionType that = (CriterionType) o;
+    CriterionTypeEntity that = (CriterionTypeEntity) o;
     return id != null && Objects.equals(id, that.id);
   }
 

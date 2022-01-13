@@ -22,7 +22,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Child {
+public class ChildEntity {
 
   /**
    * ID ребенка
@@ -41,8 +41,8 @@ public class Child {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    Child child = (Child) o;
-    return id != null && Objects.equals(id, child.id);
+    ChildEntity childEntity = (ChildEntity) o;
+    return id != null && Objects.equals(id, childEntity.id);
   }
 
   @Override

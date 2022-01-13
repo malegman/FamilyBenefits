@@ -19,7 +19,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class RecoveryPwdCode {
+public class RecoveryPwdCodeEntity {
 
   /**
    * ID пользователя
@@ -44,7 +44,7 @@ public class RecoveryPwdCode {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    RecoveryPwdCode that = (RecoveryPwdCode) o;
+    RecoveryPwdCodeEntity that = (RecoveryPwdCodeEntity) o;
     return idUser != null && Objects.equals(idUser, that.idUser);
   }
 
