@@ -2,6 +2,8 @@ package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,6 +29,7 @@ public class VerifyEmailCodeEntity {
   /**
    * ID пользователя
    */
+  @Nullable
   @Id
   @Column(name = "id_user")
   private BigInteger idUser;
@@ -34,17 +37,19 @@ public class VerifyEmailCodeEntity {
   /**
    * Код подтверждения почты
    */
+  @NonNull
   @Column(name = "code")
   private BigInteger code;
 
   /**
    * Время истечения срока кода
    */
+  @NonNull
   @Column(name = "date_expiration")
   private Date dateExpiration;
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     VerifyEmailCodeEntity that = (VerifyEmailCodeEntity) o;

@@ -2,6 +2,8 @@ package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -23,6 +25,7 @@ public class CriterionEntity {
   /**
    * ID критерия
    */
+  @Nullable
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -30,24 +33,27 @@ public class CriterionEntity {
   /**
    * Название критерия
    */
+  @NonNull
   @Column(name = "name")
   private String name;
 
   /**
    * Информация критерия
    */
+  @NonNull
   @Column(name = "info")
   private String info;
 
   /**
    * Тип критерия критерия
    */
+  @Nullable
   @ManyToOne
   @JoinColumn(name = "id_type")
   private CriterionTypeEntity type;
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     CriterionEntity criterionEntity = (CriterionEntity) o;

@@ -2,6 +2,8 @@ package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -24,6 +26,7 @@ public class BenefitEntity {
   /**
    * ID пособия
    */
+  @Nullable
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -31,24 +34,28 @@ public class BenefitEntity {
   /**
    * Название пособия
    */
+  @NonNull
   @Column(name = "name")
   private String name;
 
   /**
    * Информация пособия
    */
+  @NonNull
   @Column(name = "info")
   private String info;
 
   /**
    * Документы пособия
    */
+  @Nullable
   @Column(name = "documents")
   private String documents;
 
   /**
    * Множество городов пособия
    */
+  @Nullable
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
@@ -60,6 +67,7 @@ public class BenefitEntity {
   /**
    * Множество учреждений пособия
    */
+  @Nullable
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
@@ -71,6 +79,7 @@ public class BenefitEntity {
   /**
    * Множество критерий пособия
    */
+  @Nullable
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
@@ -80,7 +89,7 @@ public class BenefitEntity {
   private Set<CriterionEntity> criterionEntitySet;
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     BenefitEntity benefitEntity = (BenefitEntity) o;

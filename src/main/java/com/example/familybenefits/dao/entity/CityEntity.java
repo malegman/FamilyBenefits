@@ -2,6 +2,8 @@ package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -23,6 +25,7 @@ public class CityEntity {
   /**
    * ID города
    */
+  @Nullable
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -30,17 +33,19 @@ public class CityEntity {
   /**
    * Название города
    */
+  @NonNull
   @Column(name = "name")
   private String name;
 
   /**
    * Информация города
    */
+  @Nullable
   @Column(name = "info")
   private String info;
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     CityEntity cityEntity = (CityEntity) o;

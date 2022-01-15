@@ -2,6 +2,8 @@ package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -25,6 +27,7 @@ public class UserEntity {
   /**
    * ID пользователя
    */
+  @Nullable
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -32,30 +35,35 @@ public class UserEntity {
   /**
    * Имя пользователя
    */
+  @NonNull
   @Column(name = "name")
   private String name;
 
   /**
    * Эл. почта пользователя
    */
+  @NonNull
   @Column(name = "email")
   private String email;
 
   /**
    * Пароль пользователя
    */
+  @NonNull
   @Column(name = "password")
   private String password;
 
   /**
    * Дата регистрации пользователя
    */
+  @NonNull
   @Column(name = "date_registration")
   private Date dateRegistration;
 
   /**
    * Город пользователя
    */
+  @Nullable
   @ManyToOne
   @JoinColumn(name = "id_city")
   private CityEntity cityEntity;
@@ -63,6 +71,7 @@ public class UserEntity {
   /**
    * Множество ролей пользователя
    */
+  @NonNull
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
@@ -74,6 +83,7 @@ public class UserEntity {
   /**
    * Множество детей пользователя
    */
+  @Nullable
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
@@ -83,7 +93,7 @@ public class UserEntity {
   private Set<ChildEntity> childEntitySet;
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     UserEntity userEntity = (UserEntity) o;

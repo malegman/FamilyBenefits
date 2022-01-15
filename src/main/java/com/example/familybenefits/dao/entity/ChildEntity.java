@@ -2,6 +2,8 @@ package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,6 +29,7 @@ public class ChildEntity {
   /**
    * ID ребенка
    */
+  @Nullable
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -34,11 +37,12 @@ public class ChildEntity {
   /**
    * Дата рождения ребенка
    */
+  @NonNull
   @Column(name = "date_birth")
   private Date dateBirth;
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     ChildEntity childEntity = (ChildEntity) o;

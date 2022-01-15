@@ -2,6 +2,8 @@ package com.example.familybenefits.dao.entity;
 
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,6 +28,7 @@ public class RoleEntity {
   /**
    * ID роли
    */
+  @Nullable
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -33,11 +36,12 @@ public class RoleEntity {
   /**
    * Название роли
    */
+  @NonNull
   @Column(name = "name")
   private String name;
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     RoleEntity roleEntity = (RoleEntity) o;
