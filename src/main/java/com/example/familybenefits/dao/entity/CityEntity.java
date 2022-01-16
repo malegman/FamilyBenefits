@@ -25,7 +25,7 @@ public class CityEntity {
   /**
    * ID города
    */
-  @Nullable
+  @NonNull
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -49,7 +49,7 @@ public class CityEntity {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     CityEntity cityEntity = (CityEntity) o;
-    return id != null && Objects.equals(id, cityEntity.id);
+    return Objects.equals(id, cityEntity.id);
   }
 
   @Override

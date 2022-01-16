@@ -26,7 +26,7 @@ public class RecoveryPwdCodeEntity {
   /**
    * ID пользователя
    */
-  @Nullable
+  @NonNull
   @Id
   @Column(name = "id_user")
   private BigInteger idUser;
@@ -50,7 +50,7 @@ public class RecoveryPwdCodeEntity {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     RecoveryPwdCodeEntity that = (RecoveryPwdCodeEntity) o;
-    return idUser != null && Objects.equals(idUser, that.idUser);
+    return Objects.equals(idUser, that.idUser);
   }
 
   @Override

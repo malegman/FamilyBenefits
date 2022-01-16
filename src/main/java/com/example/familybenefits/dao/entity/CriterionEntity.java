@@ -25,7 +25,7 @@ public class CriterionEntity {
   /**
    * ID критерия
    */
-  @Nullable
+  @NonNull
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -57,7 +57,7 @@ public class CriterionEntity {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     CriterionEntity criterionEntity = (CriterionEntity) o;
-    return id != null && Objects.equals(id, criterionEntity.id);
+    return Objects.equals(id, criterionEntity.id);
   }
 
   @Override

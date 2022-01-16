@@ -26,7 +26,7 @@ public class BenefitEntity {
   /**
    * ID пособия
    */
-  @Nullable
+  @NonNull
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -55,7 +55,7 @@ public class BenefitEntity {
   /**
    * Множество городов пособия
    */
-  @Nullable
+  @NonNull
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
@@ -67,7 +67,7 @@ public class BenefitEntity {
   /**
    * Множество учреждений пособия
    */
-  @Nullable
+  @NonNull
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
@@ -79,7 +79,7 @@ public class BenefitEntity {
   /**
    * Множество критерий пособия
    */
-  @Nullable
+  @NonNull
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
@@ -93,7 +93,7 @@ public class BenefitEntity {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     BenefitEntity benefitEntity = (BenefitEntity) o;
-    return id != null && Objects.equals(id, benefitEntity.id);
+    return Objects.equals(id, benefitEntity.id);
   }
 
   @Override

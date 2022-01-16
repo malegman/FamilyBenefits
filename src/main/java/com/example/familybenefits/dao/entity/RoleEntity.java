@@ -28,7 +28,7 @@ public class RoleEntity {
   /**
    * ID роли
    */
-  @Nullable
+  @NonNull
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -45,7 +45,7 @@ public class RoleEntity {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     RoleEntity roleEntity = (RoleEntity) o;
-    return id != null && Objects.equals(id, roleEntity.id);
+    return Objects.equals(id, roleEntity.id);
   }
 
   @Override

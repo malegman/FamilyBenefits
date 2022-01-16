@@ -29,7 +29,7 @@ public class ChildEntity {
   /**
    * ID ребенка
    */
-  @Nullable
+  @NonNull
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -46,7 +46,7 @@ public class ChildEntity {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     ChildEntity childEntity = (ChildEntity) o;
-    return id != null && Objects.equals(id, childEntity.id);
+    return Objects.equals(id, childEntity.id);
   }
 
   @Override

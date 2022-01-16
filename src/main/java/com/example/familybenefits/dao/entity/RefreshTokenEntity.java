@@ -29,7 +29,7 @@ public class RefreshTokenEntity {
   /**
    * ID пользователя
    */
-  @Nullable
+  @NonNull
   @Id
   @Column(name = "id_user")
   private BigInteger idUser;
@@ -53,7 +53,7 @@ public class RefreshTokenEntity {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     RefreshTokenEntity that = (RefreshTokenEntity) o;
-    return idUser != null && Objects.equals(idUser, that.idUser);
+    return Objects.equals(idUser, that.idUser);
   }
 
   @Override

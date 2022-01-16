@@ -25,7 +25,7 @@ public class InstitutionEntity {
   /**
    * ID учреждения
    */
-  @Nullable
+  @NonNull
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -85,7 +85,7 @@ public class InstitutionEntity {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     InstitutionEntity that = (InstitutionEntity) o;
-    return id != null && Objects.equals(id, that.id);
+    return Objects.equals(id, that.id);
   }
 
   @Override

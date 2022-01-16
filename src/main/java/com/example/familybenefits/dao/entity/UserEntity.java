@@ -27,7 +27,7 @@ public class UserEntity {
   /**
    * ID пользователя
    */
-  @Nullable
+  @NonNull
   @Id
   @Column(name = "id")
   private BigInteger id;
@@ -83,7 +83,7 @@ public class UserEntity {
   /**
    * Множество детей пользователя
    */
-  @Nullable
+  @NonNull
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
@@ -97,7 +97,7 @@ public class UserEntity {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     UserEntity userEntity = (UserEntity) o;
-    return id != null && Objects.equals(id, userEntity.id);
+    return Objects.equals(id, userEntity.id);
   }
 
   @Override
