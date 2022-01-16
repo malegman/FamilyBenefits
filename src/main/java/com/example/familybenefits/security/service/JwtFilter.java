@@ -1,12 +1,13 @@
 package com.example.familybenefits.security.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
@@ -17,12 +18,15 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Фильтр для фильрации клиентских запросов, с использованием JWT
  */
 @Service
 public class JwtFilter extends GenericFilterBean {
+
+  private static final Logger log = LoggerFactory.getLogger(JwtFilter.class);
 
   /**
    * Название заголовка запроса, для извлечния токена доступа
@@ -32,13 +36,11 @@ public class JwtFilter extends GenericFilterBean {
   /**
    * Сервис для работы с jwt
    */
-  @NonNull
   private final JwtService jwtService;
 
   /**
    * Сервис для работы с объектом пользователя для авторизации
    */
-  @NonNull
   private final UserDetailsService userDetailsService;
 
   /**
@@ -47,7 +49,7 @@ public class JwtFilter extends GenericFilterBean {
    * @param userDetailsService сервис для работы с объектом пользователя, который используется для авторизации
    */
   @Autowired
-  public JwtFilter(@NonNull JwtService jwtService, @NonNull UserDetailsService userDetailsService) {
+  public JwtFilter(JwtService jwtService, UserDetailsService userDetailsService) {
     this.jwtService = jwtService;
     this.userDetailsService = userDetailsService;
   }
@@ -61,16 +63,29 @@ public class JwtFilter extends GenericFilterBean {
    * @throws ServletException ошибка обработки запроса и ответа
    */
   @Override
-  public void doFilter(@NonNull ServletRequest servletRequest, @NonNull ServletResponse servletResponse, @NonNull FilterChain filterChain) throws IOException, ServletException {
+  public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
-    //log.info("do filter...");
-    String token = getTokenFromRequest((HttpServletRequest) servletRequest);
-
-    if (token != null && jwtService.validateToken(token)) {
-      String userLogin = jwtService.getEmailFromToken(token);
-      UserDetails userDetails = userDetailsService.loadUserByUsername(userLogin);
-      UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-      SecurityContextHolder.getContext().setAuthentication(auth);
+    Optional<String> token = getTokenFromRequest((HttpServletRequest) servletRequest);
+    if (token.isEmpty()) {
+      log.warn("Couldn't get token from request: [{}]", servletRequest);
+    } else {
+      if (jwtService.validateToken(token.get())) {
+        Optional<String> email = jwtService.getEmailFromToken(token.get());
+        if (email.isEmpty()) {
+          log.warn("Couldn't get email from token: [{}]", token);
+        } else {
+          UserDetails userDetails = null;
+          try {
+            userDetails = userDetailsService.loadUserByUsername(email.get());
+          } catch (UsernameNotFoundException e) {
+            log.error("UserDetails with email [{}] not found", email);
+          }
+          if (userDetails != null) {
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+          }
+        }
+      }
     }
 
     filterChain.doFilter(servletRequest, servletResponse);
@@ -79,17 +94,16 @@ public class JwtFilter extends GenericFilterBean {
   /**
    * Извлекает токен из запроса клиента
    * @param request запрос клиента
-   * @return токен пользователя, jwt
+   * @return токен пользователя, jwt. null, если токен не обнаружен
    */
-  @Nullable
-  private String getTokenFromRequest(@NonNull HttpServletRequest request) {
+  private Optional<String> getTokenFromRequest(HttpServletRequest request) {
 
     String bearer = request.getHeader(AUTHORIZATION);
 
     if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
-      return bearer.substring(7);
+      return Optional.of(bearer.substring(7));
     }
 
-    return null;
+    return Optional.empty();
   }
 }

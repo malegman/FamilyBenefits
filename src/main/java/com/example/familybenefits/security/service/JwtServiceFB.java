@@ -1,15 +1,16 @@
 package com.example.familybenefits.security.service;
 
 import io.jsonwebtoken.*;
-import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * Реализация сервиса для работы с jwt
@@ -17,35 +18,41 @@ import java.util.Date;
 @Service
 public class JwtServiceFB implements JwtService {
 
+  private static final Logger log = LoggerFactory.getLogger(JwtServiceFB.class);
+
   /**
    * Закрытый ключ, используемый для подписывания jwt
    */
-  @NonNull
   @Value("$(jwt.secret)")
   private String jwtSecret;
 
   /**
    * Время жизни jwt в минутах
    */
-  @NonNull
   @Value("$(jwt.expirationMin)")
   private int jwtExpirationMin;
 
   /**
    * Создает токен пользователя с использованием его email
    * @param email email пользователя
-   * @return сгенерированный jwt
+   * @return сгенерированный jwt. null, если указан некорректный email
    */
   @Override
-  @NotNull
-  public String generateToken(@NonNull String email) {
+  public Optional<String> generateToken(String email) {
+
+    if (!StringUtils.hasText(email)) {
+      log.error("Incorrect email: [{}]", email);
+      return Optional.empty();
+    }
 
     Date expiration = Date.from(LocalDateTime.now().plusMinutes(jwtExpirationMin).toInstant(ZoneOffset.UTC));
-    return Jwts.builder()
+    return Optional.of(
+        Jwts.builder()
         .setSubject(email)
         .setExpiration(expiration)
         .signWith(SignatureAlgorithm.HS512, jwtSecret)
-        .compact();
+        .compact()
+    );
   }
 
   /**
@@ -54,52 +61,42 @@ public class JwtServiceFB implements JwtService {
    * @return true, если токен действительный
    */
   @Override
-  public boolean validateToken(@NonNull String token) {
+  public boolean validateToken(String token) {
 
     try {
       Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
       return true;
 
     } catch (ExpiredJwtException expEx) {
-      // log.severe("Token expired");
+      log.error("Token expired: [{}]", token);
     } catch (UnsupportedJwtException unsEx) {
-      // log.severe("Unsupported jwt");
+      log.error("Unsupported jwt: [{}]", token);
     } catch (MalformedJwtException mjEx) {
-      // log.severe("Malformed jwt");
+      log.error("Malformed jwt: [{}]", token);
     } catch (SignatureException sEx) {
-      // log.severe("Invalid signature");
+      log.error("Invalid signature: [{}]", token);
     } catch (IllegalArgumentException e) {
-      // log.severe("invalid token");
+      log.error("Invalid token: [{}]", token);
     }
 
     return false;
   }
 
   /**
-   * Получает email пользователя по токену
+   * Получает email пользователя по токену формата jwt
    * @param token токен пользователя, jwt
    * @return email пользователя. null, если не удалось извлечь email из jwt
    */
   @Override
-  @Nullable
-  public String getEmailFromToken(@NonNull String token) {
+  public Optional<String> getEmailFromToken(String token) {
 
     try {
       Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
-      return claims.getSubject();
+      return Optional.of(claims.getSubject());
 
-    } catch (ExpiredJwtException expEx) {
-      // log.severe("Token expired");
-    } catch (UnsupportedJwtException unsEx) {
-      // log.severe("Unsupported jwt");
-    } catch (MalformedJwtException mjEx) {
-      // log.severe("Malformed jwt");
-    } catch (SignatureException sEx) {
-      // log.severe("Invalid signature");
     } catch (Exception e) {
-      // log.severe("invalid token");
+      log.error("Couldn't get email from token: [{}]", token);
+      return Optional.empty();
     }
-
-    return null;
   }
 }

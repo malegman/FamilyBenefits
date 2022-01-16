@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.lang.NonNull;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -24,7 +23,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   /**
    * Фильтр для фильрации клиентских запросов, с использованием JWT
    */
-  @NonNull
   private final JwtFilter jwtFilter;
 
   /**
@@ -32,7 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
    * @param jwtFilter фильтр для фильрации клиентских запросов, с использованием JWT
    */
   @Autowired
-  public SecurityConfig(@NonNull JwtFilter jwtFilter) {
+  public SecurityConfig(JwtFilter jwtFilter) {
     this.jwtFilter = jwtFilter;
   }
 
@@ -42,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
    * @throws Exception если конфигурация безопасности настроена некорректно
    */
   @Override
-  protected void configure(@NonNull HttpSecurity http) throws Exception {
+  protected void configure(HttpSecurity http) throws Exception {
 
     http
         .httpBasic().disable()

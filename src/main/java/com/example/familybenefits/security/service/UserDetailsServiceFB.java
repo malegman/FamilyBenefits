@@ -3,8 +3,9 @@ package com.example.familybenefits.security.service;
 import com.example.familybenefits.dao.entity.UserEntity;
 import com.example.familybenefits.security.model.UserDetailsFB;
 import com.example.familybenefits.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,7 +20,6 @@ public class UserDetailsServiceFB implements UserDetailsService {
   /**
    * Сервис для взаимодействия с пользователем
    */
-  @NonNull
   private final UserService userService;
 
   /**
@@ -27,7 +27,7 @@ public class UserDetailsServiceFB implements UserDetailsService {
    * @param userService сервис для взаимодействия с пользователем
    */
   @Autowired
-  public UserDetailsServiceFB(@NonNull UserService userService) {
+  public UserDetailsServiceFB(UserService userService) {
     this.userService = userService;
   }
 
