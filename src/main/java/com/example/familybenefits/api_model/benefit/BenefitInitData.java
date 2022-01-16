@@ -4,6 +4,7 @@ import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.lang.NonNull;
 
 import java.util.Set;
 
@@ -15,20 +16,23 @@ import java.util.Set;
 public class BenefitInitData {
 
   /**
-   * Множество кратких информаций о городах
+   * Множество кратких информаций о городах пособия
    */
+  @NonNull
   @JsonProperty("short_city_set")
   private Set<ShortObjectInfo> shortCitySet;
 
   /**
-   * Множество кратких информаций об учреждениях
+   * Множество кратких информаций об учреждениях пособия
    */
+  @NonNull
   @JsonProperty("short_institution_set")
   private Set<ShortObjectInfo> shortInstitutionSet;
 
   /**
-   * Множество кратких информаций о критериях
+   * Множество кратких информаций о критериях пособия
    */
+  @NonNull
   @JsonProperty("short_criterion_set")
   private Set<ShortObjectInfo> shortCriterionSet;
 }

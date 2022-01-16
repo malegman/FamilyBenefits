@@ -5,6 +5,7 @@ import com.example.familybenefits.api_model.criterion.CriterionInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.lang.NonNull;
 
 import java.util.Set;
 
@@ -18,12 +19,14 @@ public class UserInitData {
   /**
    * Множество кратких информаций о городах
    */
+  @NonNull
   @JsonProperty("short_city_set")
   private Set<ShortObjectInfo> shortCitySet;
 
   /**
    * Множество информаций о критериях
    */
+  @NonNull
   @JsonProperty("criterion_set")
   private Set<CriterionInfo> criterionSet;
 }
