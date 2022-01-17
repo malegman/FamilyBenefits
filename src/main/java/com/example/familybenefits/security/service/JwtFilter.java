@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -66,18 +67,22 @@ public class JwtFilter extends GenericFilterBean {
   public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
     Optional<String> token = getTokenFromRequest((HttpServletRequest) servletRequest);
+
     if (token.isEmpty()) {
+      ((HttpServletResponse)servletResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       log.warn("Couldn't get token from request: [{}]", servletRequest);
     } else {
       if (jwtService.validateToken(token.get())) {
         Optional<String> email = jwtService.getEmailFromToken(token.get());
         if (email.isEmpty()) {
+          ((HttpServletResponse)servletResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
           log.warn("Couldn't get email from token: [{}]", token);
         } else {
           UserDetails userDetails = null;
           try {
             userDetails = userDetailsService.loadUserByUsername(email.get());
           } catch (UsernameNotFoundException e) {
+            ((HttpServletResponse)servletResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             log.error("UserDetails with email [{}] not found", email);
           }
           if (userDetails != null) {
