@@ -1,10 +1,7 @@
 package com.example.familybenefits.api_model.city;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -15,7 +12,8 @@ import java.math.BigInteger;
  */
 @Data
 @Builder
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor
+@AllArgsConstructor
 public class CityUpdate {
 
   /**
