@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -193,7 +192,7 @@ public class CityServiceFB implements CityService {
       ));
     }
 
-    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllByCityEntitySet(Collections.singleton(optCityEntity.get()))
+    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllWhereCityIdEquals(idCity)
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());

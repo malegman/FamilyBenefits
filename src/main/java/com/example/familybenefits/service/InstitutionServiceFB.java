@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -187,7 +186,7 @@ public class InstitutionServiceFB implements InstitutionService {
       ));
     }
 
-    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllByInstitutionEntitySet(Collections.singleton(optInstitutionEntity.get()))
+    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllWhereInstitutionIdEquals(idInstitution)
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());
