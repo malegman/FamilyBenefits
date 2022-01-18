@@ -44,6 +44,14 @@ public class CityEntity {
   @Column(name = "info")
   private String info;
 
+  /**
+   * Конструктор для создания модели по ID
+   * @param id ID города
+   */
+  public CityEntity(@NonNull BigInteger id) {
+    this.id = id;
+  }
+
   @Override
   public boolean equals(@Nullable Object o) {
     if (this == o) return true;
