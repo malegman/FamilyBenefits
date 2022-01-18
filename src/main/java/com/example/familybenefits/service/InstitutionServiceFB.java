@@ -2,7 +2,7 @@ package com.example.familybenefits.service;
 
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.city.CityInfo;
-import com.example.familybenefits.api_model.common.ShortObjectInfo;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.api_model.institution.InstitutionAdd;
 import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.api_model.institution.InstitutionInitData;
@@ -60,7 +60,7 @@ public class InstitutionServiceFB implements InstitutionService {
   }
 
   /**
-   * Добавление учреждения по запросу на добавление
+   * Добавляет учреждение по запросу на добавление
    * @param institutionAdd объект запроса на добавление учреждения
    * @throws AlreadyExistsException если учреждение с таким названием уже существует
    */
@@ -79,7 +79,7 @@ public class InstitutionServiceFB implements InstitutionService {
   }
 
   /**
-   * Обновление учреждения по запросу на обновление
+   * Обновляет учреждение по запросу на обновление
    * @param institutionUpdate объект запроса на обновление учреждения
    * @throws NotFoundException если учреждение с указанными данными не найдено
    */
@@ -98,7 +98,7 @@ public class InstitutionServiceFB implements InstitutionService {
   }
 
   /**
-   * Удаление учреждения по его ID
+   * Удаляет учреждение по его ID
    * @param idInstitution ID учреждения
    * @throws NotFoundException если учреждение с указанными данными не найдено
    */
@@ -115,7 +115,7 @@ public class InstitutionServiceFB implements InstitutionService {
   }
 
   /**
-   * Получение информации об учреждении по его ID
+   * Возвращает информацию об учреждении по его ID
    * @param idInstitution ID учреждения
    * @return информация об учреждении
    * @throws NotFoundException если учреждение с указанным ID не найдено
@@ -134,69 +134,69 @@ public class InstitutionServiceFB implements InstitutionService {
   }
 
   /**
-   * Получение дополнительных данных для учреждения
+   * Возваращает дополнительные данные для учреждения
    * @return дополнительные данные для учреждения
    * @throws NotFoundException если данные не найдены
    */
   public InstitutionInitData getInitData() throws NotFoundException {
 
-    Set<ShortObjectInfo> shortCityInfoSet = cityRepository.findAll()
+    Set<ObjectShortInfo> cityShortInfoSet = cityRepository.findAll()
         .stream()
         .map(CityConverter::toShortInfo)
         .collect(Collectors.toSet());
-    if (shortCityInfoSet.isEmpty()) {
+    if (cityShortInfoSet.isEmpty()) {
       throw new NotFoundException("Cities not found");
     }
 
     return InstitutionInitData
         .builder()
-        .shortCitySet(shortCityInfoSet)
+        .shortCitySet(cityShortInfoSet)
         .build();
   }
 
   /**
-   * Получение информации о городе учреждения
+   * Возвращает информацию о городе учреждения
    * @param idInstitution ID учреждения
    * @return информация о городе учреждения
    * @throws NotFoundException если город не найден или учреждение не найдено
    */
   public CityInfo readCity(BigInteger idInstitution) throws NotFoundException {
 
-    Optional<InstitutionEntity> institutionEntity = institutionRepository.findById(idInstitution);
-    if (institutionEntity.isEmpty()) {
+    Optional<InstitutionEntity> optInstitutionEntity = institutionRepository.findById(idInstitution);
+    if (optInstitutionEntity.isEmpty()) {
       throw new NotFoundException(String.format(
           "Institution with ID %s not found", idInstitution
       ));
     }
 
-    return CityConverter.toInfo(institutionEntity.get().getCityEntity());
+    return CityConverter.toInfo(optInstitutionEntity.get().getCityEntity());
   }
 
   /**
-   * Получение множества пособий учреждения
+   * Возваращает множество пособий учреждения
    * @param idInstitution ID учреждения
    * @return множество пособий учреждений
    * @throws NotFoundException если пособия учреждения не найдены или учреждение не найдено
    */
   public Set<BenefitInfo> readBenefits(BigInteger idInstitution) throws NotFoundException {
 
-    Optional<InstitutionEntity> institutionEntity = institutionRepository.findById(idInstitution);
-    if (institutionEntity.isEmpty()) {
+    Optional<InstitutionEntity> optInstitutionEntity = institutionRepository.findById(idInstitution);
+    if (optInstitutionEntity.isEmpty()) {
       throw new NotFoundException(String.format(
           "Institution with ID %s not found", idInstitution
       ));
     }
 
-    Set<BenefitInfo> benefits = benefitRepository.findAllByInstitutionEntitySet(Collections.singleton(institutionEntity.get()))
+    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllByInstitutionEntitySet(Collections.singleton(optInstitutionEntity.get()))
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());
-    if (benefits.isEmpty()) {
+    if (benefitInfoSet.isEmpty()) {
       throw new NotFoundException(String.format(
           "Benefits of institution with id %s not found", idInstitution
       ));
     }
 
-    return benefits;
+    return benefitInfoSet;
   }
 }

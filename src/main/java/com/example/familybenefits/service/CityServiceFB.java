@@ -58,7 +58,7 @@ public class CityServiceFB implements CityService {
   }
 
   /**
-   * Добавление города по запросу на добавление
+   * Добавляет город по запросу на добавление
    * @param cityAdd объект запроса на добавление города
    * @throws AlreadyExistsException если город с указанным названием уже существует
    */
@@ -77,7 +77,7 @@ public class CityServiceFB implements CityService {
   }
 
   /**
-   * Обновление города по запросу на обновление
+   * Обновляет город по запросу на обновление
    * @param cityUpdate объект запроса на обновление города
    * @throws NotFoundException если город с указанными данными не найден
    */
@@ -96,7 +96,7 @@ public class CityServiceFB implements CityService {
   }
 
   /**
-   * Удаление города по его ID
+   * Удаляет город по его ID
    * @param idCity ID города
    * @throws NotFoundException если город с указанным ID не найден
    */
@@ -113,7 +113,7 @@ public class CityServiceFB implements CityService {
   }
 
   /**
-   * Получение информации о городе по его ID
+   * Возвращает информацию о городе по его ID
    * @param idCity ID города
    * @return информация о городе
    * @throws NotFoundException если город с указанным ID не найден
@@ -130,26 +130,26 @@ public class CityServiceFB implements CityService {
   }
 
   /**
-   * Получение множества всех существующих городов
+   * Возвращает множество всех существующих городов
    * @return множество информаций о городах
    * @throws NotFoundException если города не найдены
    */
   @Override
   public Set<CityInfo> readAll() throws NotFoundException {
 
-    Set<CityInfo> cities = cityRepository.findAll()
+    Set<CityInfo> cityInfoSet = cityRepository.findAll()
         .stream()
         .map(CityConverter::toInfo)
         .collect(Collectors.toSet());
-    if (cities.isEmpty()) {
+    if (cityInfoSet.isEmpty()) {
       throw new NotFoundException("Cities not found");
     }
 
-    return cities;
+    return cityInfoSet;
   }
 
   /**
-   * Получение множества всех учреждений города
+   * Возвращает множество всех учреждений города
    * @param idCity ID города
    * @return множество информаций о городах
    * @throws NotFoundException если учреждения не найдены или город с указынным ID не найден
@@ -157,28 +157,28 @@ public class CityServiceFB implements CityService {
   @Override
   public Set<InstitutionInfo> readInstitutions(BigInteger idCity) throws NotFoundException {
 
-    Optional<CityEntity> cityEntity = cityRepository.findById(idCity);
-    if (cityEntity.isEmpty()) {
+    Optional<CityEntity> optCityEntity = cityRepository.findById(idCity);
+    if (optCityEntity.isEmpty()) {
       throw new NotFoundException(String.format(
           "City with ID %s not found", idCity
       ));
     }
 
-    Set<InstitutionInfo> institutions = institutionRepository.findAllByCityEntity(cityEntity.get())
+    Set<InstitutionInfo> institutionInfoSet = institutionRepository.findAllByCityEntity(optCityEntity.get())
         .stream()
         .map(InstitutionConverter::toInfo)
         .collect(Collectors.toSet());
-    if (institutions.isEmpty()) {
+    if (institutionInfoSet.isEmpty()) {
       throw new NotFoundException(String.format(
           "Institutions of city with id %s not found", idCity
       ));
     }
 
-    return institutions;
+    return institutionInfoSet;
   }
 
   /**
-   * Получение множества всех пособий города
+   * Возвращает множество всех пособий города
    * @param idCity ID города
    * @return множество информаций о городах
    * @throws NotFoundException если пособия не найдены или город с указынным ID не найден
@@ -186,23 +186,23 @@ public class CityServiceFB implements CityService {
   @Override
   public Set<BenefitInfo> readBenefits(BigInteger idCity) throws NotFoundException {
 
-    Optional<CityEntity> cityEntity = cityRepository.findById(idCity);
-    if (cityEntity.isEmpty()) {
+    Optional<CityEntity> optCityEntity = cityRepository.findById(idCity);
+    if (optCityEntity.isEmpty()) {
       throw new NotFoundException(String.format(
           "City with ID %s not found", idCity
       ));
     }
 
-    Set<BenefitInfo> benefits = benefitRepository.findAllByCityEntitySet(Collections.singleton(cityEntity.get()))
+    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllByCityEntitySet(Collections.singleton(optCityEntity.get()))
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());
-    if (benefits.isEmpty()) {
+    if (benefitInfoSet.isEmpty()) {
       throw new NotFoundException(String.format(
           "Benefits of city with id %s not found", idCity
       ));
     }
 
-    return benefits;
+    return benefitInfoSet;
   }
 }
