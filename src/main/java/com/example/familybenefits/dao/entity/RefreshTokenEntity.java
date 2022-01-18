@@ -39,7 +39,7 @@ public class RefreshTokenEntity {
    */
   @NonNull
   @Column(name = "token")
-  private BigInteger token;
+  private String token;
 
   /**
    * Время истечения срока токена
