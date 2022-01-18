@@ -3,7 +3,6 @@ package com.example.familybenefits.security.model;
 import com.example.familybenefits.dao.entity.UserEntity;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,8 +37,11 @@ public class UserDetailsFB implements UserDetails {
    * @param userEntity Модель пользователя, таблицы "user"
    * @return Объект пользователя
    */
-  @NonNull
-  public static UserDetailsFB fromUserEntity(@NonNull UserEntity userEntity) {
+  public static UserDetailsFB fromUserEntity(UserEntity userEntity) {
+
+    if (userEntity == null) {
+      return new UserDetailsFB();
+    }
 
     return UserDetailsFB
         .builder()

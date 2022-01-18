@@ -1,13 +1,15 @@
 package com.example.familybenefits.security.service;
 
 import com.example.familybenefits.dao.entity.UserEntity;
+import com.example.familybenefits.dao.repository.UserRepository;
 import com.example.familybenefits.security.model.UserDetailsFB;
-import com.example.familybenefits.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * Реализация сервиса для работы с объектом пользователя для авторизации
@@ -18,15 +20,15 @@ public class UserDetailsServiceFB implements UserDetailsService {
   /**
    * Сервис для взаимодействия с пользователем
    */
-  private final UserService userService;
+  private final UserRepository userRepository;
 
   /**
    * Конструктор для иниуиализации интерфейса сервиса
-   * @param userService сервис для взаимодействия с пользователем
+   * @param userRepository сервис для взаимодействия с пользователем
    */
   @Autowired
-  public UserDetailsServiceFB(UserService userService) {
-    this.userService = userService;
+  public UserDetailsServiceFB(UserRepository userRepository) {
+    this.userRepository = userRepository;
   }
 
   /**
@@ -38,11 +40,13 @@ public class UserDetailsServiceFB implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-    UserEntity userEntity = userService.getByEmail(username);
-    if (userEntity == null) {
-      throw new UsernameNotFoundException(String.format("Объект с email %s не найден", username));
+    Optional<UserEntity> optUserEntity = userRepository.findByEmail(username);
+    if (optUserEntity.isEmpty()) {
+      throw new UsernameNotFoundException(String.format(
+          "Объект с email %s не найден", username
+      ));
     }
 
-    return UserDetailsFB.fromUserEntity(userEntity);
+    return UserDetailsFB.fromUserEntity(optUserEntity.get());
   }
 }

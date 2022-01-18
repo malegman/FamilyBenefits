@@ -66,21 +66,26 @@ public class JwtFilter extends GenericFilterBean {
   @Override
   public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
-    Optional<String> token = getTokenFromRequest((HttpServletRequest) servletRequest);
+    String token;
+    String email;
 
-    if (token.isEmpty()) {
+    Optional<String> optToken = getTokenFromRequest((HttpServletRequest) servletRequest);
+
+    if (optToken.isEmpty()) {
       ((HttpServletResponse)servletResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       log.warn("Couldn't get token from request: [{}]", servletRequest);
     } else {
-      if (jwtService.validateToken(token.get())) {
-        Optional<String> email = jwtService.getEmailFromToken(token.get());
-        if (email.isEmpty()) {
+      token = optToken.get();
+      if (jwtService.validateToken(token)) {
+        Optional<String> optEmail = jwtService.getEmailFromToken(token);
+        if (optEmail.isEmpty()) {
           ((HttpServletResponse)servletResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
           log.warn("Couldn't get email from token: [{}]", token);
         } else {
+          email = optEmail.get();
           UserDetails userDetails = null;
           try {
-            userDetails = userDetailsService.loadUserByUsername(email.get());
+            userDetails = userDetailsService.loadUserByUsername(email);
           } catch (UsernameNotFoundException e) {
             ((HttpServletResponse)servletResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             log.error("UserDetails with email [{}] not found", email);
@@ -99,9 +104,13 @@ public class JwtFilter extends GenericFilterBean {
   /**
    * Извлекает токен из запроса клиента
    * @param request запрос клиента
-   * @return токен пользователя, jwt. null, если токен не обнаружен
+   * @return токен пользователя, jwt. null, если токен не обнаружен или request == null
    */
   private Optional<String> getTokenFromRequest(HttpServletRequest request) {
+
+    if (request == null) {
+      return Optional.empty();
+    }
 
     String bearer = request.getHeader(AUTHORIZATION);
 
