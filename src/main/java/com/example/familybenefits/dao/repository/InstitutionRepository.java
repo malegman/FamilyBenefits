@@ -13,6 +13,13 @@ import java.util.Set;
 public interface InstitutionRepository extends JpaRepository<InstitutionEntity, BigInteger> {
 
   /**
+   * Проверяет наличие учреждения по его названию
+   * @param name название учреждения
+   * @return true, если учреждение с указанным названием существует
+   */
+  boolean existsByName(String name);
+
+  /**
    * Находит учреждения, которые есть в указанном городе
    * @param cityEntity город
    * @return множество учреждений
