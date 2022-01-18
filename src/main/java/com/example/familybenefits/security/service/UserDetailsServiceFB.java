@@ -3,8 +3,6 @@ package com.example.familybenefits.security.service;
 import com.example.familybenefits.dao.entity.UserEntity;
 import com.example.familybenefits.security.model.UserDetailsFB;
 import com.example.familybenefits.service.UserService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
