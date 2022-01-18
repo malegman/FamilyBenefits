@@ -1,11 +1,12 @@
 package com.example.familybenefits.api_model.admin;
 
-import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+
+import java.math.BigInteger;
 
 /**
  * Объект запроса для добавления администратора
@@ -43,9 +44,9 @@ public class AdminAdd {
   private String repeatPassword;
 
   /**
-   * Краткая информация о городе администратора
+   * ID города администратора
    */
   @Nullable
-  @JsonProperty("short_city")
-  private ShortObjectInfo shortCity;
+  @JsonProperty("id_city")
+  private BigInteger idCity;
 }

@@ -1,11 +1,12 @@
 package com.example.familybenefits.api_model.institution;
 
-import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+
+import java.math.BigInteger;
 
 /**
  * Объект запроса для добавления учреждения
@@ -57,9 +58,9 @@ public class InstitutionAdd {
   private String schedule;
 
   /**
-   * Краткая информация о городе учреждения
+   * ID города учреждения
    */
   @NonNull
-  @JsonProperty("short_city")
-  private ShortObjectInfo shortCity;
+  @JsonProperty("id_city")
+  private BigInteger idCity;
 }

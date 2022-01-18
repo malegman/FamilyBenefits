@@ -1,6 +1,5 @@
 package com.example.familybenefits.api_model.criterion;
 
-import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -38,9 +37,9 @@ public class CriterionUpdate {
   private String info;
 
   /**
-   * Краткая информация о типе критерия критерия
+   * ID типа критерия критерия
    */
   @Nullable
-  @JsonProperty("short_criterion_type")
-  private ShortObjectInfo shortCriterionType;
+  @JsonProperty("id_criterion_type")
+  private BigInteger idCriterionType;
 }

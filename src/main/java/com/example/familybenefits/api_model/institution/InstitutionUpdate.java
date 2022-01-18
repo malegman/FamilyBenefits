@@ -1,6 +1,5 @@
 package com.example.familybenefits.api_model.institution;
 
-import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -66,9 +65,9 @@ public class InstitutionUpdate {
   private String schedule;
 
   /**
-   * Краткая информация о городе учреждения
+   * ID города учреждения
    */
   @NonNull
-  @JsonProperty("short_city")
-  private ShortObjectInfo shortCity;
+  @JsonProperty("id_city")
+  private BigInteger idCity;
 }

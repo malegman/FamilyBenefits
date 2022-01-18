@@ -1,6 +1,5 @@
 package com.example.familybenefits.api_model.admin;
 
-import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -38,9 +37,9 @@ public class AdminUpdate {
   private String email;
 
   /**
-   * Краткая информация о городе администратора
+   * ID города администратора
    */
   @Nullable
-  @JsonProperty("short_city")
-  private ShortObjectInfo shortCity;
+  @JsonProperty("id_city")
+  private BigInteger idCity;
 }

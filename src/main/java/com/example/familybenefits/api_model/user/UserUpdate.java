@@ -1,6 +1,5 @@
 package com.example.familybenefits.api_model.user;
 
-import com.example.familybenefits.api_model.common.ShortObjectInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -39,18 +38,18 @@ public class UserUpdate {
   private String email;
 
   /**
-   * Краткая информация о городе пользователя
+   * ID города пользователя
    */
   @Nullable
-  @JsonProperty("short_city")
-  private ShortObjectInfo shortCity;
+  @JsonProperty("id_city")
+  private BigInteger idCity;
 
   /**
-   * Множество кратких информаций о критериях пользователя
+   * Множество ID критериев пользователя
    */
   @NonNull
-  @JsonProperty("short_criterion_set")
-  private Set<ShortObjectInfo> shortCriterionSet;
+  @JsonProperty("id_criterion_set")
+  private Set<BigInteger> idCriterionSet;
 
   /**
    * Множество дат рождений детей пользователя

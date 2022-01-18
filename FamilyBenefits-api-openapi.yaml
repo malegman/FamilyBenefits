@@ -827,7 +827,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InstitutionInfo'
+                  $ref: '#/components/schemas/BenefitInfo'
         '404':
           description: Пособия не найдены
           content: { }
@@ -1237,6 +1237,7 @@ paths:
         Возвращает дополнительные данные для добавления или обновления учреждения.
         Для администратора.
         Необходима авторизация.
+      operationId: getInstitutionInitData
       responses:
         '200':
           description: Дополнительные данные учреждения получены
@@ -1786,20 +1787,27 @@ components:
           description: Повторно введенный пароль пользователя
           type: string
           example: password
-        shortCity:
-          $ref: '#/components/schemas/ShortObjectInfo'
-        shortCriterionSet:
-          description: Множество кратких информаций о критериях
+        idCity:
+          description: ID города пользователя
+          type: integer
+          example: 1222333444
+        idCriterionSet:
+          description: Множество ID критериев пользователя
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
+            allOf:
+              - description: ID критерия
+                type: integer
+                example: 1222333444
         birthDateChildren:
           description: Множество дат рождений детей пользователя
           type: array
           items:
-            type: string
-            format: date
-            example: 01-01-2022
+            allOf:
+              - description: Дата рождения ребенка
+                type: string
+                format: date
+                example: 01-01-2022
     UserUpdate:
       description: Объект запроса для обновления пользователя
       properties:
@@ -1815,20 +1823,27 @@ components:
           description: Электронная почта пользователя
           type: string
           example: exmaple@mail.com
-        shortCity:
-          $ref: '#/components/schemas/ShortObjectInfo'
-        shortCriterionSet:
-          description: Множество кратких информаций о критериях пользователя
+        idCity:
+          description: ID города пользователя
+          type: integer
+          example: 1222333444
+        idCriterionSet:
+          description: Множество ID критериев пользователя
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
+            allOf:
+              - description: ID критерия
+                type: integer
+                example: 1222333444
         birthDateChildren:
           description: Множество дат рождений детей пользователя
           type: array
           items:
-            type: string
-            format: date
-            example: 01-01-2022
+            allOf:
+              - description: Дата рождения ребенка
+                type: string
+                format: date
+                example: 01-01-2022
     UserInitData:
       description: Дополнительные данные для добавления или обновления пользователя
       properties:
@@ -1961,8 +1976,10 @@ components:
           description: Повторно введенный пароль администратора
           type: string
           example: password
-        shortCity:
-          $ref: '#/components/schemas/ShortObjectInfo'
+        idCity:
+          description: ID города администратора
+          type: integer
+          example: 1222333444
     AdminUpdate:
       description: Объект запроса для обновления администратора
       properties:
@@ -1978,8 +1995,10 @@ components:
           description: Электронная почта администратора
           type: string
           example: exmaple@mail.com
-        shortCity:
-          $ref: '#/components/schemas/ShortObjectInfo'
+        idCity:
+          description: ID города администратора
+          type: integer
+          example: 1222333444
     AdminInitData:
       description: Дополнительные данные для добавления или обновления администратора
       properties:
@@ -2063,8 +2082,10 @@ components:
           description: Информация критерия
           type: string
           example: info
-        shortCriterionType:
-          $ref: '#/components/schemas/ShortObjectInfo'
+        idCriterionType:
+          description: ID типа критерия критерия
+          type: integer
+          example: 1222333444
     CriterionUpdate:
       description: Объект запроса для обновления критерия
       properties:
@@ -2080,8 +2101,10 @@ components:
           description: Информация критерия
           type: string
           example: info
-        shortCriterionType:
-          $ref: '#/components/schemas/ShortObjectInfo'
+        idCriterionType:
+          description: ID типа критерия критерия
+          type: integer
+          example: 1222333444
     CriterionInitData:
       description: Дополнительные данные для добавления или обновления критерия
       properties:
@@ -2189,8 +2212,10 @@ components:
           description: График работы учреждения
           type: string
           example: График
-        shortCity:
-          $ref: '#/components/schemas/ShortObjectInfo'
+        idCity:
+          description: ID города учреждения
+          type: integer
+          example: 1222333444
     InstitutionUpdate:
       description: Объект запроса для обновления учреждения
       properties:
@@ -2218,8 +2243,10 @@ components:
           description: График работы учреждения
           type: string
           example: График
-        shortCity:
-          $ref: '#/components/schemas/ShortObjectInfo'
+        idCity:
+          description: ID города учреждения
+          type: integer
+          example: 1222333444
     InstitutionInitData:
       description: Дополнительные данные для добавления или обновления учреждения
       properties:
@@ -2264,21 +2291,30 @@ components:
           description: Документы для получения пособия
           type: string
           example: documents
-        shortCitySet:
-          description: Множество кратких информаций о городах пособия
+        idCitySet:
+          description: Множество ID городов пособия
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
-        shortInstitutionSet:
-          description: Множество кратких информаций об учреждениях пособия
+            allOf:
+              - description: ID города
+                type: integer
+                example: 1222333444
+        idInstitutionSet:
+          description: Множество ID учреждений пособия
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
-        shortCriterionSet:
-          description: Множество кратких информаций о критериях пособия
+            allOf:
+              - description: ID учреждения
+                type: integer
+                example: 1222333444
+        idCriterionSet:
+          description: Множество ID критериев пособия
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
+            allOf:
+              - description: ID критерия
+                type: integer
+                example: 1222333444
     BenefitUpdate:
       description: Объект запроса для обновления пособия
       properties:
@@ -2298,21 +2334,30 @@ components:
           description: Документы для получения пособия
           type: string
           example: documents
-        shortCitySet:
-          description: Множество кратких информаций о городах пособия
+        idCitySet:
+          description: Множество ID городов пособия
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
-        shortInstitutionSet:
-          description: Множество кратких информаций об учреждениях пособия
+            allOf:
+              - description: ID города
+                type: integer
+                example: 1222333444
+        idInstitutionSet:
+          description: Множество ID учреждений пособия
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
-        shortCriterionSet:
-          description: Множество кратких информаций о критериях пособия
+            allOf:
+              - description: ID учреждения
+                type: integer
+                example: 1222333444
+        idCriterionSet:
+          description: Множество ID критериев пособия
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
+            allOf:
+              - description: ID критерия
+                type: integer
+                example: 1222333444
     BenefitInitData:
       description: Дополнительные данные для добавления или обновления пособия
       properties:
