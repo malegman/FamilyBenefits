@@ -19,7 +19,7 @@ import java.util.Set;
 @Setter
 @ToString
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 public class BenefitEntity {
 
@@ -51,6 +51,14 @@ public class BenefitEntity {
   @Nullable
   @Column(name = "documents")
   private String documents;
+
+  /**
+   * Конструктор для создания модели по ID
+   * @param id ID пособия
+   */
+  public BenefitEntity(@NonNull BigInteger id) {
+    this.id = id;
+  }
 
   /**
    * Множество городов пособия

@@ -18,7 +18,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 public class CriterionEntity {
 
@@ -51,6 +51,14 @@ public class CriterionEntity {
   @ManyToOne
   @JoinColumn(name = "id_type")
   private CriterionTypeEntity type;
+
+  /**
+   * Конструктор для создания модели по ID
+   * @param id ID критерия
+   */
+  public CriterionEntity(@NonNull BigInteger id) {
+    this.id = id;
+  }
 
   @Override
   public boolean equals(@Nullable Object o) {

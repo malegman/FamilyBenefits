@@ -18,7 +18,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 public class InstitutionEntity {
 
@@ -79,6 +79,14 @@ public class InstitutionEntity {
   @ManyToOne
   @JoinColumn(name = "id_city")
   private CityEntity cityEntity;
+
+  /**
+   * Конструктор для создания модели по ID
+   * @param id ID учреждения
+   */
+  public InstitutionEntity(@NonNull BigInteger id) {
+    this.id = id;
+  }
 
   @Override
   public boolean equals(@Nullable Object o) {

@@ -21,7 +21,7 @@ import java.util.Objects;
 @Setter
 @ToString
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 public class CriterionTypeEntity {
 
@@ -46,6 +46,14 @@ public class CriterionTypeEntity {
   @NonNull
   @Column(name = "info")
   private String info;
+
+  /**
+   * Конструктор для создания модели по ID
+   * @param id ID типа критерия
+   */
+  public CriterionTypeEntity(@NonNull BigInteger id) {
+    this.id = id;
+  }
 
   @Override
   public boolean equals(@Nullable Object o) {
