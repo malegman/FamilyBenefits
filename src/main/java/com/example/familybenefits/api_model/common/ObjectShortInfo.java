@@ -12,7 +12,7 @@ import java.math.BigInteger;
  */
 @Data
 @Builder
-public class ShortObjectInfo {
+public class ObjectShortInfo {
 
   /**
    * ID объекта
