@@ -2,6 +2,7 @@ package com.example.familybenefits.dao.repository;
 
 import com.example.familybenefits.dao.entity.BenefitEntity;
 import com.example.familybenefits.dao.entity.CityEntity;
+import com.example.familybenefits.dao.entity.InstitutionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigInteger;
@@ -18,4 +19,11 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, BigInteg
    * @return множество пособий
    */
   Set<BenefitEntity> findAllByCityEntitySet(Set<CityEntity> cityEntitySet);
+
+  /**
+   * Находит пособия, которые есть в указанных учреждениях
+   * @param institutionEntitySet множество учреждений
+   * @return множество пособий
+   */
+  Set<BenefitEntity> findAllByInstitutionEntitySet(Set<InstitutionEntity> institutionEntitySet);
 }
