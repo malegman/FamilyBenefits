@@ -3,7 +3,7 @@ package com.example.familybenefits.convert;
 import com.example.familybenefits.api_model.city.CityAdd;
 import com.example.familybenefits.api_model.city.CityInfo;
 import com.example.familybenefits.api_model.city.CityUpdate;
-import com.example.familybenefits.api_model.common.ShortObjectInfo;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.dao.entity.CityEntity;
 
 /**
@@ -12,11 +12,15 @@ import com.example.familybenefits.dao.entity.CityEntity;
 public class CityConverter {
 
   /**
-   * Преобразование объекта запроса на добавление города в модель таблицы "city"
+   * Преобразует объект запроса на добавление города в модель таблицы "city"
    * @param cityAdd объект запроса на добавление города
    * @return модель таблицы "city"
    */
   static public CityEntity fromAdd(CityAdd cityAdd) {
+
+    if (cityAdd == null) {
+      return new CityEntity();
+    }
 
     return CityEntity
         .builder()
@@ -26,11 +30,15 @@ public class CityConverter {
   }
 
   /**
-   * Преобразование объекта запроса на обновление города в модель таблицы "city"
+   * Преобразует объект запроса на обновление города в модель таблицы "city"
    * @param cityUpdate объект запроса на обновление города
    * @return модель таблицы "city"
    */
   static public CityEntity fromUpdate(CityUpdate cityUpdate) {
+
+    if (cityUpdate == null) {
+      return new CityEntity();
+    }
 
     return CityEntity
         .builder()
@@ -40,25 +48,33 @@ public class CityConverter {
   }
 
   /**
-   * Преобразование объекта краткой информации о городе в модель таблицы "city"
-   * @param shortObjectInfo краткая информация о городе
+   * Преобразует объект краткой информации о городе в модель таблицы "city"
+   * @param objectShortInfo краткая информация о городе
    * @return модель таблицы "city"
    */
-  static public CityEntity fromShortInfo(ShortObjectInfo shortObjectInfo) {
+  static public CityEntity fromShortInfo(ObjectShortInfo objectShortInfo) {
+
+    if (objectShortInfo == null) {
+      return new CityEntity();
+    }
 
     return CityEntity
         .builder()
-        .id(shortObjectInfo.getIdObject())
-        .name(shortObjectInfo.getNameObject())
+        .id(objectShortInfo.getIdObject())
+        .name(objectShortInfo.getNameObject())
         .build();
   }
 
   /**
-   * Преобразование модели таблицы "city" в объект информации о городе
+   * Преобразует модель таблицы "city" в объект информации о городе
    * @param cityEntity модель таблицы "city"
    * @return информация о городе
    */
   static public CityInfo toInfo(CityEntity cityEntity) {
+
+    if (cityEntity == null) {
+      return new CityInfo();
+    }
 
     return CityInfo
         .builder()
@@ -69,13 +85,17 @@ public class CityConverter {
   }
 
   /**
-   * Преобразование модели таблицы "city" в объект краткой информации об объекте
+   * Преобразует модель таблицы "city" в объект краткой информации об объекте
    * @param cityEntity модель таблицы "city"
    * @return краткая информция о городе
    */
-  static public ShortObjectInfo toShortInfo(CityEntity cityEntity) {
+  static public ObjectShortInfo toShortInfo(CityEntity cityEntity) {
 
-    return ShortObjectInfo
+    if (cityEntity == null) {
+      return new ObjectShortInfo();
+    }
+
+    return ObjectShortInfo
         .builder()
         .idObject(cityEntity.getId())
         .nameObject(cityEntity.getName())

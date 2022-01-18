@@ -1,6 +1,6 @@
 package com.example.familybenefits.convert;
 
-import com.example.familybenefits.api_model.common.ShortObjectInfo;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.api_model.institution.InstitutionAdd;
 import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.api_model.institution.InstitutionUpdate;
@@ -13,11 +13,15 @@ import com.example.familybenefits.dao.entity.InstitutionEntity;
 public class InstitutionConverter {
 
   /**
-   * Преобразование объекта запроса на добавление учреждения в модель таблицы "institution"
+   * Преобразует объект запроса на добавление учреждения в модель таблицы "institution"
    * @param institutionAdd объект запроса на добавление учреждения
    * @return модель таблицы "institution"
    */
   static public InstitutionEntity fromAdd(InstitutionAdd institutionAdd) {
+
+    if (institutionAdd == null) {
+      return new InstitutionEntity();
+    }
 
     return InstitutionEntity
         .builder()
@@ -31,11 +35,15 @@ public class InstitutionConverter {
   }
 
   /**
-   * Преобразование объекта запроса на обновление учреждения в модель таблицы "institution"
+   * Преобразует объект запроса на обновление учреждения в модель таблицы "institution"
    * @param institutionUpdate объект запроса на обновление учреждения
    * @return модель таблицы "institution"
    */
   static public InstitutionEntity fromUpdate(InstitutionUpdate institutionUpdate) {
+
+    if (institutionUpdate == null) {
+      return new InstitutionEntity();
+    }
 
     return InstitutionEntity
         .builder()
@@ -50,11 +58,15 @@ public class InstitutionConverter {
   }
 
   /**
-   * Преобразование модели таблицы "institution" в объект информации об учреждении
+   * Преобразует модель таблицы "institution" в объект информации об учреждении
    * @param institutionEntity модель таблицы "institution"
    * @return информация об учреждении
    */
   static public InstitutionInfo toInfo(InstitutionEntity institutionEntity) {
+
+    if (institutionEntity == null) {
+      return new InstitutionInfo();
+    }
 
     return InstitutionInfo
         .builder()
@@ -70,13 +82,17 @@ public class InstitutionConverter {
   }
 
   /**
-   * Преобразование модели таблицы "institutionEntity" в объект краткой информации об объекте
+   * Преобразует модель таблицы "institutionEntity" в объект краткой информации об объекте
    * @param institutionEntity модель таблицы "institutionEntity"
    * @return краткая информция об учреждении
    */
-  static public ShortObjectInfo toShortObjectInfo(InstitutionEntity institutionEntity) {
+  static public ObjectShortInfo toShortObjectInfo(InstitutionEntity institutionEntity) {
 
-    return ShortObjectInfo
+    if (institutionEntity == null) {
+      return new ObjectShortInfo();
+    }
+
+    return ObjectShortInfo
         .builder()
         .idObject(institutionEntity.getId())
         .nameObject(institutionEntity.getName())
