@@ -449,7 +449,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ShortObjectInfo'
+                  $ref: '#/components/schemas/ObjectShortInfo'
         '401':
           description: Клиент не авторизован или токен не действительный
           content: { }
@@ -1686,7 +1686,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ShortObjectInfo'
+                  $ref: '#/components/schemas/ObjectShortInfo'
         '404':
           description: Типы критериев не найдены
           content: { }
@@ -1845,13 +1845,14 @@ components:
                 format: date
                 example: 01-01-2022
     UserInitData:
-      description: Дополнительные данные для добавления или обновления пользователя
+      description: Дополнительные данные для добавления или обновления пользователя.
+        Содержат в себе множества кратких информаций о городах и критериях
       properties:
         shortCitySet:
           description: Множество кратких информаций о городах
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
+            $ref: '#/components/schemas/ObjectShortInfo'
         criterionSet:
           description: Множество информаций о критериях
           type: array
@@ -2000,13 +2001,14 @@ components:
           type: integer
           example: 1222333444
     AdminInitData:
-      description: Дополнительные данные для добавления или обновления администратора
+      description: Дополнительные данные для добавления или обновления администратора.
+        Содержат в себе множество кратких информаций о городах
       properties:
         shortCitySet:
           description: Множество кратких информаций о городах
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
+            $ref: '#/components/schemas/ObjectShortInfo'
 
 
     CriterionTypeInfo:
@@ -2107,12 +2109,13 @@ components:
           example: 1222333444
     CriterionInitData:
       description: Дополнительные данные для добавления или обновления критерия
+        Содержат в себе множество кратких информаций о типах критериях
       properties:
         shortCriterionTypeSet:
           description: Множество кратких информаций о типах критерия
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
+            $ref: '#/components/schemas/ObjectShortInfo'
 
 
     CityInfo:
@@ -2249,12 +2252,13 @@ components:
           example: 1222333444
     InstitutionInitData:
       description: Дополнительные данные для добавления или обновления учреждения
+        Содержат в себе множество кратких информаций о городах
       properties:
         shortCitySet:
           description: Множество кратких информаций о городах
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
+            $ref: '#/components/schemas/ObjectShortInfo'
     
     
     BenefitInfo:
@@ -2360,25 +2364,26 @@ components:
                 example: 1222333444
     BenefitInitData:
       description: Дополнительные данные для добавления или обновления пособия
+        Содержат в себе множества кратких информаций о городах, учреждениях и критериях
       properties:
         shortCitySet:
           description: Множество кратких информаций о городах
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
+            $ref: '#/components/schemas/ObjectShortInfo'
         shortInstitutionSet:
           description: Множество кратких информаций об учреждениях
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
+            $ref: '#/components/schemas/ObjectShortInfo'
         shortCriterionSet:
           description: Множество кратких информаций о критериях
           type: array
           items:
-            $ref: '#/components/schemas/ShortObjectInfo'
-    
-    
-    ShortObjectInfo:
+            $ref: '#/components/schemas/ObjectShortInfo'
+
+
+    ObjectShortInfo:
       description: Краткая информация об объекте
       properties:
         idObject:
