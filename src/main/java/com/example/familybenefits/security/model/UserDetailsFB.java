@@ -1,8 +1,9 @@
 package com.example.familybenefits.security.model;
 
 import com.example.familybenefits.dao.entity.UserEntity;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +15,8 @@ import java.util.stream.Collectors;
  * Реализация объекта пользователя, которая будет использоваться в фильтрации http запросов
  */
 @Builder
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDetailsFB implements UserDetails {
 
   /**
