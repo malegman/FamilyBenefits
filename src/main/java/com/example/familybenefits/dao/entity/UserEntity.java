@@ -20,7 +20,7 @@ import java.util.Set;
 @Setter
 @ToString
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 public class UserEntity {
 
