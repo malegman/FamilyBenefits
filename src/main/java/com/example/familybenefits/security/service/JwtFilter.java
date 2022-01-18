@@ -1,7 +1,6 @@
 package com.example.familybenefits.security.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,17 +16,15 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
 /**
  * Фильтр для фильрации клиентских запросов, с использованием JWT
  */
+@Slf4j
 @Service
 public class JwtFilter extends GenericFilterBean {
-
-  private static final Logger log = LoggerFactory.getLogger(JwtFilter.class);
 
   /**
    * Название заголовка запроса, для извлечния токена доступа
@@ -72,14 +69,12 @@ public class JwtFilter extends GenericFilterBean {
     Optional<String> optToken = getTokenFromRequest((HttpServletRequest) servletRequest);
 
     if (optToken.isEmpty()) {
-      ((HttpServletResponse)servletResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       log.warn("Couldn't get token from request: [{}]", servletRequest);
     } else {
       token = optToken.get();
       if (jwtService.validateToken(token)) {
         Optional<String> optEmail = jwtService.getEmailFromToken(token);
         if (optEmail.isEmpty()) {
-          ((HttpServletResponse)servletResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
           log.warn("Couldn't get email from token: [{}]", token);
         } else {
           email = optEmail.get();
@@ -87,7 +82,6 @@ public class JwtFilter extends GenericFilterBean {
           try {
             userDetails = userDetailsService.loadUserByUsername(email);
           } catch (UsernameNotFoundException e) {
-            ((HttpServletResponse)servletResponse).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             log.error("UserDetails with email [{}] not found", email);
           }
           if (userDetails != null) {

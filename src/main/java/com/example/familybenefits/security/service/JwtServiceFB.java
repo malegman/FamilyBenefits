@@ -1,9 +1,7 @@
 package com.example.familybenefits.security.service;
 
 import io.jsonwebtoken.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -15,22 +13,19 @@ import java.util.Optional;
 /**
  * Реализация сервиса для работы с jwt
  */
+@Slf4j
 @Service
 public class JwtServiceFB implements JwtService {
-
-  private static final Logger log = LoggerFactory.getLogger(JwtServiceFB.class);
 
   /**
    * Закрытый ключ, используемый для подписывания jwt
    */
-  @Value("$(jwt.secret)")
-  private String jwtSecret;
+  private static final String JWT_SECRET = "familyben";
 
   /**
    * Время жизни jwt в минутах
    */
-  @Value("$(jwt.expirationMin)")
-  private int jwtExpirationMin;
+  private static final int JWT_EXPIRATION_MIN = 15;
 
   /**
    * Создает токен пользователя с использованием его email
@@ -45,12 +40,12 @@ public class JwtServiceFB implements JwtService {
       return Optional.empty();
     }
 
-    Date expiration = Date.from(LocalDateTime.now().plusMinutes(jwtExpirationMin).toInstant(ZoneOffset.UTC));
+    Date expiration = Date.from(LocalDateTime.now().plusMinutes(JWT_EXPIRATION_MIN).toInstant(ZoneOffset.UTC));
     return Optional.of(
         Jwts.builder()
         .setSubject(email)
         .setExpiration(expiration)
-        .signWith(SignatureAlgorithm.HS512, jwtSecret)
+        .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
         .compact()
     );
   }
@@ -64,7 +59,7 @@ public class JwtServiceFB implements JwtService {
   public boolean validateToken(String token) {
 
     try {
-      Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+      Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token);
       return true;
 
     } catch (ExpiredJwtException expEx) {
@@ -91,7 +86,7 @@ public class JwtServiceFB implements JwtService {
   public Optional<String> getEmailFromToken(String token) {
 
     try {
-      Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+      Claims claims = Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token).getBody();
       return Optional.of(claims.getSubject());
 
     } catch (Exception e) {
