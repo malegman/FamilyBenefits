@@ -1,0 +1,61 @@
+package com.example.familybenefits.service;
+
+import com.example.familybenefits.api_model.criterion.CriterionInfo;
+import com.example.familybenefits.api_model.criterion_type.CriterionTypeAdd;
+import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
+import com.example.familybenefits.api_model.criterion_type.CriterionTypeUpdate;
+import com.example.familybenefits.exception.AlreadyExistsException;
+import com.example.familybenefits.exception.NotFoundException;
+
+import java.math.BigInteger;
+import java.util.Set;
+
+/**
+ * Интерфейс сервиса, управляющего объектом "тип критерия"
+ */
+public interface CriterionTypeService {
+
+  /**
+   * Добавляет новый тип критерия
+   * @param criterionTypeAdd объект запроса для добавления типа критерия
+   * @throws AlreadyExistsException если тип критерия с указанным названием уже существует
+   */
+  void add(CriterionTypeAdd criterionTypeAdd) throws AlreadyExistsException;
+
+  /**
+   * Обновляет данные типа критерия
+   * @param criterionTypeUpdate объект запроса для обновления типа критерия
+   * @throws NotFoundException если тип критерия с указанными данными не найден
+   */
+  void update(CriterionTypeUpdate criterionTypeUpdate) throws NotFoundException;
+
+  /**
+   * Удаляет тип критерия по его ID
+   * @param idCriterionType ID типа критерия
+   * @throws NotFoundException если тип критерия с указанным ID не найден
+   */
+  void delete(BigInteger idCriterionType) throws NotFoundException;
+
+  /**
+   * Возвращает информацию о типе критерия по его ID
+   * @param idCriterionType ID типа критерия
+   * @return информация о типе критерия
+   * @throws NotFoundException если тип критерия с указанным ID не найден
+   */
+  CriterionTypeInfo read(BigInteger idCriterionType) throws NotFoundException;
+
+  /**
+   * Возвращает множество всех типов критериев
+   * @return множество информаций о типах критериев
+   * @throws NotFoundException если типы критериев не найдены
+   */
+  Set<CriterionTypeInfo> readAll() throws NotFoundException;
+
+  /**
+   * Возвращает множество всех критерий типа критерия
+   * @param idCriterionType ID типа критерия
+   * @return множество информаций о критериях типа критерия
+   * @throws NotFoundException если критерии не найдены или тип критерия с указынным ID не найден
+   */
+  Set<CriterionInfo> readCriteria(BigInteger idCriterionType) throws NotFoundException;
+}
