@@ -5,12 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -46,6 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .httpBasic().disable()
         .csrf().disable()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
         .and()
         .authorizeRequests()
 
@@ -100,6 +103,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.PUT, "/criteriontype").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/criteriontype/{id}").hasRole("ADMIN")
         .antMatchers(HttpMethod.GET, "/criteriontype/{id}", "/criteriontype/{id}/*", "/criteriontype/all").permitAll()
+
+        .and()
+        .anonymous().disable()
+        .exceptionHandling()
+        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
 
         .and()
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
