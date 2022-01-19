@@ -3,6 +3,7 @@ package com.example.familybenefits.dao.repository;
 import com.example.familybenefits.dao.entity.CityEntity;
 import com.example.familybenefits.dao.entity.InstitutionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.math.BigInteger;
 import java.util.Set;
@@ -25,4 +26,16 @@ public interface InstitutionRepository extends JpaRepository<InstitutionEntity, 
    * @return множество учреждений
    */
   Set<InstitutionEntity> findAllByCityEntity(CityEntity cityEntity);
+
+  /**
+   * Находит учреждения, которые есть в указанном пособии
+   * @param idBenefit ID пособия
+   * @return множество учреждений
+   */
+  @Query(nativeQuery = true,
+      value = "SELECT *" +
+          "FROM familybenefit.benefits_institutions INNER JOIN familybenefit.institution ON " +
+          "familybenefit.benefits_institutions.id_institution = familybenefit.institution.id " +
+          "WHERE familybenefit.benefits_institutions.id_benefit = ?1;")
+  Set<InstitutionEntity> findAllWhereBenefitIdEquals(BigInteger idBenefit);
 }

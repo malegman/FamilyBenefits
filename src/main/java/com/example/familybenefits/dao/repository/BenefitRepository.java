@@ -13,6 +13,13 @@ import java.util.Set;
 public interface BenefitRepository extends JpaRepository<BenefitEntity, BigInteger> {
 
   /**
+   * Проверяет наличие пособия по его названию
+   * @param name название пособия
+   * @return true, если пособие с указанным именем существует
+   */
+  boolean existsByName(String name);
+
+  /**
    * Находит пособия, которые есть в указанном городе
    * @param idCity ID города
    * @return множество пособий
