@@ -86,8 +86,8 @@ public class BenefitConverter {
   }
 
   /**
-   * Преобразует модель таблицы "benefitEntity" в объект краткой информации об объекте
-   * @param benefitEntity модель таблицы "benefitEntity"
+   * Преобразует модель таблицы "benefit в объект краткой информации об объекте
+   * @param benefitEntity модель таблицы "benefit"
    * @return краткая информция о пособии
    */
   static public ObjectShortInfo toShortInfo(BenefitEntity benefitEntity) {

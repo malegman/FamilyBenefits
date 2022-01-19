@@ -82,11 +82,11 @@ public class InstitutionConverter {
   }
 
   /**
-   * Преобразует модель таблицы "institutionEntity" в объект краткой информации об объекте
-   * @param institutionEntity модель таблицы "institutionEntity"
+   * Преобразует модель таблицы "institution" в объект краткой информации об объекте
+   * @param institutionEntity модель таблицы "institution"
    * @return краткая информция об учреждении
    */
-  static public ObjectShortInfo toShortObjectInfo(InstitutionEntity institutionEntity) {
+  static public ObjectShortInfo toShortInfo(InstitutionEntity institutionEntity) {
 
     if (institutionEntity == null) {
       return new ObjectShortInfo();
