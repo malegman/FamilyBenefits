@@ -46,7 +46,7 @@ public class UserUpdate {
   private BigInteger idCity;
 
   /**
-   * Множество ID критериев пользователя
+   * Множество ID критерий пользователя
    */
   @NonNull
   @JsonProperty("id_criterion_set")

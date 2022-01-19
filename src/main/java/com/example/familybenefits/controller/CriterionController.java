@@ -113,7 +113,7 @@ public class CriterionController {
 
   /**
    * Возвращает дополнительные данные для критерия.
-   * Данные содержат в себе множетсво кратких информаций о типах критериев
+   * Данные содержат в себе множетсво кратких информаций о типах критерий
    * @return дополнительные данные для критерия и код ответа
    */
   @GetMapping(value = "/criterion/initdata")
@@ -130,8 +130,8 @@ public class CriterionController {
   }
 
   /**
-   * Возвращает множество критериев
-   * @return множество критериев и код ответа
+   * Возвращает множество критерий
+   * @return множество критерий и код ответа
    */
   @GetMapping(value = "/criterion/all")
   public ResponseEntity<Set<CriterionInfo>> getCriteria() {
@@ -147,8 +147,8 @@ public class CriterionController {
   }
 
   /**
-   * Возвращает множество всех критериев, в том числе без типа критерия
-   * @return множество критериев и код ответа
+   * Возвращает множество всех критерий, в том числе без типа критерия
+   * @return множество критерий и код ответа
    */
   @GetMapping(value = "/criterion/allex")
   public ResponseEntity<Set<CriterionInfo>> getAllExCriteria() {

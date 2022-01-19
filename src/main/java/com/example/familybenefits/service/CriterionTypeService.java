@@ -45,9 +45,9 @@ public interface CriterionTypeService {
   CriterionTypeInfo read(BigInteger idCriterionType) throws NotFoundException;
 
   /**
-   * Возвращает множество всех типов критериев
-   * @return множество информаций о типах критериев
-   * @throws NotFoundException если типы критериев не найдены
+   * Возвращает множество всех типов критерий
+   * @return множество информаций о типах критерий
+   * @throws NotFoundException если типы критерий не найдены
    */
   Set<CriterionTypeInfo> readAll() throws NotFoundException;
 

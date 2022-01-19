@@ -116,9 +116,9 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
   }
 
   /**
-   * Возвращает множество всех типов критериев
-   * @return множество информаций о типах критериев
-   * @throws NotFoundException если типы критериев не найдены
+   * Возвращает множество всех типов критерий
+   * @return множество информаций о типах критерий
+   * @throws NotFoundException если типы критерий не найдены
    */
   public Set<CriterionTypeInfo> readAll() throws NotFoundException {
 

@@ -111,8 +111,8 @@ public class CriterionTypeController {
   }
 
   /**
-   * Возвращает множество типов критериев
-   * @return множество типов критериев и код ответа
+   * Возвращает множество типов критерий
+   * @return множество типов критерий и код ответа
    */
   @GetMapping(value = "/criteriontype/all")
   public ResponseEntity<Set<CriterionTypeInfo>> getCriterionTypes() {

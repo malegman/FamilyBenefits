@@ -60,7 +60,7 @@ public class BenefitUpdate {
   private Set<BigInteger> idInstitutionSet;
 
   /**
-   * Множество ID критериев пособия
+   * Множество ID критерий пособия
    */
   @NonNull
   @JsonProperty("short_criterion_set")

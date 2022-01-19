@@ -132,8 +132,8 @@ public class BenefitController {
   }
 
   /**
-   * Возвращает множество всех пособий, в том числе без города, учреждения или критериев
-   * @return множество критериев и код ответа
+   * Возвращает множество всех пособий, в том числе без города, учреждения или критерий
+   * @return множество критерий и код ответа
    */
   @GetMapping(value = "/benefit/allex")
   public ResponseEntity<Set<BenefitInfo>> getAllExBenefits() {

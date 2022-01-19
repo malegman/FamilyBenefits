@@ -16,7 +16,7 @@ public interface CriterionRepository extends JpaRepository<CriterionEntity, BigI
   /**
    * Находит критерии с указанным типом критерия
    * @param criterionTypeEntity тип критерия
-   * @return множество критериев
+   * @return множество критерий
    */
   Set<CriterionEntity> findAllByCriterionType(CriterionTypeEntity criterionTypeEntity);
 
@@ -29,7 +29,7 @@ public interface CriterionRepository extends JpaRepository<CriterionEntity, BigI
 
   /**
    * Находит критерии с указанным типом критерия
-   * @return множество критериев
+   * @return множество критерий
    */
   Set<CriterionEntity> findAllByCriterionTypeExists();
 
