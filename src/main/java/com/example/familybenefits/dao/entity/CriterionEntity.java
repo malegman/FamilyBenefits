@@ -50,7 +50,7 @@ public class CriterionEntity {
   @Nullable
   @ManyToOne
   @JoinColumn(name = "id_type")
-  private CriterionTypeEntity type;
+  private CriterionTypeEntity criterionType;
 
   /**
    * Конструктор для создания модели по ID
