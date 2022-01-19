@@ -31,7 +31,7 @@ public interface CriterionService {
   void update(CriterionUpdate criterionUpdate) throws NotFoundException;
 
   /**
-   * Удаляет критерийпо его ID
+   * Удаляет критерия по его ID
    * @param idCriterion ID критерия
    * @throws NotFoundException если критерий с указанным ID не найден
    */

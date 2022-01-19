@@ -77,7 +77,7 @@ public class CriterionServiceFB implements CriterionService {
 
     CriterionEntity criterionEntity = CriterionConverter.fromUpdate(criterionUpdate);
 
-    if (criterionRepository.existsById(criterionEntity.getId())) {
+    if (!criterionRepository.existsById(criterionEntity.getId())) {
       throw new NotFoundException(String.format(
           "Criterion with ID %s not found", criterionEntity.getId()
       ));

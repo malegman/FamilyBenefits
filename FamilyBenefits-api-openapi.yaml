@@ -969,6 +969,7 @@ paths:
           Данные содержат в себе множества кратких информаций о городах, критериях и учреждениях
         Для администратора.
         Необходима авторизация.
+      operationId: getBenefitInitData
       responses:
         '200':
           description: Дополнительные данные пособия получены
@@ -1026,7 +1027,7 @@ paths:
       summary: Возвращает множество городов пособия
       description:
         Возвращает множество городов пособия.
-      operationId: getBenefitCitites
+      operationId: getBenefitCities
       parameters:
         - name: id
           in: path
@@ -1084,7 +1085,7 @@ paths:
       summary: Возвращает множество критерий пособия
       description:
         Возвращает множество учреждений пособия.
-      operationId: getBenefitCriterions
+      operationId: getBenefitCriteria
       parameters:
         - name: id
           in: path
