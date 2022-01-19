@@ -119,8 +119,8 @@ public class CityController {
   public ResponseEntity<Set<CityInfo>> getCities() {
 
     try {
-      Set<CityInfo> cities = cityService.readAll();
-      return ResponseEntity.status(HttpStatus.OK).body(cities);
+      Set<CityInfo> cityInfoSet = cityService.readAll();
+      return ResponseEntity.status(HttpStatus.OK).body(cityInfoSet);
 
     } catch (NotFoundException e) {
       log.error(e.getMessage());
@@ -137,8 +137,8 @@ public class CityController {
   public ResponseEntity<Set<InstitutionInfo>> getCityInstitutions(@PathVariable(name = "id") BigInteger idCity) {
 
     try {
-      Set<InstitutionInfo> institutions = cityService.readInstitutions(idCity);
-      return ResponseEntity.status(HttpStatus.OK).body(institutions);
+      Set<InstitutionInfo> institutionInfoSet = cityService.readInstitutions(idCity);
+      return ResponseEntity.status(HttpStatus.OK).body(institutionInfoSet);
 
     } catch (NotFoundException e) {
       log.error(e.getMessage());
@@ -155,8 +155,8 @@ public class CityController {
   public ResponseEntity<Set<BenefitInfo>> getCityBenefits(@PathVariable(name = "id") BigInteger idCity) {
 
     try {
-      Set<BenefitInfo> benefits = cityService.readBenefits(idCity);
-      return ResponseEntity.status(HttpStatus.OK).body(benefits);
+      Set<BenefitInfo> benefitInfoSet = cityService.readBenefits(idCity);
+      return ResponseEntity.status(HttpStatus.OK).body(benefitInfoSet);
 
     } catch (NotFoundException e) {
       log.error(e.getMessage());

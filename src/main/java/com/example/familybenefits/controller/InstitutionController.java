@@ -155,8 +155,8 @@ public class InstitutionController {
   public ResponseEntity<Set<BenefitInfo>> getInstitutionBenefits(@PathVariable(name = "id") BigInteger idInstitution) {
 
     try {
-      Set<BenefitInfo> benefits = institutionService.readBenefits(idInstitution);
-      return ResponseEntity.status(HttpStatus.OK).body(benefits);
+      Set<BenefitInfo> benefitInfoSet = institutionService.readBenefits(idInstitution);
+      return ResponseEntity.status(HttpStatus.OK).body(benefitInfoSet);
 
     } catch (NotFoundException e) {
       log.error(e.getMessage());
