@@ -47,14 +47,15 @@ public interface InstitutionService {
   InstitutionInfo read(BigInteger idInstitution) throws NotFoundException;
 
   /**
-   * Возваращает дополнительные данные для учреждения
+   * Возваращает дополнительные данные для учреждения.
+   * Данные содержат в себе множество кратких информаций о городах.
    * @return дополнительные данные для учреждения
    * @throws NotFoundException если данные не найдены
    */
   InstitutionInitData getInitData() throws NotFoundException;
 
   /**
-   * Возвращает информацию о городе учреждения
+   * Возвращает информацию о городе учреждения.
    * @param idInstitution ID учреждения
    * @return информация о городе учреждения
    * @throws NotFoundException если город не найден или учреждение не найдено
