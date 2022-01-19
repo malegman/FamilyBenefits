@@ -44,6 +44,7 @@ public class CityConverter {
         .builder()
         .id(cityUpdate.getId())
         .name(cityUpdate.getName())
+        .info(cityUpdate.getInfo())
         .build();
   }
 
