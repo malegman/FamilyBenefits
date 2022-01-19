@@ -179,8 +179,7 @@ public class InstitutionServiceFB implements InstitutionService {
    */
   public Set<BenefitInfo> readBenefits(BigInteger idInstitution) throws NotFoundException {
 
-    Optional<InstitutionEntity> optInstitutionEntity = institutionRepository.findById(idInstitution);
-    if (optInstitutionEntity.isEmpty()) {
+    if (!institutionRepository.existsById(idInstitution)) {
       throw new NotFoundException(String.format(
           "Institution with ID %s not found", idInstitution
       ));

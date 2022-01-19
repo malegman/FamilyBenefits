@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -156,14 +155,13 @@ public class CityServiceFB implements CityService {
   @Override
   public Set<InstitutionInfo> readInstitutions(BigInteger idCity) throws NotFoundException {
 
-    Optional<CityEntity> optCityEntity = cityRepository.findById(idCity);
-    if (optCityEntity.isEmpty()) {
+    if (!cityRepository.existsById(idCity)) {
       throw new NotFoundException(String.format(
           "City with ID %s not found", idCity
       ));
     }
 
-    Set<InstitutionInfo> institutionInfoSet = institutionRepository.findAllByCityEntity(optCityEntity.get())
+    Set<InstitutionInfo> institutionInfoSet = institutionRepository.findAllByCityEntity(new CityEntity(idCity))
         .stream()
         .map(InstitutionConverter::toInfo)
         .collect(Collectors.toSet());
@@ -185,8 +183,7 @@ public class CityServiceFB implements CityService {
   @Override
   public Set<BenefitInfo> readBenefits(BigInteger idCity) throws NotFoundException {
 
-    Optional<CityEntity> optCityEntity = cityRepository.findById(idCity);
-    if (optCityEntity.isEmpty()) {
+    if (!cityRepository.existsById(idCity)) {
       throw new NotFoundException(String.format(
           "City with ID %s not found", idCity
       ));
