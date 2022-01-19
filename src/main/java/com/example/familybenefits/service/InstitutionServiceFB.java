@@ -158,7 +158,7 @@ public class InstitutionServiceFB implements InstitutionService {
    * Возвращает информацию о городе учреждения
    * @param idInstitution ID учреждения
    * @return информация о городе учреждения
-   * @throws NotFoundException если город не найден или учреждение не найдено
+   * @throws NotFoundException если учреждение не найдено
    */
   public CityInfo readCity(BigInteger idInstitution) throws NotFoundException {
 
