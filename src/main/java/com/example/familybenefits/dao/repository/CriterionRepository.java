@@ -18,4 +18,17 @@ public interface CriterionRepository extends JpaRepository<CriterionEntity, BigI
    * @return множество критериев
    */
   Set<CriterionEntity> findAllByCriterionType(CriterionTypeEntity criterionTypeEntity);
+
+  /**
+   * Проверяет наличие критерия по его названию
+   * @param name название критерия
+   * @return true, если критерий с указанным именем существует
+   */
+  boolean existsByName(String name);
+
+  /**
+   * Находит критерии с указанным типом критерия
+   * @return множество критериев
+   */
+  Set<CriterionEntity> findAllByCriterionTypeExists();
 }

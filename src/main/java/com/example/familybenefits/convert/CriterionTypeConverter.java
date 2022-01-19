@@ -1,5 +1,6 @@
 package com.example.familybenefits.convert;
 
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeAdd;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeUpdate;
@@ -63,6 +64,24 @@ public class CriterionTypeConverter {
         .id(criterionTypeEntity.getId())
         .name(criterionTypeEntity.getName())
         .info(criterionTypeEntity.getInfo())
+        .build();
+  }
+
+  /**
+   * Преобразует модель таблицы "criterion_type" в объект краткой информации об объекте
+   * @param criterionTypeEntity модель таблицы "criterion_type"
+   * @return краткая информция о типе критерия
+   */
+  static public ObjectShortInfo toShortInfo(CriterionTypeEntity criterionTypeEntity) {
+
+    if (criterionTypeEntity == null) {
+      return new ObjectShortInfo();
+    }
+
+    return ObjectShortInfo
+        .builder()
+        .idObject(criterionTypeEntity.getId())
+        .nameObject(criterionTypeEntity.getName())
         .build();
   }
 }
