@@ -995,7 +995,7 @@ paths:
         - benefit
       summary: Возвращает множество всех пособий
       description:
-        Возвращает множество всех пособий. В том числе без города, учреждения или критериев
+        Возвращает множество всех пособий. В том числе без города, учреждения или критерий
         Для администратора.
         Необходима авторизация.
       operationId: getAllExBenefits
@@ -1450,7 +1450,7 @@ paths:
       summary: Возвращает дополнительные данные для критерия
       description:
         Возвращает дополнительные данные для добавления или обновления критерия.
-          Данные содержат в себе множетсво кратких информаций о типах критериев.
+          Данные содержат в себе множетсво кратких информаций о типах критерий.
         Для администратора.
         Необходима авторизация.
       operationId: getCriterionInitData
@@ -1477,13 +1477,13 @@ paths:
     get:
       tags:
         - criterion
-      summary: Возвращает множество критериев
+      summary: Возвращает множество критерий
       description:
-        Возвращает множество критериев.
+        Возвращает множество критерий.
       operationId: getCriteria
       responses:
         '200':
-          description: Множество всех критериев получено
+          description: Множество всех критерий получено
           content:
             application/json:
               schema:
@@ -1498,15 +1498,15 @@ paths:
     get:
       tags:
         - criterion
-      summary: Возвращает множество всех критериев
+      summary: Возвращает множество всех критерий
       description:
-        Возвращает множество всех критериев. В том числе без типа критерия.
+        Возвращает множество всех критерий. В том числе без типа критерия.
         Для администратора.
         Необходима авторизация.
       operationId: getAllExCriteria
       responses:
         '200':
-          description: Множество всех критериев получено
+          description: Множество всех критерий получено
           content:
             application/json:
               schema:
@@ -1681,13 +1681,13 @@ paths:
     get:
       tags:
         - criterion type
-      summary: Возвращает множество типов критериев
+      summary: Возвращает множество типов критерий
       description:
-        Возвращает множество типов критериев
+        Возвращает множество типов критерий
       operationId: getCriterionTypes
       responses:
         '200':
-          description: Множество типов критериев получено
+          description: Множество типов критерий получено
           content:
             application/json:
               schema:
@@ -1695,7 +1695,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
         '404':
-          description: Типы критериев не найдены
+          description: Типы критерий не найдены
           content: { }
       security: [ ]
   /criteriontype/{id}/criteria:
@@ -1799,7 +1799,7 @@ components:
           type: integer
           example: 1222333444
         idCriterionSet:
-          description: Множество ID критериев пользователя
+          description: Множество ID критерий пользователя
           type: array
           items:
             allOf:
@@ -1835,7 +1835,7 @@ components:
           type: integer
           example: 1222333444
         idCriterionSet:
-          description: Множество ID критериев пользователя
+          description: Множество ID критерий пользователя
           type: array
           items:
             allOf:
@@ -2319,7 +2319,7 @@ components:
                 type: integer
                 example: 1222333444
         idCriterionSet:
-          description: Множество ID критериев пособия
+          description: Множество ID критерий пособия
           type: array
           items:
             allOf:
@@ -2362,7 +2362,7 @@ components:
                 type: integer
                 example: 1222333444
         idCriterionSet:
-          description: Множество ID критериев пособия
+          description: Множество ID критерий пособия
           type: array
           items:
             allOf:
