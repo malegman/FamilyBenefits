@@ -91,7 +91,7 @@ public class BenefitEntity {
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
-    name = "benefits_criterions", schema = "familybenefit",
+    name = "benefits_criteria", schema = "familybenefit",
     joinColumns = @JoinColumn(name = "id_benefit"),
     inverseJoinColumns = @JoinColumn(name = "id_criterion"))
   private Set<CriterionEntity> criterionEntitySet;

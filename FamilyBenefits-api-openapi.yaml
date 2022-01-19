@@ -1074,7 +1074,7 @@ paths:
           description: Учреждения не найдены
           content: { }
       security: [ ]
-  /benefit/{id}/criterions:
+  /benefit/{id}/criteria:
     get:
       tags:
         - benefit
@@ -1691,7 +1691,7 @@ paths:
           description: Типы критериев не найдены
           content: { }
       security: [ ]
-  /criteriontype/{id}/criterions:
+  /criteriontype/{id}/criteria:
     get:
       tags:
         - criterion type
