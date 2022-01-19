@@ -49,24 +49,6 @@ public class CityConverter {
   }
 
   /**
-   * Преобразует объект краткой информации о городе в модель таблицы "city"
-   * @param objectShortInfo краткая информация о городе
-   * @return модель таблицы "city"
-   */
-  static public CityEntity fromShortInfo(ObjectShortInfo objectShortInfo) {
-
-    if (objectShortInfo == null) {
-      return new CityEntity();
-    }
-
-    return CityEntity
-        .builder()
-        .id(objectShortInfo.getIdObject())
-        .name(objectShortInfo.getNameObject())
-        .build();
-  }
-
-  /**
    * Преобразует модель таблицы "city" в объект информации о городе
    * @param cityEntity модель таблицы "city"
    * @return информация о городе
