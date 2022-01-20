@@ -156,7 +156,7 @@ public class BenefitServiceFB implements BenefitService {
       throw new NotFoundException("Cities not found");
     }
 
-    Set<ObjectShortInfo> criterionShortInfoSet = criterionRepository.findAllByCriterionTypeExists()
+    Set<ObjectShortInfo> criterionShortInfoSet = criterionRepository.findAllByCriterionTypeIsNotNull()
         .stream()
         .map(CriterionConverter::toShortInfo)
         .collect(Collectors.toSet());

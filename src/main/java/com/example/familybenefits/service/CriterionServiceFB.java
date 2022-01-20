@@ -128,7 +128,7 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public Set<CriterionInfo> readAllFull() throws NotFoundException {
 
-    Set<CriterionInfo> criterionInfoSet = criterionRepository.findAllByCriterionTypeExists()
+    Set<CriterionInfo> criterionInfoSet = criterionRepository.findAllByCriterionTypeIsNotNull()
         .stream()
         .map(CriterionConverter::toInfo)
         .collect(Collectors.toSet());
