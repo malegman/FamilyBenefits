@@ -111,7 +111,7 @@ public class CriterionTypeController {
   }
 
   /**
-   * Возвращает множество типов критерий
+   * Возвращает множество всех типов критерий
    * @return множество типов критерий и код ответа
    */
   @GetMapping(value = "/criteriontype/all")

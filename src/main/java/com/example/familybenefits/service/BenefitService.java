@@ -49,18 +49,25 @@ public interface BenefitService {
 
   /**
    * Возваращает дополнительные данные для пособия.
-   * Данные содержат в себе множества кратких информаций о городах, критериях и учреждениях
+   * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
    * @return дополнительные данные для пособия
    * @throws NotFoundException если данные не найдены
    */
   BenefitInitData getInitData() throws NotFoundException;
 
   /**
-   * Возвращает множество всех пособий, в том числе без типа критерия
+   * Возвращает множество всех полных пособий - с городом, учреждением и критерием
    * @return множество информаций о пособиях
    * @throws NotFoundException если пособия не найдены
    */
-  Set<BenefitInfo> readAll() throws NotFoundException;
+  Set<BenefitInfo> readAllFull() throws NotFoundException;
+
+  /**
+   * Возвращает множество всех неполных пособий - без города, учреждения или критерия
+   * @return множество информаций о пособиях
+   * @throws NotFoundException если пособия не найдены
+   */
+  Set<BenefitInfo> readAllPartial() throws NotFoundException;
 
   /**
    * Возваращает множество городов учреждения
@@ -79,7 +86,7 @@ public interface BenefitService {
   Set<InstitutionInfo> readInstitutions(BigInteger idBenefit) throws NotFoundException;
 
   /**
-   * Возваращает множество критерий учреждения
+   * Возваращает множество полных критерий учреждения
    * @param idBenefit ID пособия
    * @return множество критерий пособия
    * @throws NotFoundException если критерия пособия не найдены или пособие не найдено

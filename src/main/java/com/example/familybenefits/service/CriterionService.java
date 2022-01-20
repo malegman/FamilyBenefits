@@ -46,18 +46,18 @@ public interface CriterionService {
   CriterionInfo read(BigInteger idCriterion) throws NotFoundException;
 
   /**
-   * Возвращает множество критерий с типом критерия
+   * Возвращает множество всех полных критерий - с типом критерия
    * @return множество информаций о критериях
    * @throws NotFoundException если критерии не найдены
    */
-  Set<CriterionInfo> readAllWithCriterionType() throws NotFoundException;
+  Set<CriterionInfo> readAllFull() throws NotFoundException;
 
   /**
-   * Возвращает множество всех критерий, в том числе без типа критерия
+   * Возвращает множество всех неполных критерий - без типа критерия
    * @return множество информаций о критериях
    * @throws NotFoundException если критерии не найдены
    */
-  Set<CriterionInfo> readAll() throws NotFoundException;
+  Set<CriterionInfo> readAllPartial() throws NotFoundException;
 
   /**
    * Возваращает дополнительные данные для критерия.

@@ -72,30 +72,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.DELETE, "/admin/{id}").hasRole("ADMIN")
 
         // requests: city
-        .antMatchers(HttpMethod.POST, "/cityEntity").hasRole("ADMIN")
-        .antMatchers(HttpMethod.PUT, "/cityEntity").hasRole("ADMIN")
-        .antMatchers(HttpMethod.DELETE, "/cityEntity/{id}").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/cityEntity/{id}", "/cityEntity/{id}/*", "/cityEntity/all").permitAll()
+        .antMatchers(HttpMethod.POST, "/city").hasRole("ADMIN")
+        .antMatchers(HttpMethod.PUT, "/city").hasRole("ADMIN")
+        .antMatchers(HttpMethod.DELETE, "/city/{id}").hasRole("ADMIN")
+        .antMatchers(HttpMethod.GET, "/city/{id}", "/city/{id}/*", "/city/all").permitAll()
 
         // requests: benefit
         .antMatchers(HttpMethod.POST, "/benefit").hasRole("ADMIN")
         .antMatchers(HttpMethod.PUT, "/benefit").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/benefit/{id}").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/benefit/initdata", "/benefit/allex").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/benefit/{id}", "/benefit/{id}/*").permitAll()
+        .antMatchers(HttpMethod.GET, "/benefit/initdata", "/benefit/allpartial").hasRole("ADMIN")
+        .antMatchers(HttpMethod.GET, "/benefit/{id}", "/benefit/{id}/*", "/benefit/all").permitAll()
 
         // requests: institution
         .antMatchers(HttpMethod.POST, "/institution").hasRole("ADMIN")
         .antMatchers(HttpMethod.PUT, "/institution").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/institution/{id}").hasRole("ADMIN")
         .antMatchers(HttpMethod.GET, "/institution/initdata").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/institution/{id}", "/institution/{id}/*").permitAll()
+        .antMatchers(HttpMethod.GET, "/institution/{id}", "/institution/{id}/*", "/institution/all").permitAll()
 
         // requests: criterion
         .antMatchers(HttpMethod.POST, "/criterion").hasRole("ADMIN")
         .antMatchers(HttpMethod.PUT, "/criterion").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/criterion/{id}").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/criterion/initdata", "/criterion/allex").hasRole("ADMIN")
+        .antMatchers(HttpMethod.GET, "/criterion/initdata", "/criterion/allpartial").hasRole("ADMIN")
         .antMatchers(HttpMethod.GET, "/criterion/{id}", "/criterion/{id}/*", "/criterion/all").permitAll()
 
         // requests: criterion type

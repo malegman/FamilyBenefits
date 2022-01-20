@@ -46,7 +46,7 @@ public interface CityService {
   CityInfo read(BigInteger idCity) throws NotFoundException;
 
   /**
-   * Возвращает множество всех существующих городов
+   * Возвращает множество всех городов
    * @return множество информаций о городах
    * @throws NotFoundException если города не найдены
    */
@@ -61,7 +61,7 @@ public interface CityService {
   Set<InstitutionInfo> readInstitutions(BigInteger idCity) throws NotFoundException;
 
   /**
-   * Возвращает множество всех пособий города
+   * Возвращает множество всех полных пособий города
    * @param idCity ID города
    * @return множество информаций о городах
    * @throws NotFoundException если пособия не найдены или город с указынным ID не найден

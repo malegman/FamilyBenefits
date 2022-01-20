@@ -130,6 +130,23 @@ public class InstitutionController {
   }
 
   /**
+   * Возвращает множество всех учреждений
+   * @return множество учреждений и код ответа
+   */
+  @GetMapping(value = "/institution/all")
+  public ResponseEntity<Set<InstitutionInfo>> getInstitutions() {
+
+    try {
+      Set<InstitutionInfo> institutionInfoSet = institutionService.readAll();
+      return ResponseEntity.status(HttpStatus.OK).body(institutionInfoSet);
+
+    } catch (NotFoundException e) {
+      log.error(e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
+    }
+  }
+
+  /**
    * Возвращает информацию о городе учреждения
    * @param idInstitution ID учреждения
    * @return информация о городе учреждения
@@ -148,7 +165,7 @@ public class InstitutionController {
   }
 
   /**
-   * Возвращает множество пособий учреждения
+   * Возвращает множество полных пособий учреждения
    * @param idInstitution ID учреждения
    * @return множество пособий учреждения и код ответа
    */

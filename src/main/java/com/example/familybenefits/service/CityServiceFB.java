@@ -128,7 +128,7 @@ public class CityServiceFB implements CityService {
   }
 
   /**
-   * Возвращает множество всех существующих городов
+   * Возвращает множество всех городов
    * @return множество информаций о городах
    * @throws NotFoundException если города не найдены
    */
@@ -175,7 +175,7 @@ public class CityServiceFB implements CityService {
   }
 
   /**
-   * Возвращает множество всех пособий города
+   * Возвращает множество всех полных пособий города
    * @param idCity ID города
    * @return множество информаций о городах
    * @throws NotFoundException если пособия не найдены или город с указынным ID не найден
@@ -189,7 +189,7 @@ public class CityServiceFB implements CityService {
       ));
     }
 
-    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllWhereCityIdEquals(idCity)
+    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllFullWhereCityIdEquals(idCity)
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());

@@ -141,7 +141,7 @@ public class BenefitServiceFB implements BenefitService {
 
   /**
    * Возваращает дополнительные данные для пособия.
-   * Данные содержат в себе множества кратких информаций о городах, критериях и учреждениях
+   * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
    * @return дополнительные данные для пособия
    * @throws NotFoundException если данные не найдены
    */
@@ -156,7 +156,7 @@ public class BenefitServiceFB implements BenefitService {
       throw new NotFoundException("Cities not found");
     }
 
-    Set<ObjectShortInfo> criterionShortInfoSet = criterionRepository.findAll()
+    Set<ObjectShortInfo> criterionShortInfoSet = criterionRepository.findAllByCriterionTypeExists()
         .stream()
         .map(CriterionConverter::toShortInfo)
         .collect(Collectors.toSet());
@@ -181,14 +181,33 @@ public class BenefitServiceFB implements BenefitService {
   }
 
   /**
-   * Возвращает множество всех пособий, в том числе без типа критерия
+   * Возвращает множество всех полных пособий - с городом, учреждением и критерием
    * @return множество информаций о пособиях
    * @throws NotFoundException если пособия не найдены
    */
   @Override
-  public Set<BenefitInfo> readAll() throws NotFoundException {
+  public Set<BenefitInfo> readAllFull() throws NotFoundException {
 
-    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAll()
+    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllFull()
+        .stream()
+        .map(BenefitConverter::toInfo)
+        .collect(Collectors.toSet());
+    if (benefitInfoSet.isEmpty()) {
+      throw new NotFoundException("Benefits not found");
+    }
+
+    return benefitInfoSet;
+  }
+
+  /**
+   * Возвращает множество всех неполных пособий - без города, учреждения или критерия
+   * @return множество информаций о пособиях
+   * @throws NotFoundException если пособия не найдены
+   */
+  @Override
+  public Set<BenefitInfo> readAllPartial() throws NotFoundException {
+
+    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllPartial()
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());
@@ -256,7 +275,7 @@ public class BenefitServiceFB implements BenefitService {
   }
 
   /**
-   * Возваращает множество критерий учреждения
+   * Возваращает множество полных критерий учреждения
    * @param idBenefit ID пособия
    * @return множество критерий пособия
    * @throws NotFoundException если критерия пособия не найдены или пособие не найдено
@@ -270,7 +289,7 @@ public class BenefitServiceFB implements BenefitService {
       ));
     }
 
-    Set<CriterionInfo> criterionInfoSet = criterionRepository.findAllWhereBenefitIdEquals(idBenefit)
+    Set<CriterionInfo> criterionInfoSet = criterionRepository.findAllFullWhereBenefitIdEquals(idBenefit)
         .stream()
         .map(CriterionConverter::toInfo)
         .collect(Collectors.toSet());

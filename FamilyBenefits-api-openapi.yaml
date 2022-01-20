@@ -412,7 +412,7 @@ paths:
       summary: Возвращает дополнительные данные для пользователя
       description:
         Возвращает дополнительные данные для добавления или обновления пользователя.
-          Данные содержат в себе множества кратких информаций о городах и критериях.
+          Данные содержат в себе множества кратких информаций о городах и полных критериях.
       responses:
         '200':
           description: Дополнительные данные пользователя получены
@@ -809,9 +809,9 @@ paths:
     get:
       tags:
         - city
-      summary: Возвращает множество пособий города
+      summary: Возвращает множество полных пособий города
       description:
-        Возвращает множество пособий города.
+        Возвращает множество полных пособий города.
       operationId: getCityBenefits
       parameters:
         - name: id
@@ -966,7 +966,7 @@ paths:
       summary: Возвращает дополнительные данные для пособия
       description:
         Возвращает дополнительные данные для добавления или обновления пособия.
-          Данные содержат в себе множества кратких информаций о городах, критериях и учреждениях
+          Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
         Для администратора.
         Необходима авторизация.
       operationId: getBenefitInitData
@@ -989,19 +989,48 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /benefit/allex:
+  /benefit/all:
     get:
       tags:
         - benefit
-      summary: Возвращает множество всех пособий
+      summary: Возвращает множество всех полных пособий
       description:
-        Возвращает множество всех пособий. В том числе без города, учреждения или критерий
+        Возвращает множество всех полных пособий - с городом, учреждением и критерием.
         Для администратора.
         Необходима авторизация.
-      operationId: getAllExBenefits
+      operationId: getBenefits
       responses:
         '200':
-          description: Множество всех пособий получено
+          description: Множество пособий получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BenefitInfo'
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Пособия не найдены
+          content: { }
+      security: [ ]
+  /benefit/allpartial:
+    get:
+      tags:
+        - benefit
+      summary: Возвращает множество всех неполных пособий
+      description:
+        Возвращает множество всех неполных пособий - без города, учреждения или критерия.
+        Для администратора.
+        Необходима авторизация.
+      operationId: getPartialBenefits
+      responses:
+        '200':
+          description: Множество пособий получено
           content:
             application/json:
               schema:
@@ -1082,9 +1111,9 @@ paths:
     get:
       tags:
         - benefit
-      summary: Возвращает множество критерий пособия
+      summary: Возвращает множество полных критерий пособия
       description:
-        Возвращает множество учреждений пособия.
+        Возвращает множество полных критерий пособия.
       operationId: getBenefitCriteria
       parameters:
         - name: id
@@ -1262,6 +1291,27 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
+  /institution/all:
+    get:
+      tags:
+        - institution
+      summary: Возвращает множество всех учреждений
+      description:
+        Возвращает множество всех учреждений.
+      operationId: getInstitutions
+      responses:
+        '200':
+          description: Множество учреждений получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InstitutionInfo'
+        '404':
+          description: Учреждения не найдены
+          content: { }
+      security: []
   /institution/{id}/city:
     get:
       tags:
@@ -1293,9 +1343,9 @@ paths:
     get:
       tags:
         - institution
-      summary: Возвращает множество пособий учреждения
+      summary: Возвращает множество полных пособий учреждения
       description:
-        Возвращает множество пособийх учреждения.
+        Возвращает множество полных пособий учреждения.
       operationId: getInstitutionBenefits
       parameters:
         - name: id
@@ -1477,9 +1527,9 @@ paths:
     get:
       tags:
         - criterion
-      summary: Возвращает множество критерий
+      summary: Возвращает множество всех полных критерий
       description:
-        Возвращает множество критерий.
+        Возвращает множество всех полных критерий - с типом критерия
       operationId: getCriteria
       responses:
         '200':
@@ -1494,16 +1544,16 @@ paths:
           description: Критерия не найдены
           content: { }
       security: [ ]
-  /criterion/allex:
+  /criterion/allpartial:
     get:
       tags:
         - criterion
-      summary: Возвращает множество всех критерий
+      summary: Возвращает множество всех неполных критерий
       description:
-        Возвращает множество всех критерий. В том числе без типа критерия.
+        Возвращает множество всех неполных критерий - без типа критерия.
         Для администратора.
         Необходима авторизация.
-      operationId: getAllExCriteria
+      operationId: getPartialCriteria
       responses:
         '200':
           description: Множество всех критерий получено
@@ -1681,9 +1731,9 @@ paths:
     get:
       tags:
         - criterion type
-      summary: Возвращает множество типов критерий
+      summary: Возвращает множество всех типов критерия
       description:
-        Возвращает множество типов критерий
+        Возвращает множество всех типов критерий
       operationId: getCriterionTypes
       responses:
         '200':

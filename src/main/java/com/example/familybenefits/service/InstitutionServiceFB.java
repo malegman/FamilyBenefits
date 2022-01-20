@@ -155,6 +155,25 @@ public class InstitutionServiceFB implements InstitutionService {
   }
 
   /**
+   * Возвращает множество всех учреждений
+   * @return множество информаций об учреждениях
+   * @throws NotFoundException если учреждения не найдены
+   */
+  @Override
+  public Set<InstitutionInfo> readAll() throws NotFoundException {
+
+    Set<InstitutionInfo> institutionInfoSet = institutionRepository.findAll()
+        .stream()
+        .map(InstitutionConverter::toInfo)
+        .collect(Collectors.toSet());
+    if (institutionInfoSet.isEmpty()) {
+      throw new NotFoundException("Institutions not found");
+    }
+
+    return institutionInfoSet;
+  }
+
+  /**
    * Возвращает информацию о городе учреждения
    * @param idInstitution ID учреждения
    * @return информация о городе учреждения
@@ -186,7 +205,7 @@ public class InstitutionServiceFB implements InstitutionService {
       ));
     }
 
-    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllWhereInstitutionIdEquals(idInstitution)
+    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllFullWhereInstitutionIdEquals(idInstitution)
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());

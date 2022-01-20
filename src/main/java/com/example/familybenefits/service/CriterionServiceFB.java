@@ -121,12 +121,12 @@ public class CriterionServiceFB implements CriterionService {
   }
 
   /**
-   * Возвращает множество критерий с типом критерия
+   * Возвращает множество всех полных критерий - с типом критерия
    * @return множество информаций о критериях
    * @throws NotFoundException если критерии не найдены
    */
   @Override
-  public Set<CriterionInfo> readAllWithCriterionType() throws NotFoundException {
+  public Set<CriterionInfo> readAllFull() throws NotFoundException {
 
     Set<CriterionInfo> criterionInfoSet = criterionRepository.findAllByCriterionTypeExists()
         .stream()
@@ -140,14 +140,14 @@ public class CriterionServiceFB implements CriterionService {
   }
 
   /**
-   * Возвращает множество всех критерий, в том числе без типа критерия
+   * Возвращает множество всех неполных критерий - без типа критерия
    * @return множество информаций о критериях
    * @throws NotFoundException если критерии не найдены
    */
   @Override
-  public Set<CriterionInfo> readAll() throws NotFoundException {
+  public Set<CriterionInfo> readAllPartial() throws NotFoundException {
 
-    Set<CriterionInfo> criterionInfoSet = criterionRepository.findAll()
+    Set<CriterionInfo> criterionInfoSet = criterionRepository.findAllByCriterionTypeIsNull()
         .stream()
         .map(CriterionConverter::toInfo)
         .collect(Collectors.toSet());

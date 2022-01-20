@@ -130,14 +130,14 @@ public class CriterionController {
   }
 
   /**
-   * Возвращает множество критерий
+   * Возвращает множество всех полных критерий - с типом критерия
    * @return множество критерий и код ответа
    */
   @GetMapping(value = "/criterion/all")
   public ResponseEntity<Set<CriterionInfo>> getCriteria() {
 
     try {
-      Set<CriterionInfo> criterionInfoSet = criterionService.readAllWithCriterionType();
+      Set<CriterionInfo> criterionInfoSet = criterionService.readAllFull();
       return ResponseEntity.status(HttpStatus.OK).body(criterionInfoSet);
 
     } catch (NotFoundException e) {
@@ -147,14 +147,14 @@ public class CriterionController {
   }
 
   /**
-   * Возвращает множество всех критерий, в том числе без типа критерия
+   * Возвращает множество всех неполных критерий - без типа критерия
    * @return множество критерий и код ответа
    */
-  @GetMapping(value = "/criterion/allex")
-  public ResponseEntity<Set<CriterionInfo>> getAllExCriteria() {
+  @GetMapping(value = "/criterion/allpartial")
+  public ResponseEntity<Set<CriterionInfo>> getPartialCriteria() {
 
     try {
-      Set<CriterionInfo> criterionInfoSet = criterionService.readAll();
+      Set<CriterionInfo> criterionInfoSet = criterionService.readAllPartial();
       return ResponseEntity.status(HttpStatus.OK).body(criterionInfoSet);
 
     } catch (NotFoundException e) {

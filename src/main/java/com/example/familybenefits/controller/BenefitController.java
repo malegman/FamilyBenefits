@@ -115,7 +115,7 @@ public class BenefitController {
 
   /**
    * Возвращает дополнительные данные для критерия.
-   * Данные содержат в себе множества кратких информаций о городах, критериях и учреждениях
+   * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
    * @return дополнительные данные для критерия и код ответа
    */
   @GetMapping(value = "/benefit/initdata")
@@ -132,14 +132,31 @@ public class BenefitController {
   }
 
   /**
-   * Возвращает множество всех пособий, в том числе без города, учреждения или критерий
+   * Возвращает множество всех полных пособий - с городом, учреждением и критерием
    * @return множество критерий и код ответа
    */
-  @GetMapping(value = "/benefit/allex")
-  public ResponseEntity<Set<BenefitInfo>> getAllExBenefits() {
+  @GetMapping(value = "/benefit/all")
+  public ResponseEntity<Set<BenefitInfo>> getBenefits() {
 
     try {
-      Set<BenefitInfo> benefitInfoSet = benefitService.readAll();
+      Set<BenefitInfo> benefitInfoSet = benefitService.readAllFull();
+      return ResponseEntity.status(HttpStatus.OK).body(benefitInfoSet);
+
+    } catch (NotFoundException e) {
+      log.error(e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
+    }
+  }
+
+  /**
+   * Возвращает множество всех неполных пособий - без города, учреждения или критерия
+   * @return множество критерий и код ответа
+   */
+  @GetMapping(value = "/benefit/allpartial")
+  public ResponseEntity<Set<BenefitInfo>> getPartialBenefits() {
+
+    try {
+      Set<BenefitInfo> benefitInfoSet = benefitService.readAllPartial();
       return ResponseEntity.status(HttpStatus.OK).body(benefitInfoSet);
 
     } catch (NotFoundException e) {
@@ -185,7 +202,7 @@ public class BenefitController {
   }
 
   /**
-   * Возвращает множество критерий пособия
+   * Возвращает множество полных критерий пособия
    * @param idBenefit ID пособия
    * @return множество критерий пособия и код ответа
    */

@@ -55,6 +55,13 @@ public interface InstitutionService {
   InstitutionInitData getInitData() throws NotFoundException;
 
   /**
+   * Возвращает множество всех учреждений
+   * @return множество информаций об учреждениях
+   * @throws NotFoundException если учреждения не найдены
+   */
+  Set<InstitutionInfo> readAll() throws NotFoundException;
+
+  /**
    * Возвращает информацию о городе учреждения.
    * @param idInstitution ID учреждения
    * @return информация о городе учреждения

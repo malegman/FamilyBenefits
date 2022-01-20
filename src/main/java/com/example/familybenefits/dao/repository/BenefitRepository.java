@@ -20,26 +20,64 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, BigInteg
   boolean existsByName(String name);
 
   /**
-   * Находит пособия, которые есть в указанном городе
+   * Находит полные пособия
+   * @return множество пособий
+   */
+  @Query(nativeQuery = true,
+      value = "SELECT *" +
+          "FROM familybenefit.benefit " +
+          "INNER JOIN familybenefit.benefits_cities ON familybenefit.benefits_cities.id_benefit = familybenefit.benefit.id " +
+          "INNER JOIN familybenefit.benefits_criteria ON familybenefit.benefits_criteria.id_benefit = familybenefit.benefit.id " +
+          "INNER JOIN familybenefit.benefits_institutions ON familybenefit.benefits_institutions.id_benefit = familybenefit.benefit.id " +
+          "WHERE familybenefit.benefits_cities.id_city IS NOT NULL " +
+          "AND familybenefit.benefits_criteria.id_criterion IS NOT NULL " +
+          "AND familybenefit.benefits_institutions.id_institution IS NOT NULL;")
+  Set<BenefitEntity> findAllFull();
+
+  /**
+   * Находит неполные пособия
+   * @return множество пособий
+   */
+  @Query(nativeQuery = true,
+      value = "SELECT *" +
+          "FROM familybenefit.benefit " +
+          "INNER JOIN familybenefit.benefits_cities ON familybenefit.benefits_cities.id_benefit = familybenefit.benefit.id " +
+          "INNER JOIN familybenefit.benefits_criteria ON familybenefit.benefits_criteria.id_benefit = familybenefit.benefit.id " +
+          "INNER JOIN familybenefit.benefits_institutions ON familybenefit.benefits_institutions.id_benefit = familybenefit.benefit.id " +
+          "WHERE familybenefit.benefits_cities.id_city IS NULL " +
+          "OR familybenefit.benefits_criteria.id_criterion IS NULL " +
+          "OR familybenefit.benefits_institutions.id_institution IS NULL;")
+  Set<BenefitEntity> findAllPartial();
+
+  /**
+   * Находит полные пособия, которые есть в указанном городе
    * @param idCity ID города
    * @return множество пособий
    */
   @Query(nativeQuery = true,
       value = "SELECT *" +
-          "FROM familybenefit.benefits_cities INNER JOIN familybenefit.benefit ON " +
-          "familybenefit.benefits_cities.id_benefit = familybenefit.benefit.id " +
-          "WHERE familybenefit.benefits_cities.id_city = ?1;")
-  Set<BenefitEntity> findAllWhereCityIdEquals(BigInteger idCity);
+          "FROM familybenefit.benefit " +
+          "INNER JOIN familybenefit.benefits_cities ON familybenefit.benefits_cities.id_benefit = familybenefit.benefit.id " +
+          "INNER JOIN familybenefit.benefits_criteria ON familybenefit.benefits_criteria.id_benefit = familybenefit.benefit.id " +
+          "INNER JOIN familybenefit.benefits_institutions ON familybenefit.benefits_institutions.id_benefit = familybenefit.benefit.id " +
+          "WHERE familybenefit.benefits_cities.id_city = ?1 " +
+          "AND familybenefit.benefits_criteria.id_criterion IS NOT NULL " +
+          "AND familybenefit.benefits_institutions.id_institution IS NOT NULL;")
+  Set<BenefitEntity> findAllFullWhereCityIdEquals(BigInteger idCity);
 
   /**
-   * Находит пособия, которые есть в указанном учреждении
+   * Находит полные пособия, которые есть в указанном учреждении
    * @param idInstitution ID учреждения
    * @return множество пособий
    */
   @Query(nativeQuery = true,
       value = "SELECT *" +
-          "FROM familybenefit.benefits_institutions INNER JOIN familybenefit.benefit ON " +
-          "familybenefit.benefits_institutions.id_benefit = familybenefit.benefit.id " +
-          "WHERE familybenefit.benefits_institutions.id_institution = ?1;")
-  Set<BenefitEntity> findAllWhereInstitutionIdEquals(BigInteger idInstitution);
+          "FROM familybenefit.benefit " +
+          "INNER JOIN familybenefit.benefits_cities ON familybenefit.benefits_cities.id_benefit = familybenefit.benefit.id " +
+          "INNER JOIN familybenefit.benefits_criteria ON familybenefit.benefits_criteria.id_benefit = familybenefit.benefit.id " +
+          "INNER JOIN familybenefit.benefits_institutions ON familybenefit.benefits_institutions.id_benefit = familybenefit.benefit.id " +
+          "WHERE familybenefit.benefits_cities.id_city IS NOT NULL " +
+          "AND familybenefit.benefits_criteria.id_criterion IS NOT NULL " +
+          "AND familybenefit.benefits_institutions.id_institution = ?1;")
+  Set<BenefitEntity> findAllFullWhereInstitutionIdEquals(BigInteger idInstitution);
 }
