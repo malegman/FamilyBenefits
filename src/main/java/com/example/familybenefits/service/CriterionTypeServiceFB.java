@@ -53,15 +53,10 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
   @Override
   public void add(CriterionTypeAdd criterionTypeAdd) throws AlreadyExistsException {
 
-    CriterionTypeEntity criterionTypeEntity = CriterionTypeConverter.fromAdd(criterionTypeAdd);
+    ServiceHelper.checkAbsenceObjectByUniqStrElseThrow(
+        criterionTypeRepository::existsByName, criterionTypeAdd.getName(), "The criterion type with name %s already exists");
 
-    if (criterionTypeRepository.existsByName(criterionTypeEntity.getName())) {
-      throw new AlreadyExistsException(String.format(
-          "The criterion type %s already exists", criterionTypeEntity.getName()
-      ));
-    }
-
-    criterionTypeRepository.saveAndFlush(criterionTypeEntity);
+    criterionTypeRepository.saveAndFlush(CriterionTypeConverter.fromAdd(criterionTypeAdd));
   }
 
   /**
@@ -72,15 +67,10 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
   @Override
   public void update(CriterionTypeUpdate criterionTypeUpdate) throws NotFoundException {
 
-    CriterionTypeEntity criterionTypeEntity = CriterionTypeConverter.fromUpdate(criterionTypeUpdate);
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        criterionTypeRepository::existsById, criterionTypeUpdate.getId(), "Criterion type with ID %s not found");
 
-    if (!criterionTypeRepository.existsById(criterionTypeEntity.getId())) {
-      throw new NotFoundException(String.format(
-          "Criterion type with ID %s not found", criterionTypeEntity.getId()
-      ));
-    }
-
-    criterionTypeRepository.saveAndFlush(criterionTypeEntity);
+    criterionTypeRepository.saveAndFlush(CriterionTypeConverter.fromUpdate(criterionTypeUpdate));
   }
 
   /**
@@ -90,11 +80,8 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
    */
   public void delete(BigInteger idCriterionType) throws NotFoundException {
 
-    if (!criterionTypeRepository.existsById(idCriterionType)) {
-      throw new NotFoundException(String.format(
-          "Criterion type with ID %s not found", idCriterionType
-      ));
-    }
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        criterionTypeRepository::existsById, idCriterionType, "Criterion type with ID %s not found");
 
     criterionTypeRepository.deleteById(idCriterionType);
   }
@@ -107,12 +94,10 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
    */
   public CriterionTypeInfo read(BigInteger idCriterionType) throws NotFoundException {
 
-    return CriterionTypeConverter.toInfo(criterionTypeRepository.findById(idCriterionType)
-                                             .orElseThrow(
-                                                 () -> new NotFoundException(String.format(
-                                                     "Criterion type with ID %s not found", idCriterionType
-                                                 )))
-    );
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        criterionTypeRepository::existsById, idCriterionType, "Criterion type with ID %s not found");
+
+    return CriterionTypeConverter.toInfo(criterionTypeRepository.getById(idCriterionType));
   }
 
   /**
@@ -141,20 +126,15 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
    */
   public Set<CriterionInfo> readCriteria(BigInteger idCriterionType) throws NotFoundException {
 
-    if (!criterionTypeRepository.existsById(idCriterionType)) {
-      throw new NotFoundException(String.format(
-          "Criterion type with ID %s not found", idCriterionType
-      ));
-    }
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        criterionTypeRepository::existsById, idCriterionType, "Criterion type with ID %s not found");
 
     Set<CriterionInfo> criterionInfoSet = criterionRepository.findAllByCriterionType(new CriterionTypeEntity(idCriterionType))
         .stream()
         .map(CriterionConverter::toInfo)
         .collect(Collectors.toSet());
     if (criterionInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Criteria of criterion type with id %s not found", idCriterionType
-      ));
+      throw new NotFoundException(String.format("Criteria of criterion type with id %s not found", idCriterionType));
     }
 
     return criterionInfoSet;

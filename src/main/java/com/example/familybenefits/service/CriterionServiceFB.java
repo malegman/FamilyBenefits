@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,15 +55,10 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public void add(CriterionAdd criterionAdd) throws AlreadyExistsException {
 
-    CriterionEntity criterionEntity = CriterionConverter.fromAdd(criterionAdd);
+    ServiceHelper.checkAbsenceObjectByUniqStrElseThrow(
+        criterionTypeRepository::existsByName, criterionAdd.getName(), "The criterion with name %s already exists");
 
-    if (criterionRepository.existsByName(criterionEntity.getName())) {
-      throw new AlreadyExistsException(String.format(
-          "The criterion %s already exists", criterionEntity.getName()
-      ));
-    }
-
-    criterionRepository.saveAndFlush(criterionEntity);
+    criterionRepository.saveAndFlush(CriterionConverter.fromAdd(criterionAdd));
   }
 
   /**
@@ -75,15 +69,10 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public void update(CriterionUpdate criterionUpdate) throws NotFoundException {
 
-    CriterionEntity criterionEntity = CriterionConverter.fromUpdate(criterionUpdate);
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        criterionTypeRepository::existsById, criterionUpdate.getId(), "Criterion with ID %s not found");
 
-    if (!criterionRepository.existsById(criterionEntity.getId())) {
-      throw new NotFoundException(String.format(
-          "Criterion with ID %s not found", criterionEntity.getId()
-      ));
-    }
-
-    criterionRepository.saveAndFlush(criterionEntity);
+    criterionRepository.saveAndFlush(CriterionConverter.fromUpdate(criterionUpdate));
   }
 
   /**
@@ -94,11 +83,8 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public void delete(BigInteger idCriterion) throws NotFoundException {
 
-    if (!criterionRepository.existsById(idCriterion)) {
-      throw new NotFoundException(String.format(
-          "Criterion with ID %s not found", idCriterion
-      ));
-    }
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        criterionTypeRepository::existsById, idCriterion, "Criterion with ID %s not found");
 
     criterionRepository.deleteById(idCriterion);
   }
@@ -112,12 +98,10 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public CriterionInfo read(BigInteger idCriterion) throws NotFoundException {
 
-    return CriterionConverter.toInfo(criterionRepository.findById(idCriterion)
-                                         .orElseThrow(
-                                             () -> new NotFoundException(String.format(
-                                                 "Criterion with ID %s not found", idCriterion
-                                         )))
-    );
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        criterionTypeRepository::existsById, idCriterion, "Criterion with ID %s not found");
+
+    return CriterionConverter.toInfo(criterionRepository.getById(idCriterion));
   }
 
   /**
@@ -190,19 +174,15 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public CriterionTypeInfo readCriterionType(BigInteger idCriterion) throws NotFoundException {
 
-    Optional<CriterionEntity> optCriterionEntity = criterionRepository.findById(idCriterion);
-    if (optCriterionEntity.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Criterion with ID %s not found", idCriterion
-      ));
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        criterionTypeRepository::existsById, idCriterion, "Criterion with ID %s not found");
+
+    CriterionEntity criterionEntity = criterionRepository.getById(idCriterion);
+
+    if (criterionEntity.getCriterionType() == null) {
+      throw new NotFoundException(String.format("Criterion type of criterion with ID %s not found", idCriterion));
     }
 
-    if (optCriterionEntity.get().getCriterionType() == null) {
-      throw new NotFoundException(String.format(
-          "Criterion type of criterion with id %s not found", idCriterion
-      ));
-    }
-
-    return CriterionTypeConverter.toInfo(optCriterionEntity.get().getCriterionType());
+    return CriterionTypeConverter.toInfo(criterionEntity.getCriterionType());
   }
 }

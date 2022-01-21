@@ -12,7 +12,6 @@ import com.example.familybenefits.convert.BenefitConverter;
 import com.example.familybenefits.convert.CityConverter;
 import com.example.familybenefits.convert.CriterionConverter;
 import com.example.familybenefits.convert.InstitutionConverter;
-import com.example.familybenefits.dao.entity.BenefitEntity;
 import com.example.familybenefits.dao.repository.BenefitRepository;
 import com.example.familybenefits.dao.repository.CityRepository;
 import com.example.familybenefits.dao.repository.CriterionRepository;
@@ -60,7 +59,8 @@ public class BenefitServiceFB implements BenefitService {
    * @param criterionRepository репозиторий, работающий с моделью таблицы "criterion"
    */
   @Autowired
-  public BenefitServiceFB(BenefitRepository benefitRepository, CityRepository cityRepository, InstitutionRepository institutionRepository, CriterionRepository criterionRepository) {
+  public BenefitServiceFB(BenefitRepository benefitRepository, CityRepository cityRepository,
+                          InstitutionRepository institutionRepository, CriterionRepository criterionRepository) {
     this.benefitRepository = benefitRepository;
     this.cityRepository = cityRepository;
     this.institutionRepository = institutionRepository;
@@ -75,15 +75,10 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public void add(BenefitAdd benefitAdd) throws AlreadyExistsException {
 
-    BenefitEntity benefitEntity = BenefitConverter.fromAdd(benefitAdd);
+    ServiceHelper.checkAbsenceObjectByUniqStrElseThrow(
+        benefitRepository::existsByName, benefitAdd.getName(), "The benefit with name %s already exists");
 
-    if (benefitRepository.existsByName(benefitEntity.getName())) {
-      throw new AlreadyExistsException(String.format(
-          "The benefit %s already exists", benefitEntity.getName()
-      ));
-    }
-
-    benefitRepository.saveAndFlush(benefitEntity);
+    benefitRepository.saveAndFlush(BenefitConverter.fromAdd(benefitAdd));
   }
 
   /**
@@ -94,15 +89,10 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public void update(BenefitUpdate benefitUpdate) throws NotFoundException {
 
-    BenefitEntity benefitEntity = BenefitConverter.fromUpdate(benefitUpdate);
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        benefitRepository::existsById, benefitUpdate.getId(), "Benefit with ID %s not found");
 
-    if (!benefitRepository.existsById(benefitEntity.getId())) {
-      throw new NotFoundException(String.format(
-          "Benefit with ID %s not found", benefitEntity.getId()
-      ));
-    }
-
-    benefitRepository.saveAndFlush(benefitEntity);
+    benefitRepository.saveAndFlush(BenefitConverter.fromUpdate(benefitUpdate));
   }
 
   /**
@@ -113,11 +103,8 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public void delete(BigInteger idBenefit) throws NotFoundException {
 
-    if (!benefitRepository.existsById(idBenefit)) {
-      throw new NotFoundException(String.format(
-          "Benefit with ID %s not found", idBenefit
-      ));
-    }
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        benefitRepository::existsById, idBenefit, "Benefit with ID %s not found");
 
     benefitRepository.deleteById(idBenefit);
   }
@@ -131,12 +118,10 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public BenefitInfo read(BigInteger idBenefit) throws NotFoundException {
 
-    return BenefitConverter.toInfo(benefitRepository.findById(idBenefit)
-                                       .orElseThrow(
-                                           () -> new NotFoundException(String.format(
-                                               "Benefit with ID %s not found", idBenefit
-                                           )))
-    );
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        benefitRepository::existsById, idBenefit, "Benefit with ID %s not found");
+
+    return BenefitConverter.toInfo(benefitRepository.getById(idBenefit));
   }
 
   /**
@@ -227,20 +212,15 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public Set<CityInfo> readCities(BigInteger idBenefit) throws NotFoundException {
 
-    if (!benefitRepository.existsById(idBenefit)) {
-      throw new NotFoundException(String.format(
-          "Benefit with ID %s not found", idBenefit
-      ));
-    }
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        benefitRepository::existsById, idBenefit, "Benefit with ID %s not found");
 
     Set<CityInfo> cityInfoSet = cityRepository.findAllWhereBenefitIdEquals(idBenefit)
         .stream()
         .map(CityConverter::toInfo)
         .collect(Collectors.toSet());
     if (cityInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Cities of benefit with id %s not found", idBenefit
-      ));
+      throw new NotFoundException(String.format("Cities of benefit with id %s not found", idBenefit));
     }
 
     return cityInfoSet;
@@ -255,20 +235,15 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public Set<InstitutionInfo> readInstitutions(BigInteger idBenefit) throws NotFoundException {
 
-    if (!benefitRepository.existsById(idBenefit)) {
-      throw new NotFoundException(String.format(
-          "Benefit with ID %s not found", idBenefit
-      ));
-    }
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        benefitRepository::existsById, idBenefit, "Benefit with ID %s not found");
 
     Set<InstitutionInfo> institutionInfoSet = institutionRepository.findAllWhereBenefitIdEquals(idBenefit)
         .stream()
         .map(InstitutionConverter::toInfo)
         .collect(Collectors.toSet());
     if (institutionInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Institutions of benefit with id %s not found", idBenefit
-      ));
+      throw new NotFoundException(String.format("Institutions of benefit with id %s not found", idBenefit));
     }
 
     return institutionInfoSet;
@@ -283,20 +258,15 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public Set<CriterionInfo> readCriteria(BigInteger idBenefit) throws NotFoundException {
 
-    if (!benefitRepository.existsById(idBenefit)) {
-      throw new NotFoundException(String.format(
-          "Benefit with ID %s not found", idBenefit
-      ));
-    }
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        benefitRepository::existsById, idBenefit, "Benefit with ID %s not found");
 
     Set<CriterionInfo> criterionInfoSet = criterionRepository.findAllFullWhereBenefitIdEquals(idBenefit)
         .stream()
         .map(CriterionConverter::toInfo)
         .collect(Collectors.toSet());
     if (criterionInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Criteria of benefit with id %s not found", idBenefit
-      ));
+      throw new NotFoundException(String.format("Criteria of benefit with id %s not found", idBenefit));
     }
 
     return criterionInfoSet;

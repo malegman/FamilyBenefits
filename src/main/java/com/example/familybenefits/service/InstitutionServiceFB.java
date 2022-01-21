@@ -10,7 +10,6 @@ import com.example.familybenefits.api_model.institution.InstitutionUpdate;
 import com.example.familybenefits.convert.BenefitConverter;
 import com.example.familybenefits.convert.CityConverter;
 import com.example.familybenefits.convert.InstitutionConverter;
-import com.example.familybenefits.dao.entity.InstitutionEntity;
 import com.example.familybenefits.dao.repository.BenefitRepository;
 import com.example.familybenefits.dao.repository.CityRepository;
 import com.example.familybenefits.dao.repository.InstitutionRepository;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,7 +50,8 @@ public class InstitutionServiceFB implements InstitutionService {
    * @param benefitRepository репозиторий, работающий с моделью таблицы "benefit"
    */
   @Autowired
-  public InstitutionServiceFB(InstitutionRepository institutionRepository, CityRepository cityRepository, BenefitRepository benefitRepository) {
+  public InstitutionServiceFB(InstitutionRepository institutionRepository, CityRepository cityRepository,
+                              BenefitRepository benefitRepository) {
     this.institutionRepository = institutionRepository;
     this.cityRepository = cityRepository;
     this.benefitRepository = benefitRepository;
@@ -66,15 +65,10 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public void add(InstitutionAdd institutionAdd) throws AlreadyExistsException{
 
-    InstitutionEntity institutionEntity = InstitutionConverter.fromAdd(institutionAdd);
+    ServiceHelper.checkAbsenceObjectByUniqStrElseThrow(
+        institutionRepository::existsByName, institutionAdd.getName(), "The institution %s already exists");
 
-    if (institutionRepository.existsByName(institutionEntity.getName())) {
-      throw new AlreadyExistsException(String.format(
-          "The institution %s already exists", institutionEntity.getName()
-      ));
-    }
-
-    institutionRepository.saveAndFlush(institutionEntity);
+    institutionRepository.saveAndFlush(InstitutionConverter.fromAdd(institutionAdd));
   }
 
   /**
@@ -85,15 +79,10 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public void update(InstitutionUpdate institutionUpdate) throws NotFoundException {
 
-    InstitutionEntity institutionEntity = InstitutionConverter.fromUpdate(institutionUpdate);
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        institutionRepository::existsById, institutionUpdate.getId(), "Institution with ID %s not found");
 
-    if (!institutionRepository.existsById(institutionEntity.getId())) {
-      throw new NotFoundException(String.format(
-          "Institution with ID %s not found", institutionEntity.getId()
-      ));
-    }
-
-    institutionRepository.saveAndFlush(institutionEntity);
+    institutionRepository.saveAndFlush(InstitutionConverter.fromUpdate(institutionUpdate));
   }
 
   /**
@@ -104,11 +93,8 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public void delete(BigInteger idInstitution) throws NotFoundException {
 
-    if (!institutionRepository.existsById(idInstitution)) {
-      throw new NotFoundException(String.format(
-          "Institution with ID %s not found", idInstitution
-      ));
-    }
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        institutionRepository::existsById, idInstitution, "Institution with ID %s not found");
 
     institutionRepository.deleteById(idInstitution);
   }
@@ -122,14 +108,10 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public InstitutionInfo read(BigInteger idInstitution) throws NotFoundException {
 
-    return InstitutionConverter
-        .toInfo(institutionRepository
-                    .findById(idInstitution)
-                    .orElseThrow(
-                        () -> new NotFoundException(String.format(
-                            "Institution with ID %s not found", idInstitution
-                        )))
-    );
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        institutionRepository::existsById, idInstitution, "Institution with ID %s not found");
+
+    return InstitutionConverter.toInfo(institutionRepository.getById(idInstitution));
   }
 
   /**
@@ -181,14 +163,10 @@ public class InstitutionServiceFB implements InstitutionService {
    */
   public CityInfo readCity(BigInteger idInstitution) throws NotFoundException {
 
-    Optional<InstitutionEntity> optInstitutionEntity = institutionRepository.findById(idInstitution);
-    if (optInstitutionEntity.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Institution with ID %s not found", idInstitution
-      ));
-    }
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        institutionRepository::existsById, idInstitution, "Institution with ID %s not found");
 
-    return CityConverter.toInfo(optInstitutionEntity.get().getCityEntity());
+    return CityConverter.toInfo(institutionRepository.getById(idInstitution).getCityEntity());
   }
 
   /**
@@ -199,20 +177,15 @@ public class InstitutionServiceFB implements InstitutionService {
    */
   public Set<BenefitInfo> readBenefits(BigInteger idInstitution) throws NotFoundException {
 
-    if (!institutionRepository.existsById(idInstitution)) {
-      throw new NotFoundException(String.format(
-          "Institution with ID %s not found", idInstitution
-      ));
-    }
+    ServiceHelper.checkExistenceObjectByIdElseThrow(
+        institutionRepository::existsById, idInstitution, "Institution with ID %s not found");
 
     Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllFullWhereInstitutionIdEquals(idInstitution)
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());
     if (benefitInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Benefits of institution with id %s not found", idInstitution
-      ));
+      throw new NotFoundException(String.format("Benefits of institution with id %s not found", idInstitution));
     }
 
     return benefitInfoSet;
