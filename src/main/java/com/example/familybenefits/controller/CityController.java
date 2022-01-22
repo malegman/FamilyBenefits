@@ -47,6 +47,11 @@ public class CityController {
   @PostMapping(value = "/city")
   public ResponseEntity<?> addCity(@RequestBody CityAdd cityAdd) {
 
+    if (cityAdd == null) {
+      log.warn("Request body \"cityAdd\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
     try {
       cityService.add(cityAdd);
       return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -64,6 +69,11 @@ public class CityController {
    */
   @PutMapping(value = "/city")
   public ResponseEntity<?> updateCity(@RequestBody CityUpdate cityUpdate) {
+
+    if (cityUpdate == null) {
+      log.warn("Request body \"cityUpdate\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
 
     try {
       cityService.update(cityUpdate);

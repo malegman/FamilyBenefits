@@ -49,13 +49,18 @@ public class BenefitController {
   @PostMapping(value = "/benefit")
   public ResponseEntity<?> addBenefit(@RequestBody BenefitAdd benefitAdd) {
 
+    if (benefitAdd == null) {
+      log.warn("Request body \"benefitAdd\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
     try {
       benefitService.add(benefitAdd);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException nfe) {
       log.error(nfe.getMessage());
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException aee) {
       log.error(aee.getMessage());
@@ -70,6 +75,11 @@ public class BenefitController {
    */
   @PutMapping(value = "/benefit")
   public ResponseEntity<?> updateBenefit(@RequestBody BenefitUpdate benefitUpdate) {
+
+    if (benefitUpdate == null) {
+      log.warn("Request body \"benefitUpdate\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
 
     try {
       benefitService.update(benefitUpdate);

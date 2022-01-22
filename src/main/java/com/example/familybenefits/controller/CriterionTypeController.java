@@ -46,6 +46,11 @@ public class CriterionTypeController {
   @PostMapping(value = "/criteriontype")
   public ResponseEntity<?> addCriterionType(@RequestBody CriterionTypeAdd criterionTypeAdd) {
 
+    if (criterionTypeAdd == null) {
+      log.warn("Request body \"criterionTypeAdd\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
     try {
       criterionTypeService.add(criterionTypeAdd);
       return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -63,6 +68,11 @@ public class CriterionTypeController {
    */
   @PutMapping(value = "/criteriontype")
   public ResponseEntity<?> updateCriterionType(@RequestBody CriterionTypeUpdate criterionTypeUpdate) {
+
+    if (criterionTypeUpdate == null) {
+      log.warn("Request body \"criterionTypeUpdate\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
 
     try {
       criterionTypeService.update(criterionTypeUpdate);

@@ -48,13 +48,18 @@ public class InstitutionController {
   @PostMapping(value = "/institution")
   public ResponseEntity<?> addInstitution(@RequestBody InstitutionAdd institutionAdd) {
 
+    if (institutionAdd == null) {
+      log.warn("Request body \"institutionAdd\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
     try {
       institutionService.add(institutionAdd);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException nfe) {
       log.error(nfe.getMessage());
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException aee) {
       log.error(aee.getMessage());
@@ -69,6 +74,11 @@ public class InstitutionController {
    */
   @PutMapping(value = "/institution")
   public ResponseEntity<?> updateInstitution(@RequestBody InstitutionUpdate institutionUpdate) {
+
+    if (institutionUpdate == null) {
+      log.warn("Request body \"institutionUpdate\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
 
     try {
       institutionService.update(institutionUpdate);

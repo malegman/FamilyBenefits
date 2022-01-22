@@ -47,13 +47,18 @@ public class CriterionController {
   @PostMapping(value = "/criterion")
   public ResponseEntity<?> addCriterion(@RequestBody CriterionAdd criterionAdd) {
 
+    if (criterionAdd == null) {
+      log.warn("Request body \"criterionAdd\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
     try {
       criterionService.add(criterionAdd);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException nfe) {
       log.error(nfe.getMessage());
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException aee) {
       log.error(aee.getMessage());
@@ -68,6 +73,11 @@ public class CriterionController {
    */
   @PutMapping(value = "/criterion")
   public ResponseEntity<?> updateCriterion(@RequestBody CriterionUpdate criterionUpdate) {
+
+    if (criterionUpdate == null) {
+      log.warn("Request body \"criterionUpdate\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
 
     try {
       criterionService.update(criterionUpdate);
