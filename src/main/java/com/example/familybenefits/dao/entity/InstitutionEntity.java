@@ -8,6 +8,7 @@ import org.springframework.lang.Nullable;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Модель таблицы "institution"
@@ -20,7 +21,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class InstitutionEntity {
+public class InstitutionEntity implements DBPreparer {
 
   /**
    * ID учреждения
@@ -86,6 +87,24 @@ public class InstitutionEntity {
    */
   public InstitutionEntity(@NonNull BigInteger id) {
     this.id = id;
+  }
+
+  /**
+   * Обработывает строковые поля объекта перед записью в базу данных
+   * @param prepareFunc функция обработки строки
+   * @return объект с обработанными полями
+   */
+  @Override
+  public DBPreparer prepareForDB(Function<String, String> prepareFunc) {
+
+    name = prepareFunc.apply(name);
+    info = prepareFunc.apply(info);
+    address = prepareFunc.apply(address);
+    phone = prepareFunc.apply(phone);
+    email = prepareFunc.apply(email);
+    schedule = prepareFunc.apply(schedule);
+
+    return this;
   }
 
   @Override

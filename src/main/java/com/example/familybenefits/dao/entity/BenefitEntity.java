@@ -9,6 +9,7 @@ import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Модель таблицы "benefit"
@@ -21,7 +22,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class BenefitEntity {
+public class BenefitEntity implements DBPreparer {
 
   /**
    * ID пособия
@@ -95,6 +96,21 @@ public class BenefitEntity {
     joinColumns = @JoinColumn(name = "id_benefit"),
     inverseJoinColumns = @JoinColumn(name = "id_criterion"))
   private Set<CriterionEntity> criterionEntitySet;
+
+  /**
+   * Обработывает строковые поля объекта перед записью в базу данных
+   * @param prepareFunc функция обработки строки
+   * @return объект с обработанными полями
+   */
+  @Override
+  public DBPreparer prepareForDB(Function<String, String> prepareFunc) {
+
+    name = prepareFunc.apply(name);
+    info = prepareFunc.apply(info);
+    documents = prepareFunc.apply(documents);
+
+    return this;
+  }
 
   @Override
   public boolean equals(@Nullable Object o) {

@@ -22,8 +22,9 @@ public interface BenefitService {
    * Добавляет новое пособие
    * @param benefitAdd объект запроса для добавления пособия
    * @throws AlreadyExistsException если пособие с указанным названием уже существует
+   * @throws NotFoundException если город, критерий или учреждение пособия с указанным ID не найдено
    */
-  void add(BenefitAdd benefitAdd) throws AlreadyExistsException;
+  void add(BenefitAdd benefitAdd) throws AlreadyExistsException, NotFoundException;
 
   /**
    * Обновляет пособие

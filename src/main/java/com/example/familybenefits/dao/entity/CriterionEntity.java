@@ -8,6 +8,7 @@ import org.springframework.lang.Nullable;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Модель таблицы "criterion"
@@ -20,7 +21,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class CriterionEntity {
+public class CriterionEntity implements DBPreparer {
 
   /**
    * ID критерия
@@ -58,6 +59,20 @@ public class CriterionEntity {
    */
   public CriterionEntity(@NonNull BigInteger id) {
     this.id = id;
+  }
+
+  /**
+   * Обработывает строковые поля объекта перед записью в базу данных
+   * @param prepareFunc функция обработки строки
+   * @return объект с обработанными полями
+   */
+  @Override
+  public DBPreparer prepareForDB(Function<String, String> prepareFunc) {
+
+    name = prepareFunc.apply(name);
+    info = prepareFunc.apply(info);
+
+    return this;
   }
 
   @Override

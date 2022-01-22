@@ -52,8 +52,12 @@ public class InstitutionController {
       institutionService.add(institutionAdd);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
-    } catch (AlreadyExistsException e) {
-      log.error(e.getMessage());
+    } catch (NotFoundException nfe) {
+      log.error(nfe.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+    } catch (AlreadyExistsException aee) {
+      log.error(aee.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }

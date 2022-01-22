@@ -43,17 +43,24 @@ public class CityServiceFB implements CityService {
   private final BenefitRepository benefitRepository;
 
   /**
+   * Интерфейс сервиса, отвечающего за целостность базы данных
+   */
+  private final DBIntegrityService dbIntegrityService;
+
+  /**
    * Конструктор для инициализации интерфейсов репозиториев
    * @param cityRepository репозиторий, работающий с моделью таблицы "city"
    * @param institutionRepository репозиторий, работающий с моделью таблицы "institution"
    * @param benefitRepository репозиторий, работающий с моделью таблицы "benefit"
+   * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    */
   @Autowired
   public CityServiceFB(CityRepository cityRepository, InstitutionRepository institutionRepository,
-                       BenefitRepository benefitRepository) {
+                       BenefitRepository benefitRepository, DBIntegrityService dbIntegrityService) {
     this.cityRepository = cityRepository;
     this.institutionRepository = institutionRepository;
     this.benefitRepository = benefitRepository;
+    this.dbIntegrityService = dbIntegrityService;
   }
 
   /**
@@ -64,10 +71,13 @@ public class CityServiceFB implements CityService {
   @Override
   public void add(CityAdd cityAdd) throws AlreadyExistsException {
 
-    ServiceHelper.checkAbsenceObjectByUniqStrElseThrow(
-        cityRepository::existsByName, cityAdd.getName(), "The city with name %s already exists");
+    dbIntegrityService.checkAbsenceByUniqStrElseThrow(
+        cityRepository::existsByName, cityAdd.getName(),
+        "The city with name %s already exists");
 
-    cityRepository.saveAndFlush(CityConverter.fromAdd(cityAdd));
+    cityRepository.saveAndFlush((CityEntity) CityConverter
+        .fromAdd(cityAdd)
+        .prepareForDB(dbIntegrityService::preparePostgreSQLString));
   }
 
   /**
@@ -78,10 +88,13 @@ public class CityServiceFB implements CityService {
   @Override
   public void update(CityUpdate cityUpdate) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        cityRepository::existsById, cityUpdate.getId(), "City with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        cityRepository::existsById, cityUpdate.getId(),
+        "City with ID %s not found");
 
-    cityRepository.saveAndFlush(CityConverter.fromUpdate(cityUpdate));
+    cityRepository.saveAndFlush((CityEntity) CityConverter
+        .fromUpdate(cityUpdate)
+        .prepareForDB(dbIntegrityService::preparePostgreSQLString));
   }
 
   /**
@@ -92,8 +105,9 @@ public class CityServiceFB implements CityService {
   @Override
   public void delete(BigInteger idCity) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        cityRepository::existsById, idCity, "City with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        cityRepository::existsById, idCity,
+        "City with ID %s not found");
 
     cityRepository.deleteById(idCity);
   }
@@ -107,8 +121,9 @@ public class CityServiceFB implements CityService {
   @Override
   public CityInfo read(BigInteger idCity) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        cityRepository::existsById, idCity, "City with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        cityRepository::existsById, idCity,
+        "City with ID %s not found");
 
     return CityConverter.toInfo(cityRepository.getById(idCity));
   }
@@ -121,7 +136,8 @@ public class CityServiceFB implements CityService {
   @Override
   public Set<CityInfo> readAll() throws NotFoundException {
 
-    Set<CityInfo> cityInfoSet = cityRepository.findAll()
+    Set<CityInfo> cityInfoSet = cityRepository
+        .findAll()
         .stream()
         .map(CityConverter::toInfo)
         .collect(Collectors.toSet());
@@ -141,15 +157,18 @@ public class CityServiceFB implements CityService {
   @Override
   public Set<InstitutionInfo> readInstitutions(BigInteger idCity) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        cityRepository::existsById, idCity, "City with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        cityRepository::existsById, idCity,
+        "City with ID %s not found");
 
-    Set<InstitutionInfo> institutionInfoSet = institutionRepository.findAllByCityEntity(new CityEntity(idCity))
+    Set<InstitutionInfo> institutionInfoSet = institutionRepository
+        .findAllByCityEntity(new CityEntity(idCity))
         .stream()
         .map(InstitutionConverter::toInfo)
         .collect(Collectors.toSet());
     if (institutionInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format("Institutions of city with id %s not found", idCity));
+      throw new NotFoundException(String.format(
+          "Institutions of city with id %s not found", idCity));
     }
 
     return institutionInfoSet;
@@ -164,15 +183,18 @@ public class CityServiceFB implements CityService {
   @Override
   public Set<BenefitInfo> readBenefits(BigInteger idCity) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        cityRepository::existsById, idCity, "City with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        cityRepository::existsById, idCity,
+        "City with ID %s not found");
 
-    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllFullWhereCityIdEquals(idCity)
+    Set<BenefitInfo> benefitInfoSet = benefitRepository
+        .findAllFullWhereCityIdEquals(idCity)
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());
     if (benefitInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format("Benefits of city with id %s not found", idCity));
+      throw new NotFoundException(String.format(
+          "Benefits of city with id %s not found", idCity));
     }
 
     return benefitInfoSet;

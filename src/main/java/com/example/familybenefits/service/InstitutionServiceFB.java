@@ -10,6 +10,7 @@ import com.example.familybenefits.api_model.institution.InstitutionUpdate;
 import com.example.familybenefits.convert.BenefitConverter;
 import com.example.familybenefits.convert.CityConverter;
 import com.example.familybenefits.convert.InstitutionConverter;
+import com.example.familybenefits.dao.entity.InstitutionEntity;
 import com.example.familybenefits.dao.repository.BenefitRepository;
 import com.example.familybenefits.dao.repository.CityRepository;
 import com.example.familybenefits.dao.repository.InstitutionRepository;
@@ -44,31 +45,46 @@ public class InstitutionServiceFB implements InstitutionService {
   private final BenefitRepository benefitRepository;
 
   /**
+   * Интерфейс сервиса, отвечающего за целостность базы данных
+   */
+  private final DBIntegrityService dbIntegrityService;
+
+  /**
    * Конструктор для инициализации интерфейсов репозиториев
    * @param institutionRepository репозиторий, работающий с моделью таблицы "institution"
    * @param cityRepository репозиторий, работающий с моделью таблицы "city"
    * @param benefitRepository репозиторий, работающий с моделью таблицы "benefit"
+   * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    */
   @Autowired
   public InstitutionServiceFB(InstitutionRepository institutionRepository, CityRepository cityRepository,
-                              BenefitRepository benefitRepository) {
+                              BenefitRepository benefitRepository, DBIntegrityService dbIntegrityService) {
     this.institutionRepository = institutionRepository;
     this.cityRepository = cityRepository;
     this.benefitRepository = benefitRepository;
+    this.dbIntegrityService = dbIntegrityService;
   }
 
   /**
    * Добавляет учреждение по запросу на добавление
    * @param institutionAdd объект запроса на добавление учреждения
    * @throws AlreadyExistsException если учреждение с таким названием уже существует
+   * @throws NotFoundException если город учреждения с указанным ID не найден
    */
   @Override
-  public void add(InstitutionAdd institutionAdd) throws AlreadyExistsException{
+  public void add(InstitutionAdd institutionAdd) throws AlreadyExistsException, NotFoundException {
 
-    ServiceHelper.checkAbsenceObjectByUniqStrElseThrow(
-        institutionRepository::existsByName, institutionAdd.getName(), "The institution %s already exists");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        cityRepository::existsById, institutionAdd.getIdCity(),
+        "City with ID %s not found");
 
-    institutionRepository.saveAndFlush(InstitutionConverter.fromAdd(institutionAdd));
+    dbIntegrityService.checkAbsenceByUniqStrElseThrow(
+        institutionRepository::existsByName, institutionAdd.getName(),
+        "The institution %s already exists");
+
+    institutionRepository.saveAndFlush((InstitutionEntity) InstitutionConverter
+        .fromAdd(institutionAdd)
+        .prepareForDB(dbIntegrityService::preparePostgreSQLString));
   }
 
   /**
@@ -79,10 +95,17 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public void update(InstitutionUpdate institutionUpdate) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        institutionRepository::existsById, institutionUpdate.getId(), "Institution with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        cityRepository::existsById, institutionUpdate.getIdCity(),
+        "City with ID %s not found");
 
-    institutionRepository.saveAndFlush(InstitutionConverter.fromUpdate(institutionUpdate));
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        institutionRepository::existsById, institutionUpdate.getId(),
+        "Institution with ID %s not found");
+
+    institutionRepository.saveAndFlush((InstitutionEntity) InstitutionConverter
+        .fromUpdate(institutionUpdate)
+        .prepareForDB(dbIntegrityService::preparePostgreSQLString));
   }
 
   /**
@@ -93,8 +116,9 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public void delete(BigInteger idInstitution) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        institutionRepository::existsById, idInstitution, "Institution with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        institutionRepository::existsById, idInstitution,
+        "Institution with ID %s not found");
 
     institutionRepository.deleteById(idInstitution);
   }
@@ -108,8 +132,9 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public InstitutionInfo read(BigInteger idInstitution) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        institutionRepository::existsById, idInstitution, "Institution with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        institutionRepository::existsById, idInstitution,
+        "Institution with ID %s not found");
 
     return InstitutionConverter.toInfo(institutionRepository.getById(idInstitution));
   }
@@ -122,7 +147,8 @@ public class InstitutionServiceFB implements InstitutionService {
    */
   public InstitutionInitData getInitData() throws NotFoundException {
 
-    Set<ObjectShortInfo> cityShortInfoSet = cityRepository.findAll()
+    Set<ObjectShortInfo> cityShortInfoSet = cityRepository
+        .findAll()
         .stream()
         .map(CityConverter::toShortInfo)
         .collect(Collectors.toSet());
@@ -144,7 +170,8 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public Set<InstitutionInfo> readAll() throws NotFoundException {
 
-    Set<InstitutionInfo> institutionInfoSet = institutionRepository.findAll()
+    Set<InstitutionInfo> institutionInfoSet = institutionRepository
+        .findAll()
         .stream()
         .map(InstitutionConverter::toInfo)
         .collect(Collectors.toSet());
@@ -163,8 +190,9 @@ public class InstitutionServiceFB implements InstitutionService {
    */
   public CityInfo readCity(BigInteger idInstitution) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        institutionRepository::existsById, idInstitution, "Institution with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        institutionRepository::existsById, idInstitution,
+        "Institution with ID %s not found");
 
     return CityConverter.toInfo(institutionRepository.getById(idInstitution).getCityEntity());
   }
@@ -177,15 +205,18 @@ public class InstitutionServiceFB implements InstitutionService {
    */
   public Set<BenefitInfo> readBenefits(BigInteger idInstitution) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        institutionRepository::existsById, idInstitution, "Institution with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        institutionRepository::existsById, idInstitution,
+        "Institution with ID %s not found");
 
-    Set<BenefitInfo> benefitInfoSet = benefitRepository.findAllFullWhereInstitutionIdEquals(idInstitution)
+    Set<BenefitInfo> benefitInfoSet = benefitRepository
+        .findAllFullWhereInstitutionIdEquals(idInstitution)
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());
     if (benefitInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format("Benefits of institution with id %s not found", idInstitution));
+      throw new NotFoundException(String.format(
+          "Benefits of institution with id %s not found", idInstitution));
     }
 
     return benefitInfoSet;

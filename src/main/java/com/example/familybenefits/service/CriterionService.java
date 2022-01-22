@@ -20,8 +20,9 @@ public interface CriterionService {
    * Добавляет новый критерий
    * @param criterionAdd объект запроса для добавления критерия
    * @throws AlreadyExistsException если критерий с указанным названием уже существует
+   * @throws NotFoundException если тип критерия критерия с указанным ID не найден
    */
-  void add(CriterionAdd criterionAdd) throws AlreadyExistsException;
+  void add(CriterionAdd criterionAdd) throws AlreadyExistsException, NotFoundException;
 
   /**
    * Обновляет данные критерия
@@ -31,7 +32,7 @@ public interface CriterionService {
   void update(CriterionUpdate criterionUpdate) throws NotFoundException;
 
   /**
-   * Удаляет критерия по его ID
+   * Удаляет критерий по его ID
    * @param idCriterion ID критерия
    * @throws NotFoundException если критерий с указанным ID не найден
    */

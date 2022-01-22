@@ -37,28 +37,44 @@ public class CriterionServiceFB implements CriterionService {
   private final CriterionTypeRepository criterionTypeRepository;
 
   /**
+   * Интерфейс сервиса, отвечающего за целостность базы данных
+   */
+  private final DBIntegrityService dbIntegrityService;
+
+  /**
    * Конструктор для инициализации интерфейсов репозиториев
    * @param criterionRepository репозиторий, работающий с моделью таблицы "criterion"
    * @param criterionTypeRepository репозиторий, работающий с моделью таблицы "criterion_type"
+   * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    */
   @Autowired
-  public CriterionServiceFB(CriterionRepository criterionRepository, CriterionTypeRepository criterionTypeRepository) {
+  public CriterionServiceFB(CriterionRepository criterionRepository, CriterionTypeRepository criterionTypeRepository,
+                            DBIntegrityService dbIntegrityService) {
     this.criterionRepository = criterionRepository;
     this.criterionTypeRepository = criterionTypeRepository;
+    this.dbIntegrityService = dbIntegrityService;
   }
 
   /**
    * Добавляет новый критерий
    * @param criterionAdd объект запроса для добавления критерия
    * @throws AlreadyExistsException если критерий с указанным названием уже существует
+   * @throws NotFoundException если тип критерия критерия с указанным ID не найден
    */
   @Override
-  public void add(CriterionAdd criterionAdd) throws AlreadyExistsException {
+  public void add(CriterionAdd criterionAdd) throws AlreadyExistsException, NotFoundException {
 
-    ServiceHelper.checkAbsenceObjectByUniqStrElseThrow(
-        criterionTypeRepository::existsByName, criterionAdd.getName(), "The criterion with name %s already exists");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        criterionTypeRepository::existsById, criterionAdd.getIdCriterionType(),
+        "Criterion type with ID %s not found");
 
-    criterionRepository.saveAndFlush(CriterionConverter.fromAdd(criterionAdd));
+    dbIntegrityService.checkAbsenceByUniqStrElseThrow(
+        criterionTypeRepository::existsByName, criterionAdd.getName(),
+        "The criterion with name %s already exists");
+
+    criterionRepository.saveAndFlush((CriterionEntity) CriterionConverter
+        .fromAdd(criterionAdd)
+        .prepareForDB(dbIntegrityService::preparePostgreSQLString));
   }
 
   /**
@@ -69,22 +85,30 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public void update(CriterionUpdate criterionUpdate) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        criterionTypeRepository::existsById, criterionUpdate.getId(), "Criterion with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        criterionTypeRepository::existsById, criterionUpdate.getIdCriterionType(),
+        "Criterion type with ID %s not found");
 
-    criterionRepository.saveAndFlush(CriterionConverter.fromUpdate(criterionUpdate));
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        criterionTypeRepository::existsById, criterionUpdate.getId(),
+        "Criterion with ID %s not found");
+
+    criterionRepository.saveAndFlush((CriterionEntity) CriterionConverter
+        .fromUpdate(criterionUpdate)
+        .prepareForDB(dbIntegrityService::preparePostgreSQLString));
   }
 
   /**
-   * Удаляет критерийпо его ID
+   * Удаляет критерий по его ID
    * @param idCriterion ID критерия
    * @throws NotFoundException если критерий с указанным ID не найден
    */
   @Override
   public void delete(BigInteger idCriterion) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        criterionTypeRepository::existsById, idCriterion, "Criterion with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        criterionTypeRepository::existsById, idCriterion,
+        "Criterion with ID %s not found");
 
     criterionRepository.deleteById(idCriterion);
   }
@@ -98,8 +122,9 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public CriterionInfo read(BigInteger idCriterion) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        criterionTypeRepository::existsById, idCriterion, "Criterion with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        criterionTypeRepository::existsById, idCriterion,
+        "Criterion with ID %s not found");
 
     return CriterionConverter.toInfo(criterionRepository.getById(idCriterion));
   }
@@ -112,7 +137,8 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public Set<CriterionInfo> readAllFull() throws NotFoundException {
 
-    Set<CriterionInfo> criterionInfoSet = criterionRepository.findAllByCriterionTypeIsNotNull()
+    Set<CriterionInfo> criterionInfoSet = criterionRepository
+        .findAllByCriterionTypeIsNotNull()
         .stream()
         .map(CriterionConverter::toInfo)
         .collect(Collectors.toSet());
@@ -131,7 +157,8 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public Set<CriterionInfo> readAllPartial() throws NotFoundException {
 
-    Set<CriterionInfo> criterionInfoSet = criterionRepository.findAllByCriterionTypeIsNull()
+    Set<CriterionInfo> criterionInfoSet = criterionRepository
+        .findAllByCriterionTypeIsNull()
         .stream()
         .map(CriterionConverter::toInfo)
         .collect(Collectors.toSet());
@@ -151,7 +178,8 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public CriterionInitData getInitData() throws NotFoundException {
 
-    Set<ObjectShortInfo> criterionTypeShortInfoSet = criterionTypeRepository.findAll()
+    Set<ObjectShortInfo> criterionTypeShortInfoSet = criterionTypeRepository
+        .findAll()
         .stream()
         .map(CriterionTypeConverter::toShortInfo)
         .collect(Collectors.toSet());
@@ -174,13 +202,15 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public CriterionTypeInfo readCriterionType(BigInteger idCriterion) throws NotFoundException {
 
-    ServiceHelper.checkExistenceObjectByIdElseThrow(
-        criterionTypeRepository::existsById, idCriterion, "Criterion with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        criterionTypeRepository::existsById, idCriterion,
+        "Criterion with ID %s not found");
 
     CriterionEntity criterionEntity = criterionRepository.getById(idCriterion);
 
     if (criterionEntity.getCriterionType() == null) {
-      throw new NotFoundException(String.format("Criterion type of criterion with ID %s not found", idCriterion));
+      throw new NotFoundException(String.format(
+          "Criterion type of criterion with ID %s not found", idCriterion));
     }
 
     return CriterionTypeConverter.toInfo(criterionEntity.getCriterionType());

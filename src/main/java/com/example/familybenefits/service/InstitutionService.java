@@ -21,8 +21,9 @@ public interface InstitutionService {
    * Добавляет учреждение по запросу на добавление
    * @param institutionAdd объект запроса на добавление учреждения
    * @throws AlreadyExistsException если учреждение с таким названием уже существует
+   * @throws NotFoundException если город учреждения с указанным ID не найден
    */
-  void add(InstitutionAdd institutionAdd) throws AlreadyExistsException;
+  void add(InstitutionAdd institutionAdd) throws AlreadyExistsException, NotFoundException;
 
   /**
    * Обновляет учреждение по запросу на обновление

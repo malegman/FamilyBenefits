@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.math.BigInteger;
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Модель таблицы "criterion_type"
@@ -23,7 +24,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class CriterionTypeEntity {
+public class CriterionTypeEntity implements DBPreparer {
 
   /**
    * ID типа критерия
@@ -53,6 +54,20 @@ public class CriterionTypeEntity {
    */
   public CriterionTypeEntity(@NonNull BigInteger id) {
     this.id = id;
+  }
+
+  /**
+   * Обработывает строковые поля объекта перед записью в базу данных
+   * @param prepareFunc функция обработки строки
+   * @return объект с обработанными полями
+   */
+  @Override
+  public DBPreparer prepareForDB(Function<String, String> prepareFunc) {
+
+    name = prepareFunc.apply(name);
+    info = prepareFunc.apply(info);
+
+    return this;
   }
 
   @Override
