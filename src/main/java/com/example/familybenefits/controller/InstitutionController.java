@@ -83,6 +83,7 @@ public class InstitutionController {
     try {
       institutionService.update(institutionUpdate);
       return ResponseEntity.status(HttpStatus.CREATED).build();
+
     } catch (NotFoundException e) {
       log.error(e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
