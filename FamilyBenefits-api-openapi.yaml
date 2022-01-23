@@ -601,35 +601,6 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /admin/initdata:
-    get:
-      tags:
-        - admin
-      summary: Возвращает дополнительные данные для администратора
-      description:
-        Возвращает дополнительные данные для добавления или обновления администратора.
-          Данные содержат в себе множество кратких информаций о городах.
-        Для администратора.
-        Необходима авторизация.
-      responses:
-        '200':
-          description: Дополнительные данные администратора получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AdminInitData'
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Дополнительные данные администратора не найдены
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
 
 
   /city:
@@ -1820,8 +1791,8 @@ components:
             type: string
             format: date
             example: 01-01-2022
-        dateRegistration:
-          description: Дата регистрации пользователя
+        dateBirth:
+          description: Дата рождения пользователя
           type: string
           format: date
           example: 01-01-2022
@@ -2006,15 +1977,6 @@ components:
           description: Статус почты, true, если подтверждена
           type: boolean
           example: false
-        nameCity:
-          description: Название города администратора
-          type: string
-          example: name
-        dateRegistration:
-          description: Дата регистрации администратора
-          type: string
-          format: date
-          example: 01-01-2022
     AdminAdd:
       description: Объект запроса для добавления администратора
       properties:
@@ -2034,10 +1996,6 @@ components:
           description: Повторно введенный пароль администратора
           type: string
           example: password
-        idCity:
-          description: ID города администратора
-          type: integer
-          example: 1222333444
     AdminUpdate:
       description: Объект запроса для обновления администратора
       properties:
@@ -2053,19 +2011,6 @@ components:
           description: Электронная почта администратора
           type: string
           example: exmaple@mail.com
-        idCity:
-          description: ID города администратора
-          type: integer
-          example: 1222333444
-    AdminInitData:
-      description: Дополнительные данные для добавления или обновления администратора.
-        Содержат в себе множество кратких информаций о городах
-      properties:
-        shortCitySet:
-          description: Множество кратких информаций о городах
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectShortInfo'
 
 
     CriterionTypeInfo:
