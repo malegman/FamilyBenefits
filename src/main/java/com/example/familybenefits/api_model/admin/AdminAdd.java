@@ -43,11 +43,4 @@ public class AdminAdd {
   @NonNull
   @JsonProperty("repeat_password")
   private String repeatPassword;
-
-  /**
-   * ID города администратора
-   */
-  @Nullable
-  @JsonProperty("id_city")
-  private BigInteger idCity;
 }

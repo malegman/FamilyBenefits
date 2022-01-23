@@ -42,18 +42,4 @@ public class AdminInfo {
    */
   @JsonProperty("is_verified_email")
   private boolean isVerifiedEmail;
-
-  /**
-   * Название города администратора
-   */
-  @Nullable
-  @JsonProperty("name_city")
-  private String nameCity;
-
-  /**
-   * Дата регистрации администратора
-   */
-  @NonNull
-  @JsonProperty("date_registration")
-  private String dateRegistration;
 }

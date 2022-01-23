@@ -36,11 +36,4 @@ public class AdminUpdate {
   @NonNull
   @JsonProperty("email")
   private String email;
-
-  /**
-   * ID города администратора
-   */
-  @Nullable
-  @JsonProperty("id_city")
-  private BigInteger idCity;
 }

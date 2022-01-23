@@ -59,9 +59,9 @@ public class UserInfo {
   private Set<String> birthDateChildren;
 
   /**
-   * Дата регистрации пользователя
+   * Дата рождения пользователя
    */
   @NonNull
-  @JsonProperty("date_registration")
-  private String dateRegistration;
+  @JsonProperty("date_birth")
+  private String dateBirth;
 }
