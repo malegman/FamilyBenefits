@@ -10,19 +10,20 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
- * Модель таблицы "user"
+ * Модель записи таблицы "user"
  */
 @Entity
-@Table(name = "user", schema = "familybenefit")
+@Table(name = "user", schema = "family_benefit")
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class UserEntity {
+public class UserEntity implements DBPreparer {
 
   /**
    * ID пользователя
@@ -40,11 +41,17 @@ public class UserEntity {
   private String name;
 
   /**
-   * Эл. почта пользователя
+   * Эллектронная почта пользователя
    */
   @NonNull
   @Column(name = "email")
   private String email;
+
+  /**
+   * Статус подтверждения почты
+   */
+  @Column(name = "is_verified_email")
+  private boolean isVerifiedEmail;
 
   /**
    * Пароль пользователя
@@ -54,11 +61,18 @@ public class UserEntity {
   private String password;
 
   /**
-   * Дата регистрации пользователя
+   * Дата рождения пользователя
    */
   @NonNull
-  @Column(name = "date_registration")
-  private Date dateRegistration;
+  @Column(name = "date_birth")
+  private Date dateBirth;
+
+  /**
+   * Дата подбора пособий пользователя
+   */
+  @NonNull
+  @Column(name = "date_select_benefit")
+  private Date dateSelectBenefit;
 
   /**
    * Город пользователя
@@ -69,28 +83,31 @@ public class UserEntity {
   private CityEntity cityEntity;
 
   /**
-   * Множество ролей пользователя
-   */
-  @NonNull
-  @ToString.Exclude
-  @ManyToMany
-  @JoinTable(
-    name = "users_roles", schema = "familybenefit",
-    joinColumns = @JoinColumn(name = "id_user"),
-    inverseJoinColumns = @JoinColumn(name = "id_role"))
-  private Set<RoleEntity> roleEntitySet;
-
-  /**
    * Множество детей пользователя
    */
   @NonNull
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
-      name = "users_children", schema = "familybenefit",
+      name = "users_children", schema = "family_benefit",
       joinColumns = @JoinColumn(name = "id_user"),
       inverseJoinColumns = @JoinColumn(name = "id_child"))
   private Set<ChildEntity> childEntitySet;
+
+  /**
+   * Обработывает строковые поля объекта перед записью в базу данных
+   * @param prepareFunc функция обработки строки
+   * @return объект с обработанными полями
+   */
+  @Override
+  public DBPreparer prepareForDB(Function<String, String> prepareFunc) {
+
+    name = prepareFunc.apply(name);
+    email = prepareFunc.apply(email);
+    password = prepareFunc.apply(password);
+
+    return this;
+  }
 
   @Override
   public boolean equals(@Nullable Object o) {

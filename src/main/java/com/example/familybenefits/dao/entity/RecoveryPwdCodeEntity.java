@@ -11,10 +11,10 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- * Модель таблицы "recovery_pwd_code"
+ * Модель записи таблицы "recovery_pwd_code"
  */
 @Entity
-@Table(name = "recovery_pwd_code", schema = "familybenefit")
+@Table(name = "recovery_pwd_code", schema = "family_benefit")
 @Getter
 @Setter
 @ToString

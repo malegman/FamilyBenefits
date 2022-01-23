@@ -3,7 +3,6 @@ package com.example.familybenefits.dao.entity;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,20 +13,20 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * Модель записи таблицы "criterion_type"
+ * Модель записи таблицы "admin"
  */
 @Entity
-@Table(name = "criterion_type", schema = "family_benefit")
+@Table(name = "admin", schema = "family_benefit")
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class CriterionTypeEntity implements DBPreparer {
+public class AdminEntity implements DBPreparer {
 
   /**
-   * ID типа критерия
+   * ID администратора
    */
   @NonNull
   @Id
@@ -35,26 +34,31 @@ public class CriterionTypeEntity implements DBPreparer {
   private BigInteger id;
 
   /**
-   * Название типа критерия
+   * Имя администратора
    */
   @NonNull
   @Column(name = "name")
   private String name;
 
   /**
-   * Информация типа критерия
+   * Эллектронная почта администратора
    */
   @NonNull
-  @Column(name = "info")
-  private String info;
+  @Column(name = "email")
+  private String email;
 
   /**
-   * Конструктор для создания модели по ID
-   * @param id ID типа критерия
+   * Статус подтверждения почты
    */
-  public CriterionTypeEntity(@NonNull BigInteger id) {
-    this.id = id;
-  }
+  @Column(name = "is_verified_email")
+  private boolean isVerifiedEmail;
+
+  /**
+   * Пароль администратора
+   */
+  @NonNull
+  @Column(name = "password")
+  private String password;
 
   /**
    * Обработывает строковые поля объекта перед записью в базу данных
@@ -65,17 +69,18 @@ public class CriterionTypeEntity implements DBPreparer {
   public DBPreparer prepareForDB(Function<String, String> prepareFunc) {
 
     name = prepareFunc.apply(name);
-    info = prepareFunc.apply(info);
+    email = prepareFunc.apply(email);
+    password = prepareFunc.apply(password);
 
     return this;
   }
 
   @Override
-  public boolean equals(@Nullable Object o) {
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    CriterionTypeEntity that = (CriterionTypeEntity) o;
-    return Objects.equals(id, that.id);
+    AdminEntity that = (AdminEntity) o;
+    return id != null && Objects.equals(id, that.id);
   }
 
   @Override
@@ -83,4 +88,3 @@ public class CriterionTypeEntity implements DBPreparer {
     return getClass().hashCode();
   }
 }
-

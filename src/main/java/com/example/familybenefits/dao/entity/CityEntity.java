@@ -11,10 +11,10 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * Модель таблицы "cityEntity"
+ * Модель записи таблицы "cityEntity"
  */
 @Entity
-@Table(name = "city", schema = "familybenefit")
+@Table(name = "city", schema = "family_benefit")
 @Getter
 @Setter
 @ToString

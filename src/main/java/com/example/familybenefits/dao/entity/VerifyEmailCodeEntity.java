@@ -14,10 +14,10 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- * Модель таблицы "verify_email_code"
+ * Модель записи таблицы "verify_email_code"
  */
 @Entity
-@Table(name = "verify_email_code", schema = "familybenefit")
+@Table(name = "verify_email_code", schema = "family_benefit")
 @Getter
 @Setter
 @ToString

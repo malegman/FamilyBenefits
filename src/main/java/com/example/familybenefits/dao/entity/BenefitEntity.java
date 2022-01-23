@@ -12,10 +12,10 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * Модель таблицы "benefit"
+ * Модель записи таблицы "benefit"
  */
 @Entity
-@Table(name = "benefit", schema = "familybenefit")
+@Table(name = "benefit", schema = "family_benefit")
 @Getter
 @Setter
 @ToString
@@ -68,7 +68,7 @@ public class BenefitEntity implements DBPreparer {
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
-    name = "benefits_cities", schema = "familybenefit",
+    name = "benefits_cities", schema = "family_benefit",
     joinColumns = @JoinColumn(name = "id_benefit"),
     inverseJoinColumns = @JoinColumn(name = "id_city"))
   private Set<CityEntity> cityEntitySet;
@@ -80,7 +80,7 @@ public class BenefitEntity implements DBPreparer {
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
-      name = "benefits_institutions", schema = "familybenefit",
+      name = "benefits_institutions", schema = "family_benefit",
       joinColumns = @JoinColumn(name = "id_benefit"),
       inverseJoinColumns = @JoinColumn(name = "id_institution"))
   private Set<InstitutionEntity> institutionEntitySet;
@@ -92,7 +92,7 @@ public class BenefitEntity implements DBPreparer {
   @ToString.Exclude
   @ManyToMany
   @JoinTable(
-    name = "benefits_criteria", schema = "familybenefit",
+    name = "benefits_criteria", schema = "family_benefit",
     joinColumns = @JoinColumn(name = "id_benefit"),
     inverseJoinColumns = @JoinColumn(name = "id_criterion"))
   private Set<CriterionEntity> criterionEntitySet;
