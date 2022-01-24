@@ -12,8 +12,6 @@ tags:
     description: Операции, связанные с системой и безопасностью
   - name: user
     description: Операции с пользователем
-  - name: super admin
-    description: Операции администратора с ролью "супер администратор"
   - name: admin
     description: Операции с администратором
   - name: city
@@ -467,10 +465,10 @@ paths:
         - bearerAuth: [ ]
 
 
-  /supadmin/admin:
+  /admin:
     post:
       tags:
-        - super admin
+        - admin
       summary: Добавляет нового администратора
       description:
         Добавляет нового администратора.
@@ -499,107 +497,6 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
-    delete:
-      tags:
-        - super admin
-      summary: Удаляет администратора
-      description:
-        Удаляет существующего администратора. Если администратор имеет роль пользователя, то удаляется роль админа.
-        Для супер администратора.
-        Необходима авторизация.
-      operationId: deleteAdmin
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: email удаляемого администратора
-              type: string
-              example: example@email.com
-        required: true
-      responses:
-        '201':
-          description: Администратор удален
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Администратор с данным email не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-  /supadmin/usertoadmin:
-    post:
-      tags:
-        - super admin
-      summary: Добавление роли администратора пользователю
-      description: Добавление роли администратора пользователю.
-        Для супер администратора.
-        Необходима авторизация.
-      operationId: userToAdmin
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: email пользователя
-              type: string
-              example: example@email.com
-        required: true
-      responses:
-        '201':
-          description: Роль администратора добавлена
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пользователь с данным email не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-  /supadmin/admintouser:
-    post:
-      tags:
-        - super admin
-      summary: Добавление роли пользователя администратору
-      description: Добавление роли пользователя администратору.
-        Для супер администратора.
-        Необходима авторизация.
-      operationId: adminToUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: email администратора
-              type: string
-              example: example@email.com
-        required: true
-      responses:
-        '201':
-          description: Роль пользователя добавлена
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Администратор с данным email не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-
-  /admin:
     put:
       tags:
         - admin
@@ -676,8 +573,7 @@ paths:
       summary: Удаляет администратора по ID
       description:
         Удаление администратора по ID.
-        О запросившем клиенте.
-        Для администратора.
+        Для супер администратора.
         Необходима авторизация.
       operationId: deleteAdmin
       parameters:
@@ -700,6 +596,72 @@ paths:
           content: { }
         '404':
           description: Администратор с указанными данными не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /admin/fromuser/{id}:
+    post:
+      tags:
+        - admin
+      summary: Добавление роли администратора пользователю
+      description: Добавление роли администратора пользователю.
+        Для супер администратора.
+        Необходима авторизация.
+      operationId: adminFromUser
+      parameters:
+        - name: id
+          in: path
+          description: ID администратора
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '201':
+          description: Роль администратора добавлена
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Пользователь с данным email не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
+  /admin/{id}/touser:
+    post:
+      tags:
+        - admin
+      summary: Добавление роли пользователя администратору
+      description: Добавление роли пользователя администратору.
+        Для супер администратора.
+        Необходима авторизация.
+      operationId: adminToUser
+      parameters:
+        - name: id
+          in: path
+          description: ID администратора
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '201':
+          description: Роль пользователя добавлена
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Администратор с данным email не найден
           content: { }
       security:
         - cookieAuth: [ ]
