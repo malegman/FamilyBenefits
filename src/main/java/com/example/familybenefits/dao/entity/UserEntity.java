@@ -95,6 +95,18 @@ public class UserEntity implements DBPreparer {
   private Set<ChildEntity> childEntitySet;
 
   /**
+   * Множество ролей пользователя
+   */
+  @NonNull
+  @ToString.Exclude
+  @ManyToMany
+  @JoinTable(
+      name = "users_roles", schema = "family_benefit",
+      joinColumns = @JoinColumn(name = "id_user"),
+      inverseJoinColumns = @JoinColumn(name = "id_role"))
+  private Set<RoleEntity> roleEntitySet;
+
+  /**
    * Обработывает строковые поля объекта перед записью в базу данных
    * @param prepareFunc функция обработки строки
    * @return объект с обработанными полями
