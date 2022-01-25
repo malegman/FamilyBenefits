@@ -66,10 +66,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.GET, "/user/initdata").permitAll()
 
         // requests: admin
-        .antMatchers(HttpMethod.POST, "/admin").hasRole("ADMIN")
+        .antMatchers(HttpMethod.POST, "/admin", "/admin/fromuser/{id}", "/admin/{id}/touser").hasRole("SUPER_ADMIN")
         .antMatchers(HttpMethod.PUT, "/admin").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/admin/{id}", "/admin/initdata").hasRole("ADMIN")
-        .antMatchers(HttpMethod.DELETE, "/admin/{id}").hasRole("ADMIN")
+        .antMatchers(HttpMethod.GET, "/admin/{id}").hasRole("ADMIN")
+        .antMatchers(HttpMethod.DELETE, "/admin/{id}").hasRole("SUPER_ADMIN")
 
         // requests: city
         .antMatchers(HttpMethod.POST, "/city").hasRole("ADMIN")
