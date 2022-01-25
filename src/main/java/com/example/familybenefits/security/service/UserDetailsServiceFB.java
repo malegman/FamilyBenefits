@@ -18,13 +18,13 @@ import java.util.Optional;
 public class UserDetailsServiceFB implements UserDetailsService {
 
   /**
-   * Сервис для взаимодействия с пользователем
+   * Репозиторий, работающий с моделью таблицы "user"
    */
   private final UserRepository userRepository;
 
   /**
    * Конструктор для иниуиализации интерфейса сервиса
-   * @param userRepository сервис для взаимодействия с пользователем
+   * @param userRepository репозиторий, работающий с моделью таблицы "user"
    */
   @Autowired
   public UserDetailsServiceFB(UserRepository userRepository) {
@@ -43,8 +43,7 @@ public class UserDetailsServiceFB implements UserDetailsService {
     Optional<UserEntity> optUserEntity = userRepository.findByEmail(username);
     if (optUserEntity.isEmpty()) {
       throw new UsernameNotFoundException(String.format(
-          "Объект с email %s не найден", username
-      ));
+          "Объект с email %s не найден", username));
     }
 
     return UserDetailsFB.fromUserEntity(optUserEntity.get());
