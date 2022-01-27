@@ -5,7 +5,7 @@ CREATE TABLE family_benefit.user (
   "name" TEXT NOT NULL,
   "email" TEXT NOT NULL,
   "password" TEXT NOT NULL,
-  "is_verified_email" BIT NOT NULL DEFAULT FALSE,
+  "is_verified_email" BOOLEAN NOT NULL,
   "date_birth" TIMESTAMP NOT NULL,
   "date_select_benefit" TIMESTAMP NOT NULL,
   "id_city" NUMERIC NULL,
