@@ -3,9 +3,9 @@ package com.example.familybenefits.api_model.admin;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import java.math.BigInteger;
+import java.util.Set;
 
 /**
  * Информация об администраторе
@@ -42,4 +42,10 @@ public class AdminInfo {
    */
   @JsonProperty("is_verified_email")
   private boolean isVerifiedEmail;
+
+  /**
+   * Множество названий ролей администратора
+   */
+  @JsonProperty("name_role_set")
+  private Set<String> nameRoleSet;
 }

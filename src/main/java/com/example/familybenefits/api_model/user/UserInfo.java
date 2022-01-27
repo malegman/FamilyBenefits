@@ -64,4 +64,10 @@ public class UserInfo {
   @NonNull
   @JsonProperty("date_birth")
   private String dateBirth;
+
+  /**
+   * Множество названий ролей пользователя
+   */
+  @JsonProperty("name_role_set")
+  private Set<String> nameRoleSet;
 }
