@@ -485,14 +485,19 @@ paths:
         '201':
           description: Администратор добавлен
           content: { }
+        '400':
+          description:
+            Варианты -
+            1) администратор или пользователь с данным email уже существует;
+            2) не безопасный пароль;
+            3) указанные пароли не эквивалентны;
+            4) указанный "email" не является email.
+          content: { }
         '401':
           description: Клиент не авторизован или токен не действительный
           content: { }
         '403':
           description: Нет доступа
-          content: { }
-        '404':
-          description: Администратор с данным email уже существует
           content: { }
       security:
         - cookieAuth: [ ]
@@ -516,6 +521,9 @@ paths:
       responses:
         '201':
           description: Администратор обновлен
+          content: { }
+        '400':
+          description: Указанный "email" не является email
           content: { }
         '401':
           description: Клиент не авторизован или токен не действительный
@@ -613,7 +621,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: ID администратора
+          description: ID пользователя
           schema:
             type: integer
             example: 1222333444
@@ -632,7 +640,7 @@ paths:
           description: Нет доступа
           content: { }
         '404':
-          description: Пользователь с данным email не найден
+          description: Пользователь с данным ID не найден
           content: { }
       security:
         - cookieAuth: [ ]
@@ -669,7 +677,7 @@ paths:
           description: Нет доступа
           content: { }
         '404':
-          description: Администратор с данным email не найден
+          description: Администратор с данным ID не найден
           content: { }
       security:
         - cookieAuth: [ ]
@@ -1869,6 +1877,15 @@ components:
           type: string
           format: date
           example: 01-01-2022
+        nameRoleSet:
+          description: Множество названий ролей пользователя
+          type: array
+          items:
+            allOf:
+              - description: Название роли
+                type: string
+                example: name
+
     UserAdd:
       description: Объект запроса для добавления пользователя
       properties:
@@ -2050,6 +2067,14 @@ components:
           description: Статус почты, true, если подтверждена
           type: boolean
           example: false
+        nameRoleSet:
+          description: Множество названий ролей администратора
+          type: array
+          items:
+            allOf:
+              - description: Название роли
+                type: string
+                example: name
     AdminAdd:
       description: Объект запроса для добавления администратора
       properties:
