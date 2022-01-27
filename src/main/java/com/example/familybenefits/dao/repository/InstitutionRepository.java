@@ -34,8 +34,8 @@ public interface InstitutionRepository extends JpaRepository<InstitutionEntity, 
    */
   @Query(nativeQuery = true,
       value = "SELECT *" +
-          "FROM familybenefit.benefits_institutions INNER JOIN familybenefit.institution ON " +
-          "familybenefit.benefits_institutions.id_institution = familybenefit.institution.id " +
-          "WHERE familybenefit.benefits_institutions.id_benefit = ?1;")
+          "FROM family_benefit.benefits_institutions INNER JOIN family_benefit.institution ON " +
+          "family_benefit.benefits_institutions.id_institution = family_benefit.institution.id " +
+          "WHERE family_benefit.benefits_institutions.id_benefit = ?1;")
   Set<InstitutionEntity> findAllWhereBenefitIdEquals(BigInteger idBenefit);
 }

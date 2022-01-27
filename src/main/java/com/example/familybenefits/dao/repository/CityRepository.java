@@ -26,8 +26,8 @@ public interface CityRepository extends JpaRepository<CityEntity, BigInteger> {
    */
   @Query(nativeQuery = true,
       value = "SELECT *" +
-          "FROM familybenefit.benefits_cities INNER JOIN familybenefit.city ON " +
-          "familybenefit.benefits_cities.id_city = familybenefit.city.id " +
-          "WHERE familybenefit.benefits_cities.id_benefit = ?1;")
+          "FROM family_benefit.benefits_cities INNER JOIN family_benefit.city ON " +
+          "family_benefit.benefits_cities.id_city = family_benefit.city.id " +
+          "WHERE family_benefit.benefits_cities.id_benefit = ?1;")
   Set<CityEntity> findAllWhereBenefitIdEquals(BigInteger idBenefit);
 }

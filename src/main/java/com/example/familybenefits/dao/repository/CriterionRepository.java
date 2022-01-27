@@ -46,9 +46,9 @@ public interface CriterionRepository extends JpaRepository<CriterionEntity, BigI
    */
   @Query(nativeQuery = true,
       value = "SELECT *" +
-          "FROM familybenefit.criterion " +
-          "INNER JOIN familybenefit.benefits_criteria ON familybenefit.benefits_criteria.id_criterion = familybenefit.criterion.id " +
-          "WHERE familybenefit.benefits_criteria.id_benefit = ?1 " +
-          "AND familybenefit.criterion.id_type IS NOT NULL;")
+          "FROM family_benefit.criterion " +
+          "INNER JOIN family_benefit.benefits_criteria ON family_benefit.benefits_criteria.id_criterion = family_benefit.criterion.id " +
+          "WHERE family_benefit.benefits_criteria.id_benefit = ?1 " +
+          "AND family_benefit.criterion.id_type IS NOT NULL;")
   Set<CriterionEntity> findAllFullWhereBenefitIdEquals(BigInteger idBenefit);
 }

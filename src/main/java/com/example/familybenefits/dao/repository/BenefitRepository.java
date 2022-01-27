@@ -25,13 +25,13 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, BigInteg
    */
   @Query(nativeQuery = true,
       value = "SELECT *" +
-          "FROM familybenefit.benefit " +
-          "INNER JOIN familybenefit.benefits_cities ON familybenefit.benefits_cities.id_benefit = familybenefit.benefit.id " +
-          "INNER JOIN familybenefit.benefits_criteria ON familybenefit.benefits_criteria.id_benefit = familybenefit.benefit.id " +
-          "INNER JOIN familybenefit.benefits_institutions ON familybenefit.benefits_institutions.id_benefit = familybenefit.benefit.id " +
-          "WHERE familybenefit.benefits_cities.id_city IS NOT NULL " +
-          "AND familybenefit.benefits_criteria.id_criterion IS NOT NULL " +
-          "AND familybenefit.benefits_institutions.id_institution IS NOT NULL;")
+          "FROM family_benefit.benefit " +
+          "INNER JOIN family_benefit.benefits_cities ON family_benefit.benefits_cities.id_benefit = family_benefit.benefit.id " +
+          "INNER JOIN family_benefit.benefits_criteria ON family_benefit.benefits_criteria.id_benefit = family_benefit.benefit.id " +
+          "INNER JOIN family_benefit.benefits_institutions ON family_benefit.benefits_institutions.id_benefit = family_benefit.benefit.id " +
+          "WHERE family_benefit.benefits_cities.id_city IS NOT NULL " +
+          "AND family_benefit.benefits_criteria.id_criterion IS NOT NULL " +
+          "AND family_benefit.benefits_institutions.id_institution IS NOT NULL;")
   Set<BenefitEntity> findAllFull();
 
   /**
@@ -40,13 +40,13 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, BigInteg
    */
   @Query(nativeQuery = true,
       value = "SELECT *" +
-          "FROM familybenefit.benefit " +
-          "INNER JOIN familybenefit.benefits_cities ON familybenefit.benefits_cities.id_benefit = familybenefit.benefit.id " +
-          "INNER JOIN familybenefit.benefits_criteria ON familybenefit.benefits_criteria.id_benefit = familybenefit.benefit.id " +
-          "INNER JOIN familybenefit.benefits_institutions ON familybenefit.benefits_institutions.id_benefit = familybenefit.benefit.id " +
-          "WHERE familybenefit.benefits_cities.id_city IS NULL " +
-          "OR familybenefit.benefits_criteria.id_criterion IS NULL " +
-          "OR familybenefit.benefits_institutions.id_institution IS NULL;")
+          "FROM family_benefit.benefit " +
+          "INNER JOIN family_benefit.benefits_cities ON family_benefit.benefits_cities.id_benefit = family_benefit.benefit.id " +
+          "INNER JOIN family_benefit.benefits_criteria ON family_benefit.benefits_criteria.id_benefit = family_benefit.benefit.id " +
+          "INNER JOIN family_benefit.benefits_institutions ON family_benefit.benefits_institutions.id_benefit = family_benefit.benefit.id " +
+          "WHERE family_benefit.benefits_cities.id_city IS NULL " +
+          "OR family_benefit.benefits_criteria.id_criterion IS NULL " +
+          "OR family_benefit.benefits_institutions.id_institution IS NULL;")
   Set<BenefitEntity> findAllPartial();
 
   /**
@@ -56,13 +56,13 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, BigInteg
    */
   @Query(nativeQuery = true,
       value = "SELECT *" +
-          "FROM familybenefit.benefit " +
-          "INNER JOIN familybenefit.benefits_cities ON familybenefit.benefits_cities.id_benefit = familybenefit.benefit.id " +
-          "INNER JOIN familybenefit.benefits_criteria ON familybenefit.benefits_criteria.id_benefit = familybenefit.benefit.id " +
-          "INNER JOIN familybenefit.benefits_institutions ON familybenefit.benefits_institutions.id_benefit = familybenefit.benefit.id " +
-          "WHERE familybenefit.benefits_cities.id_city = ?1 " +
-          "AND familybenefit.benefits_criteria.id_criterion IS NOT NULL " +
-          "AND familybenefit.benefits_institutions.id_institution IS NOT NULL;")
+          "FROM family_benefit.benefit " +
+          "INNER JOIN family_benefit.benefits_cities ON family_benefit.benefits_cities.id_benefit = family_benefit.benefit.id " +
+          "INNER JOIN family_benefit.benefits_criteria ON family_benefit.benefits_criteria.id_benefit = family_benefit.benefit.id " +
+          "INNER JOIN family_benefit.benefits_institutions ON family_benefit.benefits_institutions.id_benefit = family_benefit.benefit.id " +
+          "WHERE family_benefit.benefits_cities.id_city = ?1 " +
+          "AND family_benefit.benefits_criteria.id_criterion IS NOT NULL " +
+          "AND family_benefit.benefits_institutions.id_institution IS NOT NULL;")
   Set<BenefitEntity> findAllFullWhereCityIdEquals(BigInteger idCity);
 
   /**
@@ -72,12 +72,12 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, BigInteg
    */
   @Query(nativeQuery = true,
       value = "SELECT *" +
-          "FROM familybenefit.benefit " +
-          "INNER JOIN familybenefit.benefits_cities ON familybenefit.benefits_cities.id_benefit = familybenefit.benefit.id " +
-          "INNER JOIN familybenefit.benefits_criteria ON familybenefit.benefits_criteria.id_benefit = familybenefit.benefit.id " +
-          "INNER JOIN familybenefit.benefits_institutions ON familybenefit.benefits_institutions.id_benefit = familybenefit.benefit.id " +
-          "WHERE familybenefit.benefits_cities.id_city IS NOT NULL " +
-          "AND familybenefit.benefits_criteria.id_criterion IS NOT NULL " +
-          "AND familybenefit.benefits_institutions.id_institution = ?1;")
+          "FROM family_benefit.benefit " +
+          "INNER JOIN family_benefit.benefits_cities ON family_benefit.benefits_cities.id_benefit = family_benefit.benefit.id " +
+          "INNER JOIN family_benefit.benefits_criteria ON family_benefit.benefits_criteria.id_benefit = family_benefit.benefit.id " +
+          "INNER JOIN family_benefit.benefits_institutions ON family_benefit.benefits_institutions.id_benefit = family_benefit.benefit.id " +
+          "WHERE family_benefit.benefits_cities.id_city IS NOT NULL " +
+          "AND family_benefit.benefits_criteria.id_criterion IS NOT NULL " +
+          "AND family_benefit.benefits_institutions.id_institution = ?1;")
   Set<BenefitEntity> findAllFullWhereInstitutionIdEquals(BigInteger idInstitution);
 }
