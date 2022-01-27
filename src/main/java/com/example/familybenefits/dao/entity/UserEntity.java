@@ -107,6 +107,34 @@ public class UserEntity implements DBPreparer {
   private Set<RoleEntity> roleEntitySet;
 
   /**
+   * Добавляет пользователю роль по её названию
+   * @param nameRole название добавляемой роли
+   */
+  public void addRole(String nameRole) {
+    roleEntitySet.add(RoleEntity.builder().name(nameRole).build());
+  }
+
+  /**
+   * Удаляет у пользователя роль по её названию
+   * @param nameRole название удаляемой роли
+   */
+  public void removeRole(String nameRole) {
+
+    RoleEntity roleEntityToRemove = null;
+
+    for (RoleEntity roleEntity : roleEntitySet) {
+      if (roleEntity.getName().equals(nameRole)) {
+        roleEntityToRemove = roleEntity;
+        break;
+      }
+    }
+
+    if (roleEntityToRemove != null) {
+      roleEntitySet.remove(roleEntityToRemove);
+    }
+  }
+
+  /**
    * Обработывает строковые поля объекта перед записью в базу данных
    * @param prepareFunc функция обработки строки
    * @return объект с обработанными полями
