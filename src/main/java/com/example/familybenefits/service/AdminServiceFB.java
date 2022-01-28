@@ -9,6 +9,7 @@ import com.example.familybenefits.dao.entity.UserEntity;
 import com.example.familybenefits.dao.repository.UserRepository;
 import com.example.familybenefits.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -36,17 +37,24 @@ public class AdminServiceFB implements AdminService {
   private final UserSecurityService userSecurityService;
 
   /**
+   * Интерфейс сервиса для шифрования паролей
+   */
+  private final PasswordEncoder passwordEncoder;
+
+  /**
    * Конструктор для инициализации интерфейсов репозиториев
    * @param userRepository репозиторий, работающий с моделью таблицы "user"
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    * @param userSecurityService интерфейс сервиса, отвечающего за данные пользователя
+   * @param passwordEncoder интерфейс сервиса для шифрования паролей
    */
   @Autowired
   public AdminServiceFB(UserRepository userRepository, DBIntegrityService dbIntegrityService,
-                        UserSecurityService userSecurityService) {
+                        UserSecurityService userSecurityService, PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
     this.dbIntegrityService = dbIntegrityService;
     this.userSecurityService = userSecurityService;
+    this.passwordEncoder = passwordEncoder;
   }
 
   /**
@@ -101,6 +109,7 @@ public class AdminServiceFB implements AdminService {
 
     userEntityFromAdd.addRole("ROLE_ADMIN");
     userEntityFromAdd.setVerifiedEmail(false);
+    userEntityFromAdd.encryptPassword(passwordEncoder::encode);
 
     userRepository.saveAndFlush(userEntityFromAdd);
   }
@@ -115,7 +124,6 @@ public class AdminServiceFB implements AdminService {
   public void update(AdminUpdate adminUpdate) throws NotFoundException, InvalidEmailException {
 
     UserEntity userEntityFromDB;
-    boolean isAdmin = false;
 
     userSecurityService.checkEmailElseThrow(
         adminUpdate.getEmail(),
@@ -134,14 +142,7 @@ public class AdminServiceFB implements AdminService {
 
     userEntityFromDB = optUserEntityFromDB.get();
 
-    for (RoleEntity roleEntity : userEntityFromDB.getRoleEntitySet()) {
-      if (roleEntity.getName().equals("ROLE_ADMIN")) {
-        isAdmin = true;
-        break;
-      }
-    }
-
-    if (!isAdmin) {
+    if (!userEntityFromDB.hasRole("ROLE_ADMIN")) {
       throw new NotFoundException(String.format(
           "Administrator with ID %s not found", userEntityFromUpdate.getId()));
     }
@@ -165,7 +166,6 @@ public class AdminServiceFB implements AdminService {
   public void delete(BigInteger idAdmin) throws NotFoundException {
 
     UserEntity userEntityFromDB;
-    boolean isUser = false;
 
     Optional<UserEntity> optUserEntityFromDB = userRepository.findById(idAdmin);
 
@@ -176,16 +176,10 @@ public class AdminServiceFB implements AdminService {
 
     userEntityFromDB = optUserEntityFromDB.get();
 
-    for (RoleEntity roleEntity : userEntityFromDB.getRoleEntitySet()) {
-      if (roleEntity.getName().equals("ROLE_USER")) {
-        isUser = true;
-        break;
-      }
-    }
-
-    if (isUser) {
+    if (userEntityFromDB.hasRole("ROLE_USER")) {
       userEntityFromDB.removeRole("ROLE_ADMIN");
       userRepository.saveAndFlush(userEntityFromDB);
+
     } else {
       userRepository.deleteById(idAdmin);
     }
@@ -220,7 +214,6 @@ public class AdminServiceFB implements AdminService {
   public void fromUser(BigInteger idUser) throws NotFoundException, AlreadyExistsException {
 
     UserEntity userEntityFromDB;
-    boolean isAdmin = false;
 
     Optional<UserEntity> optUserEntityFromDB = userRepository.findById(idUser);
 
@@ -231,14 +224,7 @@ public class AdminServiceFB implements AdminService {
 
     userEntityFromDB = optUserEntityFromDB.get();
 
-    for (RoleEntity roleEntity : userEntityFromDB.getRoleEntitySet()) {
-      if (roleEntity.getName().equals("ROLE_ADMIN")) {
-        isAdmin = true;
-        break;
-      }
-    }
-
-    if (!isAdmin) {
+    if (!userEntityFromDB.hasRole("ROLE_ADMIN")) {
       throw new AlreadyExistsException(String.format(
           "User with ID %s already has role \"ROLE_ADMIN\"", idUser));
     }
@@ -258,7 +244,6 @@ public class AdminServiceFB implements AdminService {
   public void toUser(BigInteger idAdmin) throws NotFoundException, AlreadyExistsException {
 
     UserEntity userEntityFromDB;
-    boolean isUser = false;
 
     Optional<UserEntity> optUserEntityFromDB = userRepository.findById(idAdmin);
 
@@ -269,14 +254,7 @@ public class AdminServiceFB implements AdminService {
 
     userEntityFromDB = optUserEntityFromDB.get();
 
-    for (RoleEntity roleEntity : userEntityFromDB.getRoleEntitySet()) {
-      if (roleEntity.getName().equals("ROLE_USER")) {
-        isUser = true;
-        break;
-      }
-    }
-
-    if (isUser) {
+    if (userEntityFromDB.hasRole("ROLE_USER")) {
       throw new AlreadyExistsException(String.format(
           "Administrator with ID %s already has role \"ROLE_USER\"", idAdmin));
     }

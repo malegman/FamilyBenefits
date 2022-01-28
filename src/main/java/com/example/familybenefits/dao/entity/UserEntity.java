@@ -115,6 +115,22 @@ public class UserEntity implements DBPreparer {
   }
 
   /**
+   * Проверяет наличие роли у пользователя
+   * @param nameRole название роли, наличие которой необходимр проверить
+   * @return true, если пользователь имеет роль с указанным именем
+   */
+  public boolean hasRole(String nameRole) {
+
+    for (RoleEntity roleEntity : roleEntitySet) {
+      if (roleEntity.getName().equals(nameRole)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Удаляет у пользователя роль по её названию
    * @param nameRole название удаляемой роли
    */
@@ -132,6 +148,14 @@ public class UserEntity implements DBPreparer {
     if (roleEntityToRemove != null) {
       roleEntitySet.remove(roleEntityToRemove);
     }
+  }
+
+  /**
+   * Шифрует пароль пользователя указанной функцией шифрования
+   * @param encryptFunc функция шифрования
+   */
+  public void encryptPassword(Function<String, String> encryptFunc) {
+    password = encryptFunc.apply(password);
   }
 
   /**
