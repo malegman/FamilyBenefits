@@ -54,14 +54,6 @@ public class BenefitEntity implements DBPreparer {
   private String documents;
 
   /**
-   * Конструктор для создания модели по ID
-   * @param id ID пособия
-   */
-  public BenefitEntity(@NonNull BigInteger id) {
-    this.id = id;
-  }
-
-  /**
    * Множество городов пособия
    */
   @NonNull
@@ -96,6 +88,14 @@ public class BenefitEntity implements DBPreparer {
     joinColumns = @JoinColumn(name = "id_benefit"),
     inverseJoinColumns = @JoinColumn(name = "id_criterion"))
   private Set<CriterionEntity> criterionEntitySet;
+
+  /**
+   * Конструктор для создания модели по ID
+   * @param id ID пособия
+   */
+  public BenefitEntity(@NonNull BigInteger id) {
+    this.id = id;
+  }
 
   /**
    * Обработывает строковые поля объекта перед записью в базу данных
