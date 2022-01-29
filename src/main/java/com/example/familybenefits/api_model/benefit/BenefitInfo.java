@@ -1,11 +1,12 @@
 package com.example.familybenefits.api_model.benefit;
 
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
+import com.example.familybenefits.api_model.criterion.CriterionInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import java.math.BigInteger;
+import java.util.Set;
 
 /**
  * Информация о пособии
@@ -19,28 +20,42 @@ public class BenefitInfo {
   /**
    * ID пособия
    */
-  @NonNull
   @JsonProperty("id")
   private BigInteger id;
 
   /**
    * Название пособия
    */
-  @NonNull
   @JsonProperty("name")
   private String name;
 
   /**
    * Информация пособия
    */
-  @NonNull
   @JsonProperty("info")
   private String info;
 
   /**
    * Документы для получения пособия
    */
-  @Nullable
   @JsonProperty("documents")
   private String documents;
+
+  /**
+   * Множество кратких информаций о городах пособия
+   */
+  @JsonProperty("shortCitySet")
+  private Set<ObjectShortInfo> shortCitySet;
+
+  /**
+   * Множество кратких информаций об учреждениях пособия
+   */
+  @JsonProperty("shortInstitutionSet")
+  private Set<ObjectShortInfo> shortInstitutionSet;
+
+  /**
+   * Множество информаций о критериях пособия
+   */
+  @JsonProperty("criterionSet")
+  private Set<CriterionInfo> criterionSet;
 }

@@ -1,9 +1,12 @@
 package com.example.familybenefits.api_model.user;
 
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
+import com.example.familybenefits.api_model.criterion.CriterionInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
 import java.util.Set;
@@ -20,54 +23,54 @@ public class UserInfo {
   /**
    * ID пользователя
    */
-  @NonNull
   @JsonProperty("id")
   private BigInteger id;
 
   /**
    * Имя пользователя
    */
-  @NonNull
   @JsonProperty("name")
   private String name;
 
   /**
    * Электронная почта пользователя
    */
-  @NonNull
   @JsonProperty("email")
   private String email;
 
   /**
    * Статус почты, true, если подтверждена
    */
-  @JsonProperty("is_verified_email")
+  @JsonProperty("isVerifiedEmail")
   private boolean isVerifiedEmail;
-
-  /**
-   * Название города пользователя
-   */
-  @Nullable
-  @JsonProperty("name_city")
-  private String nameCity;
 
   /**
    * Множество дат рождений детей пользователя
    */
-  @NonNull
-  @JsonProperty("birth_date_children")
+  @JsonProperty("birthDateChildren")
   private Set<String> birthDateChildren;
 
   /**
    * Дата рождения пользователя
    */
-  @NonNull
-  @JsonProperty("date_birth")
+  @JsonProperty("dateBirth")
   private String dateBirth;
 
   /**
    * Множество названий ролей пользователя
    */
-  @JsonProperty("name_role_set")
+  @JsonProperty("nameRoleSet")
   private Set<String> nameRoleSet;
+
+  /**
+   * Краткая информация о городе пользователя
+   */
+  @JsonProperty("shortCity")
+  private ObjectShortInfo shortCity;
+
+  /**
+   * Множество информаций о критериях пользователя
+   */
+  @JsonProperty("criterionSet")
+  private Set<CriterionInfo> criterionSet;
 }

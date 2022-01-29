@@ -2,7 +2,6 @@ package com.example.familybenefits.api_model.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.lang.NonNull;
 
 import java.math.BigInteger;
 
@@ -18,14 +17,12 @@ public class ObjectShortInfo {
   /**
    * ID объекта
    */
-  @NonNull
-  @JsonProperty("id_object")
+  @JsonProperty("idObject")
   private BigInteger idObject;
 
   /**
    * Название объекта
    */
-  @NonNull
-  @JsonProperty("name_object")
+  @JsonProperty("nameObject")
   private String nameObject;
 }

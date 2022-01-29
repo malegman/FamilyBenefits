@@ -2,8 +2,6 @@ package com.example.familybenefits.api_model.benefit;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import java.math.BigInteger;
 import java.util.Set;
@@ -20,42 +18,36 @@ public class BenefitAdd {
   /**
    * Название пособия
    */
-  @NonNull
   @JsonProperty("name")
   private String name;
 
   /**
    * Информация пособия
    */
-  @NonNull
   @JsonProperty("info")
   private String info;
 
   /**
    * Документы для получения пособия
    */
-  @Nullable
   @JsonProperty("documents")
   private String documents;
 
   /**
    * Множество ID городов пособия
    */
-  @NonNull
-  @JsonProperty("id_city_set")
+  @JsonProperty("idCitySet")
   private Set<BigInteger> idCitySet;
 
   /**
    * Множество ID учреждений пособия
    */
-  @NonNull
-  @JsonProperty("short_institution_set")
+  @JsonProperty("idInstitutionSet")
   private Set<BigInteger> idInstitutionSet;
 
   /**
    * Множество ID критерий пособия
    */
-  @NonNull
-  @JsonProperty("short_criterion_set")
+  @JsonProperty("idCriterionSet")
   private Set<BigInteger> idCriterionSet;
 }

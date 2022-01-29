@@ -1,11 +1,11 @@
 package com.example.familybenefits.api_model.city;
 
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import java.math.BigInteger;
+import java.util.Set;
 
 /**
  * Информация о городе
@@ -19,21 +19,30 @@ public class CityInfo {
   /**
    * ID города
    */
-  @NonNull
   @JsonProperty("id")
   private BigInteger id;
 
   /**
    * Название города
    */
-  @NonNull
   @JsonProperty("name")
   private String name;
 
   /**
    * Информация города
    */
-  @Nullable
   @JsonProperty("info")
   private String info;
+
+  /**
+   * Множество кратких информаций о пособиях города
+   */
+  @JsonProperty("shortBenefitSet")
+  private Set<ObjectShortInfo> shortBenefitSet;
+
+  /**
+   * Множество кратких информаций об учреждениях города
+   */
+  @JsonProperty("shortInstitutionSet")
+  private Set<ObjectShortInfo> shortInstitutionSet;
 }

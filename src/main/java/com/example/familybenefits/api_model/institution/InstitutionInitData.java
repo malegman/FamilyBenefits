@@ -3,13 +3,12 @@ package com.example.familybenefits.api_model.institution;
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.lang.NonNull;
 
 import java.util.Set;
 
 /**
  * Дополнительные данные для добавления или обновления учреждения.
- * Содержат в себе множество кратких информаций о городах
+ * Содержат в себе множество кратких информаций о городах и пособиях
  */
 @Data
 @Builder
@@ -20,7 +19,12 @@ public class InstitutionInitData {
   /**
    * Множество кратких информаций о городах
    */
-  @NonNull
-  @JsonProperty("short_city_set")
+  @JsonProperty("shortCitySet")
   private Set<ObjectShortInfo> shortCitySet;
+
+  /**
+   * Множество кратких информаций о пособиях
+   */
+  @JsonProperty("shortCitySet")
+  private Set<ObjectShortInfo> shortBenefitSet;
 }

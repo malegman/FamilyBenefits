@@ -2,10 +2,9 @@ package com.example.familybenefits.api_model.institution;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import java.math.BigInteger;
+import java.util.Set;
 
 /**
  * Объект запроса для добавления учреждения
@@ -19,49 +18,48 @@ public class InstitutionAdd {
   /**
    * Название учреждения
    */
-  @NonNull
   @JsonProperty("name")
   private String name;
 
   /**
    * Информация учреждения
    */
-  @Nullable
   @JsonProperty("info")
   private String info;
 
   /**
    * Адрес учреждения
    */
-  @NonNull
   @JsonProperty("address")
   private String address;
 
   /**
    * Телефон учреждения
    */
-  @Nullable
   @JsonProperty("phone")
   private String phone;
 
   /**
    * Электронная почта учржедения
    */
-  @Nullable
   @JsonProperty("email")
   private String email;
 
   /**
    * График работы учреждения
    */
-  @Nullable
   @JsonProperty("schedule")
   private String schedule;
 
   /**
    * ID города учреждения
    */
-  @NonNull
-  @JsonProperty("id_city")
+  @JsonProperty("idCity")
   private BigInteger idCity;
+
+  /**
+   * Множество ID пособий учреждения
+   */
+  @JsonProperty("idBenefitSet")
+  private Set<BigInteger> idBenefitSet;
 }

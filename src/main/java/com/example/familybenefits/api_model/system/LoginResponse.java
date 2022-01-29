@@ -1,8 +1,7 @@
-package com.example.familybenefits.api_model.service;
+package com.example.familybenefits.api_model.system;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.lang.NonNull;
 
 import java.math.BigInteger;
 import java.util.Set;
@@ -19,28 +18,24 @@ public class LoginResponse {
   /**
    * ID пользователя
    */
-  @NonNull
-  @JsonProperty("id_user")
+  @JsonProperty("idUser")
   private BigInteger idUser;
 
   /**
    * Имя пользователя
    */
-  @NonNull
-  @JsonProperty("name_user")
+  @JsonProperty("nameUser")
   private String nameUser;
 
   /**
-   * Множество ролей пользователя
+   * Множество названий ролей пользователя
    */
-  @NonNull
-  @JsonProperty("role_user_set")
-  private Set<String> roleUserSet;
+  @JsonProperty("nameRoleUserSet")
+  private Set<String> nameRoleUserSet;
 
   /**
    * Токен доступа в формате jwt
    */
-  @NonNull
   @JsonProperty("jwt")
   private String jwt;
 }

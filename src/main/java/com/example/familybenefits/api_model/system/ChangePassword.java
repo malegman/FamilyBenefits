@@ -1,8 +1,7 @@
-package com.example.familybenefits.api_model.service;
+package com.example.familybenefits.api_model.system;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.lang.NonNull;
 
 /**
  * Объект запроса для изменения пароля пользователя
@@ -16,21 +15,18 @@ public class ChangePassword {
   /**
    * Старый пароль пользователя
    */
-  @NonNull
   @JsonProperty("old_password")
   private String oldPassword;
 
   /**
    * Новый пароль пользователя
    */
-  @NonNull
-  @JsonProperty("new_password")
+  @JsonProperty("newPassword")
   private String newPassword;
 
   /**
    * Повторно введенный новый пароль пользователя
    */
-  @NonNull
-  @JsonProperty("repeat_password")
+  @JsonProperty("repeatPassword")
   private String repeatPassword;
 }

@@ -1,8 +1,7 @@
-package com.example.familybenefits.api_model.service;
+package com.example.familybenefits.api_model.system;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import org.springframework.lang.NonNull;
 
 import java.math.BigInteger;
 
@@ -18,28 +17,24 @@ public class RecoveryPassword {
   /**
    * Электронная почта пользователя
    */
-  @NonNull
   @JsonProperty("email")
   private String email;
 
   /**
    * Код пользователя, необходимый для восстановления пароля
    */
-  @NonNull
-  @JsonProperty("recovery_pwd_code")
+  @JsonProperty("recoveryPwdCode")
   private BigInteger recoveryPwdCode;
 
   /**
    * Новый пароль пользователя
    */
-  @NonNull
-  @JsonProperty("new_password")
+  @JsonProperty("newPassword")
   private String newPassword;
 
   /**
    * Повторно введенный новый пароль пользователя
    */
-  @NonNull
-  @JsonProperty("repeat_password")
+  @JsonProperty("repeatPassword")
   private String repeatPassword;
 }
