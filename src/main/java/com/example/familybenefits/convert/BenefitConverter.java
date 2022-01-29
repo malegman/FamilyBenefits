@@ -62,6 +62,20 @@ public class BenefitConverter {
         .builder()
         .id(benefitUpdate.getId())
         .name(benefitUpdate.getName())
+        .info(benefitUpdate.getInfo())
+        .documents(benefitUpdate.getDocuments())
+        .cityEntitySet(benefitUpdate.getIdCitySet()
+                           .stream()
+                           .map(CityEntity::new)
+                           .collect(Collectors.toSet()))
+        .institutionEntitySet(benefitUpdate.getIdInstitutionSet()
+                                  .stream()
+                                  .map(InstitutionEntity::new)
+                                  .collect(Collectors.toSet()))
+        .criterionEntitySet(benefitUpdate.getIdCriterionSet()
+                                .stream()
+                                .map(CriterionEntity::new)
+                                .collect(Collectors.toSet()))
         .build();
   }
 
@@ -82,6 +96,18 @@ public class BenefitConverter {
         .name(benefitEntity.getName())
         .info(benefitEntity.getInfo())
         .documents(benefitEntity.getDocuments())
+        .shortCitySet(benefitEntity.getCityEntitySet()
+                          .stream()
+                          .map(CityConverter::toShortInfo)
+                          .collect(Collectors.toSet()))
+        .shortInstitutionSet(benefitEntity.getInstitutionEntitySet()
+                                 .stream()
+                                 .map(InstitutionConverter::toShortInfo)
+                                 .collect(Collectors.toSet()))
+        .criterionSet(benefitEntity.getCriterionEntitySet()
+                          .stream()
+                          .map(CriterionConverter::toInfo)
+                          .collect(Collectors.toSet()))
         .build();
   }
 

@@ -4,7 +4,10 @@ import com.example.familybenefits.api_model.city.CityAdd;
 import com.example.familybenefits.api_model.city.CityInfo;
 import com.example.familybenefits.api_model.city.CityUpdate;
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
+import com.example.familybenefits.dao.entity.BenefitEntity;
 import com.example.familybenefits.dao.entity.CityEntity;
+
+import java.util.stream.Collectors;
 
 /**
  * Класс преобразования модели таблицы "city" в другие объекты и получения из других объектов
@@ -26,6 +29,10 @@ public class CityConverter {
         .builder()
         .name(cityAdd.getName())
         .info(cityAdd.getInfo())
+        .benefitEntitySet(cityAdd.getIdBenefitSet()
+                              .stream()
+                              .map(BenefitEntity::new)
+                              .collect(Collectors.toSet()))
         .build();
   }
 
@@ -45,6 +52,10 @@ public class CityConverter {
         .id(cityUpdate.getId())
         .name(cityUpdate.getName())
         .info(cityUpdate.getInfo())
+        .benefitEntitySet(cityUpdate.getIdBenefitSet()
+                              .stream()
+                              .map(BenefitEntity::new)
+                              .collect(Collectors.toSet()))
         .build();
   }
 
@@ -64,6 +75,14 @@ public class CityConverter {
         .id(cityEntity.getId())
         .name(cityEntity.getName())
         .info(cityEntity.getInfo())
+        .shortBenefitSet(cityEntity.getBenefitEntitySet()
+                              .stream()
+                              .map(BenefitConverter::toShortInfo)
+                              .collect(Collectors.toSet()))
+        .shortInstitutionSet(cityEntity.getInstitutionEntitySet()
+                              .stream()
+                              .map(InstitutionConverter::toShortInfo)
+                              .collect(Collectors.toSet()))
         .build();
   }
 

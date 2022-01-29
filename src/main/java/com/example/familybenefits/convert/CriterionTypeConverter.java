@@ -6,6 +6,8 @@ import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeUpdate;
 import com.example.familybenefits.dao.entity.CriterionTypeEntity;
 
+import java.util.stream.Collectors;
+
 /**
  * Класс преобразования модели таблицы "criterion_type" в другие объекты и получения из других объектов
  */
@@ -64,6 +66,10 @@ public class CriterionTypeConverter {
         .id(criterionTypeEntity.getId())
         .name(criterionTypeEntity.getName())
         .info(criterionTypeEntity.getInfo())
+        .shortCriterionSet(criterionTypeEntity.getCriterionEntitySet()
+                               .stream()
+                               .map(CriterionConverter::toShortInfo)
+                               .collect(Collectors.toSet()))
         .build();
   }
 

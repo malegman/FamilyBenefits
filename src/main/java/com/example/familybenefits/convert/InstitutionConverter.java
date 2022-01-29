@@ -4,8 +4,11 @@ import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.api_model.institution.InstitutionAdd;
 import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.api_model.institution.InstitutionUpdate;
+import com.example.familybenefits.dao.entity.BenefitEntity;
 import com.example.familybenefits.dao.entity.CityEntity;
 import com.example.familybenefits.dao.entity.InstitutionEntity;
+
+import java.util.stream.Collectors;
 
 /**
  * Класс преобразования модели таблицы "institution" в другие объекты и получения из других объектов
@@ -31,6 +34,10 @@ public class InstitutionConverter {
         .phone(institutionAdd.getPhone())
         .schedule(institutionAdd.getSchedule())
         .cityEntity(new CityEntity(institutionAdd.getIdCity()))
+        .benefitEntitySet(institutionAdd.getIdBenefitSet()
+                              .stream()
+                              .map(BenefitEntity::new)
+                              .collect(Collectors.toSet()))
         .build();
   }
 
@@ -54,6 +61,10 @@ public class InstitutionConverter {
         .email(institutionUpdate.getEmail())
         .schedule(institutionUpdate.getSchedule())
         .cityEntity(new CityEntity(institutionUpdate.getId()))
+        .benefitEntitySet(institutionUpdate.getIdBenefitSet()
+                              .stream()
+                              .map(BenefitEntity::new)
+                              .collect(Collectors.toSet()))
         .build();
   }
 
@@ -77,7 +88,11 @@ public class InstitutionConverter {
         .phone(institutionEntity.getPhone())
         .email(institutionEntity.getEmail())
         .schedule(institutionEntity.getSchedule())
-        .nameCity(institutionEntity.getCityEntity().getName())
+        .shortCity(CityConverter.toShortInfo(institutionEntity.getCityEntity()))
+        .shortBenefitSet(institutionEntity.getBenefitEntitySet()
+                             .stream()
+                             .map(BenefitConverter::toShortInfo)
+                             .collect(Collectors.toSet()))
         .build();
   }
 

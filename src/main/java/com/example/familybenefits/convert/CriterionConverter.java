@@ -27,10 +27,7 @@ public class CriterionConverter {
         .builder()
         .name(criterionAdd.getName())
         .info(criterionAdd.getInfo())
-        .criterionType(
-            criterionAdd.getIdCriterionType() == null
-                ? null
-                : new CriterionTypeEntity(criterionAdd.getIdCriterionType()))
+        .criterionTypeEntity(new CriterionTypeEntity(criterionAdd.getIdCriterionType()))
         .build();
   }
 
@@ -50,10 +47,7 @@ public class CriterionConverter {
         .id(criterionUpdate.getId())
         .name(criterionUpdate.getName())
         .info(criterionUpdate.getInfo())
-        .criterionType(
-            criterionUpdate.getIdCriterionType() == null
-                ? null
-                : new CriterionTypeEntity(criterionUpdate.getIdCriterionType()))
+        .criterionTypeEntity(new CriterionTypeEntity(criterionUpdate.getIdCriterionType()))
         .build();
   }
 
@@ -73,6 +67,7 @@ public class CriterionConverter {
         .id(criterionEntity.getId())
         .name(criterionEntity.getName())
         .info(criterionEntity.getInfo())
+        .shortCriterionType(CriterionTypeConverter.toShortInfo(criterionEntity.getCriterionTypeEntity()))
         .build();
   }
 
