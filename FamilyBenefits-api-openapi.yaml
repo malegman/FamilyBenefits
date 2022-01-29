@@ -1668,11 +1668,11 @@ components:
             example: name
         shortCity:
           $ref: '#/components/schemas/ObjectShortInfo'
-        shortCriterionSet:
-          description: Множество кратких информаций о критериях пользователя
+        criterionSet:
+          description: Множество информаций о критериях пользователя
           type: array
           items:
-            $ref: '#/components/schemas/ObjectShortInfo'
+            $ref: '#/components/schemas/CriterionInfo'
     UserAdd:
       description: Объект запроса для добавления пользователя
       properties:
@@ -1700,6 +1700,11 @@ components:
             type: string
             format: date
             example: 01-01-2022
+        dateBirth:
+          description: Дата рождения пользователя
+          type: string
+          format: date
+          example: 01-01-2022
         idCity:
           description: ID города пользователя
           type: integer
@@ -1734,6 +1739,11 @@ components:
             type: string
             format: date
             example: 01-01-2022
+        dateBirth:
+          description: Дата рождения пользователя
+          type: string
+          format: date
+          example: 01-01-2022
         idCity:
           description: ID города пользователя
           type: integer
@@ -2229,11 +2239,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ObjectShortInfo'
-        shortCriteriaSet:
-          description: Множество кратких информаций о критериях пособия
+        criterionSet:
+          description: Множество информаций о критериях пособия
           type: array
           items:
-            $ref: '#/components/schemas/ObjectShortInfo'
+            $ref: '#/components/schemas/CriterionInfo'
     BenefitAdd:
       description: Объект запроса для добавления пособия
       properties:
@@ -2328,7 +2338,7 @@ components:
           description: Множество информаций о критериях
           type: array
           items:
-            $ref: '#/components/schemas/ObjectShortInfo'
+            $ref: '#/components/schemas/CriterionInfo'
 
 
     ObjectShortInfo:
