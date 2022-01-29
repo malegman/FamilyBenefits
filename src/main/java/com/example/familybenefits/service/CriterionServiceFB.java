@@ -208,11 +208,11 @@ public class CriterionServiceFB implements CriterionService {
 
     CriterionEntity criterionEntity = criterionRepository.getById(idCriterion);
 
-    if (criterionEntity.getCriterionType() == null) {
+    if (criterionEntity.getCriterionTypeEntity() == null) {
       throw new NotFoundException(String.format(
           "Criterion type of criterion with ID %s not found", idCriterion));
     }
 
-    return CriterionTypeConverter.toInfo(criterionEntity.getCriterionType());
+    return CriterionTypeConverter.toInfo(criterionEntity.getCriterionTypeEntity());
   }
 }

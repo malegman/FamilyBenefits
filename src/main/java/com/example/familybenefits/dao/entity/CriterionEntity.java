@@ -50,8 +50,8 @@ public class CriterionEntity implements DBPreparer {
    */
   @Nullable
   @ManyToOne
-  @JoinColumn(name = "id_type")
-  private CriterionTypeEntity criterionType;
+  @JoinColumn(name = "id_type", referencedColumnName = "id")
+  private CriterionTypeEntity criterionTypeEntity;
 
   /**
    * Конструктор для создания модели по ID
