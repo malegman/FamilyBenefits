@@ -5,12 +5,10 @@ import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -47,6 +45,14 @@ public class CriterionTypeEntity implements DBPreparer {
   @NonNull
   @Column(name = "info")
   private String info;
+
+  /**
+   * Множество критерий типа критерия
+   */
+  @NonNull
+  @ToString.Exclude
+  @OneToMany(mappedBy = "criterionTypeEntity")
+  private Set<CriterionEntity> criterionEntitySet;
 
   /**
    * Конструктор для создания модели по ID

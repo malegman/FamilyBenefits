@@ -8,6 +8,7 @@ import org.springframework.lang.Nullable;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -44,6 +45,22 @@ public class CityEntity implements DBPreparer {
   @Nullable
   @Column(name = "info")
   private String info;
+
+  /**
+   * Множество учреждений города
+   */
+  @NonNull
+  @ToString.Exclude
+  @OneToMany(mappedBy = "cityEntity")
+  private Set<InstitutionEntity> institutionEntitySet;
+
+  /**
+   * Множество пособий города
+   */
+  @NonNull
+  @ToString.Exclude
+  @ManyToMany(mappedBy = "cityEntitySet")
+  private Set<BenefitEntity> benefitEntitySet;
 
   /**
    * Конструктор для создания модели по ID
