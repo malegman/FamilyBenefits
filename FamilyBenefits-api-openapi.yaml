@@ -8,27 +8,27 @@ info:
 servers:
   - url: https://localhost
 tags:
-  - name: service
+  - name: system
     description: Операции, связанные с системой и безопасностью
   - name: user
-    description: Операции с пользователем
+    description: Получение и изменение пользователя
   - name: admin
-    description: Операции с администратором
+    description: Получение и изменение администратора
   - name: city
-    description: Операции с городом
+    description: Получение и изменение города
   - name: benefit
-    description: Операции с пособием
+    description: Получение и изменение пособия
   - name: institution
-    description: Операции с учреждением
+    description: Получение и изменение учреждения
   - name: criterion
-    description: Операции с критерием
+    description: Получение и изменение критерия
   - name: criterion type
-    description: Операции с типом критерия
+    description: Получение и изменение типа критерия
 paths:
   /login:
     post:
       tags:
-        - service
+        - system
       summary: Вход в систему
       description:
         Вход в систему.
@@ -60,7 +60,7 @@ paths:
   /logout:
     post:
       tags:
-        - service
+        - system
       summary: Выход из системы
       description:
         Выход из системы.
@@ -87,7 +87,7 @@ paths:
   /refresh:
     post:
       tags:
-        - service
+        - system
       summary: Обновляет токены сессии
       description:
         Обновляет токены доступа и обновления.
@@ -123,7 +123,7 @@ paths:
   /changepwd:
     put:
       tags:
-        - service
+        - system
       summary: Изменяет пароль
       description:
         Изменяет пароль.
@@ -156,7 +156,7 @@ paths:
   /verifemail:
     post:
       tags:
-        - service
+        - system
       summary: Принимает запрос на подтверждение почты
       description:
         Принимает запрос на подтверждение почты. Отправляет на почту код подтверждения.
@@ -185,7 +185,7 @@ paths:
         - bearerAuth: [ ]
     put:
       tags:
-        - service
+        - system
       summary: Подтверждает почту
       description:
         Подтверждает почту.
@@ -220,7 +220,7 @@ paths:
   /recoverpwd:
     post:
       tags:
-        - service
+        - system
       summary: Принимает запрос на восстановление пароля
       description:
         Принимает запрос на восстановление пароля. Отправляет на почту код восстановления.
@@ -250,7 +250,7 @@ paths:
       security: [ ]
     put:
       tags:
-        - service
+        - system
       summary: Восстановливает пароль
       description:
         Восстановливает пароль.
@@ -298,7 +298,14 @@ paths:
           description: Пользователь зарегистрирован
           content: { }
         '400':
-          description: Пользователь с данным email уже существует
+          description:
+            Варианты -
+            1) администратор или пользователь с данным email уже существует;
+            2) не безопасный пароль;
+            3) указанные пароли не эквивалентны;
+            4) указанный "email" не является email.
+        '404':
+          description: Город с указанным ID не найден
           content: { }
       security: [ ]
     put:
@@ -321,6 +328,9 @@ paths:
         '201':
           description: Пользователь обновлен
           content: { }
+        '400':
+          description: Указанный "email" не является email
+          content: { }
         '401':
           description: Клиент не авторизован или токен не действительный
           content: { }
@@ -328,49 +338,15 @@ paths:
           description: Нет доступа
           content: { }
         '404':
-          description: Пользователь с указанными данными не найден
+          description:
+            Варианты -
+            1) пользователь с указанными данными не найден;
+            2) город с указанным ID не найден.
           content: { }
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
   /user/{id}:
-    get:
-      tags:
-        - user
-      summary: Возвращает информацию о пользователе по ID
-      description:
-        Возвращает информацию о пользователе по ID.
-        О запросившем клиенте.
-        Для пользователя.
-        Необходима авторизация.
-      operationId: getUser
-      parameters:
-        - name: id
-          in: path
-          description: ID пользователя
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '200':
-          description: Данные о пользователе получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserInfo'
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
     delete:
       tags:
         - user
@@ -405,25 +381,43 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /user/initdata:
     get:
       tags:
         - user
-      summary: Возвращает дополнительные данные для пользователя
+      summary: Возвращает информацию о пользователе
       description:
-        Возвращает дополнительные данные для добавления или обновления пользователя.
-          Данные содержат в себе множества кратких информаций о городах и полных критериях.
+        Возвращает информацию о пользователе по ID.
+        О запросившем клиенте.
+        Для пользователя.
+        Необходима авторизация.
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
       responses:
         '200':
-          description: Дополнительные данные пользователя получены
+          description: Данные о пользователе получены
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInitData'
-        '404':
-          description: Дополнительные данные пользователя не найдены
+                $ref: '#/components/schemas/UserInfo'
+        '401':
+          description: Клиент не авторизован или токен не действительный
           content: { }
-      security: [ ]
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Пользователь с указанными данными не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
   /user/{id}/benefits:
     get:
       tags:
@@ -450,7 +444,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
+                  $ref: '#/components/schemas/BenefitInfo'
         '401':
           description: Клиент не авторизован или токен не действительный
           content: { }
@@ -463,6 +457,25 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
+  /user/initdata:
+    get:
+      tags:
+        - user
+      summary: Возвращает дополнительные данные для пользователя
+      description:
+        Возвращает дополнительные данные для добавления или обновления пользователя.
+        Данные содержат в себе множества кратких информаций о городах и полных критериях.
+      responses:
+        '200':
+          description: Дополнительные данные пользователя получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInitData'
+        '404':
+          description: Дополнительные данные пользователя не найдены
+          content: { }
+      security: [ ]
 
 
   /admin:
@@ -538,6 +551,39 @@ paths:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
   /admin/{id}:
+    delete:
+      tags:
+        - admin
+      summary: Удаляет администратора по ID
+      description:
+        Удаляет администратора по ID.
+        Для супер администратора.
+        Необходима авторизация.
+      operationId: deleteAdmin
+      parameters:
+        - name: id
+          in: path
+          description: ID администратора
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '201':
+          description: Администратор удален
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Администратор с указанными данными не найден
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
     get:
       tags:
         - admin
@@ -563,39 +609,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdminInfo'
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Администратор с указанными данными не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-    delete:
-      tags:
-        - admin
-      summary: Удаляет администратора по ID
-      description:
-        Удаляет администратора по ID.
-        Для супер администратора.
-        Необходима авторизация.
-      operationId: deleteAdmin
-      parameters:
-        - name: id
-          in: path
-          description: ID администратора
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '201':
-          description: Администратор удален
-          content: { }
         '401':
           description: Клиент не авторизован или токен не действительный
           content: { }
@@ -748,32 +761,6 @@ paths:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
   /city/{id}:
-    get:
-      tags:
-        - city
-      summary: Возвращает информацию о городе
-      description:
-        Возвращает информацию о городе.
-      operationId: getCity
-      parameters:
-        - name: id
-          in: path
-          description: ID города
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '200':
-          description: Данные о городе получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CityInfo'
-        '404':
-          description: Город с указанным ID не найден
-          content: { }
-      security: [ ]
     delete:
       tags:
         - city
@@ -807,6 +794,32 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
+    get:
+      tags:
+        - city
+      summary: Возвращает информацию о городе
+      description:
+        Возвращает информацию о городе.
+      operationId: getCity
+      parameters:
+        - name: id
+          in: path
+          description: ID города
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Данные о городе получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CityInfo'
+        '404':
+          description: Город с указанным ID не найден
+          content: { }
+      security: [ ]
   /city/all:
     get:
       tags:
@@ -828,64 +841,34 @@ paths:
           description: Города не найдены
           content: { }
       security: [ ]
-  /city/{id}/institutions:
+  /city/initdata:
     get:
       tags:
         - city
-      summary: Возвращает множество учреждений города
+      summary: Возвращает дополнительные данные для города
       description:
-        Возвращает множество учреждений города.
-      operationId: getCityInstitutions
-      parameters:
-        - name: id
-          in: path
-          description: ID города
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
+        Возвращает дополнительные данные для добавления или обновления города.
+        Данные содержат в себе множества кратких информаций о пособиях.
+      operationId: getCityInitData
       responses:
         '200':
-          description: Множество учреждений города получено
+          description: Дополнительные данные пользователя получены
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/InstitutionInfo'
-        '404':
-          description: Учреждения не найдены
+                $ref: '#/components/schemas/CityInitData'
+        '401':
+          description: Клиент не авторизован или токен не действительный
           content: { }
-      security: [ ]
-  /city/{id}/benefits:
-    get:
-      tags:
-        - city
-      summary: Возвращает множество полных пособий города
-      description:
-        Возвращает множество полных пособий города.
-      operationId: getCityBenefits
-      parameters:
-        - name: id
-          in: path
-          description: ID города
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '200':
-          description: Множество пособий города получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BenefitInfo'
-        '404':
-          description: Пособия не найдены
+        '403':
+          description: Нет доступа
           content: { }
-      security: [ ]
+        '404':
+          description: Дополнительные данные города не найдены
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
 
 
   /benefit:
@@ -952,32 +935,6 @@ paths:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
   /benefit/{id}:
-    get:
-      tags:
-        - benefit
-      summary: Возвращает информацию о пособии
-      description:
-        Возвращает информацию о пособии.
-      operationId: getBenefit
-      parameters:
-        - name: id
-          in: path
-          description: ID пособия
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '200':
-          description: Данные о пособии получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BenefitInfo'
-        '404':
-          description: Пособие с указанным ID не найдено
-          content: { }
-      security: [ ]
     delete:
       tags:
         - benefit
@@ -1011,36 +968,32 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /benefit/initdata:
     get:
       tags:
         - benefit
-      summary: Возвращает дополнительные данные для пособия
+      summary: Возвращает информацию о пособии
       description:
-        Возвращает дополнительные данные для добавления или обновления пособия.
-          Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
-        Для администратора.
-        Необходима авторизация.
-      operationId: getBenefitInitData
+        Возвращает информацию о пособии.
+      operationId: getBenefit
+      parameters:
+        - name: id
+          in: path
+          description: ID пособия
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
       responses:
         '200':
-          description: Дополнительные данные пособия получены
+          description: Данные о пособии получены
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BenefitInitData'
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
+                $ref: '#/components/schemas/BenefitInfo'
         '404':
-          description: Дополнительные данные пособия не найдены
+          description: Пособие с указанным ID не найдено
           content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
+      security: [ ]
   /benefit/all:
     get:
       tags:
@@ -1101,93 +1054,36 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /benefit/{id}/cities:
+  /benefit/initdata:
     get:
       tags:
         - benefit
-      summary: Возвращает множество городов пособия
+      summary: Возвращает дополнительные данные для пособия
       description:
-        Возвращает множество городов пособия.
-      operationId: getBenefitCities
-      parameters:
-        - name: id
-          in: path
-          description: ID пособия
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
+        Возвращает дополнительные данные для добавления или обновления пособия.
+        Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
+        Для администратора.
+        Необходима авторизация.
+      operationId: getBenefitInitData
       responses:
         '200':
-          description: Множество городов пособия получено
+          description: Дополнительные данные пособия получены
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CityInfo'
-        '404':
-          description: Города не найдены
+                $ref: '#/components/schemas/BenefitInitData'
+        '401':
+          description: Клиент не авторизован или токен не действительный
           content: { }
-      security: [ ]
-  /benefit/{id}/institutions:
-    get:
-      tags:
-        - benefit
-      summary: Возвращает множество учреждений пособия
-      description:
-        Возвращает множество учреждений пособия.
-      operationId: getBenefitInstitutions
-      parameters:
-        - name: id
-          in: path
-          description: ID пособия
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '200':
-          description: Множество учреждений пособия получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/InstitutionInfo'
-        '404':
-          description: Учреждения не найдены
+        '403':
+          description: Нет доступа
           content: { }
-      security: [ ]
-  /benefit/{id}/criteria:
-    get:
-      tags:
-        - benefit
-      summary: Возвращает множество полных критерий пособия
-      description:
-        Возвращает множество полных критерий пособия.
-      operationId: getBenefitCriteria
-      parameters:
-        - name: id
-          in: path
-          description: ID пособия
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '200':
-          description: Множество критерий пособия получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CriterionInfo'
         '404':
-          description: Критерии не найдены
+          description: Дополнительные данные пособия не найдены
           content: { }
-      security: [ ]
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
 
 
   /institution:
@@ -1254,32 +1150,6 @@ paths:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
   /institution/{id}:
-    get:
-      tags:
-        - institution
-      summary: Возвращает информацию об учреждении
-      description:
-        Возвращает информацию об учреждении.
-      operationId: getInstitution
-      parameters:
-        - name: id
-          in: path
-          description: ID учреждения
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '200':
-          description: Данные об учреждении получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InstitutionInfo'
-        '404':
-          description: Учреждение с указанным ID не найдено
-          content: { }
-      security: [ ]
     delete:
       tags:
         - institution
@@ -1313,6 +1183,53 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
+    get:
+      tags:
+        - institution
+      summary: Возвращает информацию об учреждении
+      description:
+        Возвращает информацию об учреждении.
+      operationId: getInstitution
+      parameters:
+        - name: id
+          in: path
+          description: ID учреждения
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Данные об учреждении получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstitutionInfo'
+        '404':
+          description: Учреждение с указанным ID не найдено
+          content: { }
+      security: [ ]
+  /institution/all:
+    get:
+      tags:
+        - institution
+      summary: Возвращает множество всех учреждений
+      description:
+        Возвращает множество всех учреждений.
+      operationId: getInstitutions
+      responses:
+        '200':
+          description: Множество учреждений получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InstitutionInfo'
+        '404':
+          description: Учреждения не найдены
+          content: { }
+      security: [ ]
   /institution/initdata:
     get:
       tags:
@@ -1320,7 +1237,7 @@ paths:
       summary: Возвращает дополнительные данные для учреждения
       description:
         Возвращает дополнительные данные для добавления или обновления учреждения.
-          Данные содержат в себе множество кратких информаций о городах.
+        Данные содержат в себе множество кратких информаций о городах и пособиях.
         Для администратора.
         Необходима авторизация.
       operationId: getInstitutionInitData
@@ -1343,83 +1260,6 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /institution/all:
-    get:
-      tags:
-        - institution
-      summary: Возвращает множество всех учреждений
-      description:
-        Возвращает множество всех учреждений.
-      operationId: getInstitutions
-      responses:
-        '200':
-          description: Множество учреждений получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/InstitutionInfo'
-        '404':
-          description: Учреждения не найдены
-          content: { }
-      security: []
-  /institution/{id}/city:
-    get:
-      tags:
-        - institution
-      summary: Возвращает информацию о городе учреждения
-      description:
-        Возвращает информацию о городе учреждения.
-      operationId: getInstitutionCity
-      parameters:
-        - name: id
-          in: path
-          description: ID учреждения
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '200':
-          description: Информация о городе учреждения получена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CityInfo'
-        '404':
-          description: Информация о городе учреждения не найдена
-          content: { }
-      security: [ ]
-  /institution/{id}/benefits:
-    get:
-      tags:
-        - institution
-      summary: Возвращает множество полных пособий учреждения
-      description:
-        Возвращает множество полных пособий учреждения.
-      operationId: getInstitutionBenefits
-      parameters:
-        - name: id
-          in: path
-          description: ID учреждения
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '200':
-          description: Множество пособий учреждения получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BenefitInfo'
-        '404':
-          description: Множество пособий учреждения не найдено
-          content: { }
-      security: [ ]
 
 
   /criterion:
@@ -1486,32 +1326,6 @@ paths:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
   /criterion/{id}:
-    get:
-      tags:
-        - criterion
-      summary: Возвращает информацию о критерии
-      description:
-        Возвращает информацию о критерии.
-      operationId: getCriterion
-      parameters:
-        - name: id
-          in: path
-          description: ID критерия
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '200':
-          description: Данные о критерии получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CriterionInfo'
-        '404':
-          description: Критерий с указанным ID не найден
-          content: { }
-      security: [ ]
     delete:
       tags:
         - criterion
@@ -1545,36 +1359,32 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /criterion/initdata:
     get:
       tags:
         - criterion
-      summary: Возвращает дополнительные данные для критерия
+      summary: Возвращает информацию о критерии
       description:
-        Возвращает дополнительные данные для добавления или обновления критерия.
-          Данные содержат в себе множетсво кратких информаций о типах критерий.
-        Для администратора.
-        Необходима авторизация.
-      operationId: getCriterionInitData
+        Возвращает информацию о критерии.
+      operationId: getCriterion
+      parameters:
+        - name: id
+          in: path
+          description: ID критерия
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
       responses:
         '200':
-          description: Дополнительные данные критерия получены
+          description: Данные о критерии получены
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CriterionInitData'
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
+                $ref: '#/components/schemas/CriterionInfo'
         '404':
-          description: Дополнительные данные критерия не найдены
+          description: Критерий с указанным ID не найден
           content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
+      security: [ ]
   /criterion/all:
     get:
       tags:
@@ -1622,38 +1432,41 @@ paths:
           description: Нет доступа
           content: { }
         '404':
-          description: Критерия не найдены
+          description: Критерии не найдены
           content: { }
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /criterion/{id}/criteriontype:
+  /criterion/initdata:
     get:
       tags:
         - criterion
-      summary: Возвращает информацию о типе критерия критерия
+      summary: Возвращает дополнительные данные для критерия
       description:
-        Возвращает информацию о типе критерия критерия.
-      operationId: getCriterionCriterionType
-      parameters:
-        - name: id
-          in: path
-          description: ID критерия
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
+        Возвращает дополнительные данные для добавления или обновления критерия.
+        Данные содержат в себе множетсво кратких информаций о типах критерий.
+        Для администратора.
+        Необходима авторизация.
+      operationId: getCriterionInitData
       responses:
         '200':
-          description: Информация о типе критерия критерия получена
+          description: Дополнительные данные критерия получены
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CityInfo'
-        '404':
-          description: Информация о типе критерия критерия не найдена
+                $ref: '#/components/schemas/CriterionInitData'
+        '401':
+          description: Клиент не авторизован или токен не действительный
           content: { }
-      security: [ ]
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Дополнительные данные критерия не найдены
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
 
 
   /criteriontype:
@@ -1720,32 +1533,6 @@ paths:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
   /criteriontype/{id}:
-    get:
-      tags:
-        - criterion type
-      summary: Возвращает информацию о типе критерия
-      description:
-        Возвращает информацию о типе критерия.
-      operationId: getCriterionType
-      parameters:
-        - name: id
-          in: path
-          description: ID типа критерия
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '200':
-          description: Данные о типе критерия получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CriterionTypeInfo'
-        '404':
-          description: Тип критерия с указанным ID не найден
-          content: { }
-      security: [ ]
     delete:
       tags:
         - criterion type
@@ -1779,6 +1566,32 @@ paths:
       security:
         - cookieAuth: [ ]
         - bearerAuth: [ ]
+    get:
+      tags:
+        - criterion type
+      summary: Возвращает информацию о типе критерия
+      description:
+        Возвращает информацию о типе критерия.
+      operationId: getCriterionType
+      parameters:
+        - name: id
+          in: path
+          description: ID типа критерия
+          schema:
+            type: integer
+            example: 1222333444
+          required: true
+      responses:
+        '200':
+          description: Данные о типе критерия получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CriterionTypeInfo'
+        '404':
+          description: Тип критерия с указанным ID не найден
+          content: { }
+      security: [ ]
   /criteriontype/all:
     get:
       tags:
@@ -1798,33 +1611,6 @@ paths:
                   $ref: '#/components/schemas/ObjectShortInfo'
         '404':
           description: Типы критерий не найдены
-          content: { }
-      security: [ ]
-  /criteriontype/{id}/criteria:
-    get:
-      tags:
-        - criterion type
-      summary: Возвращает множество критерий типа критерия
-      description:
-        Возвращает множество критерий типа критерия.
-      operationId: getCriterionTypeCriterions
-      parameters:
-        - name: id
-          in: path
-          description: ID типа критерия
-          schema:
-            type: integer
-            example: 1222333444
-          required: true
-      responses:
-        '200':
-          description: Множество критерий типа критерия получено
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CityInfo'
-        '404':
-          description: Критерии не найдены
           content: { }
       security: [ ]
 
@@ -1861,10 +1647,6 @@ components:
           description: Статус почты, true, если подтверждена
           type: boolean
           example: false
-        nameCity:
-          description: Название города пользователя
-          type: string
-          example: name
         birthDateChildren:
           description: Множество дат рождений детей пользователя
           type: array
@@ -1881,11 +1663,16 @@ components:
           description: Множество названий ролей пользователя
           type: array
           items:
-            allOf:
-              - description: Название роли
-                type: string
-                example: name
-
+            description: Название роли
+            type: string
+            example: name
+        shortCity:
+          $ref: '#/components/schemas/ObjectShortInfo'
+        shortCriterionSet:
+          description: Множество кратких информаций о критериях пользователя
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectShortInfo'
     UserAdd:
       description: Объект запроса для добавления пользователя
       properties:
@@ -1905,6 +1692,14 @@ components:
           description: Повторно введенный пароль пользователя
           type: string
           example: password
+        birthDateChildren:
+          description: Множество дат рождений детей пользователя
+          type: array
+          items:
+            description: Дата рождения ребенка
+            type: string
+            format: date
+            example: 01-01-2022
         idCity:
           description: ID города пользователя
           type: integer
@@ -1913,19 +1708,9 @@ components:
           description: Множество ID критерий пользователя
           type: array
           items:
-            allOf:
-              - description: ID критерия
-                type: integer
-                example: 1222333444
-        birthDateChildren:
-          description: Множество дат рождений детей пользователя
-          type: array
-          items:
-            allOf:
-              - description: Дата рождения ребенка
-                type: string
-                format: date
-                example: 01-01-2022
+            description: ID критерия
+            type: integer
+            example: 1222333444
     UserUpdate:
       description: Объект запроса для обновления пользователя
       properties:
@@ -1941,6 +1726,14 @@ components:
           description: Электронная почта пользователя
           type: string
           example: exmaple@mail.com
+        birthDateChildren:
+          description: Множество дат рождений детей пользователя
+          type: array
+          items:
+            description: Дата рождения ребенка
+            type: string
+            format: date
+            example: 01-01-2022
         idCity:
           description: ID города пользователя
           type: integer
@@ -1949,22 +1742,12 @@ components:
           description: Множество ID критерий пользователя
           type: array
           items:
-            allOf:
-              - description: ID критерия
-                type: integer
-                example: 1222333444
-        birthDateChildren:
-          description: Множество дат рождений детей пользователя
-          type: array
-          items:
-            allOf:
-              - description: Дата рождения ребенка
-                type: string
-                format: date
-                example: 01-01-2022
+            description: ID критерия
+            type: integer
+            example: 1222333444
     UserInitData:
       description: Дополнительные данные для добавления или обновления пользователя.
-        Содержат в себе множества кратких информаций о городах и критериях
+        Содержат в себе множества кратких информаций о городах и полных инф. о критериях
       properties:
         shortCitySet:
           description: Множество кратких информаций о городах
@@ -2000,14 +1783,13 @@ components:
           description: Имя пользователя
           type: string
           example: name
-        roleUserSet:
-          description: Множество ролей пользователя
+        nameRoleUserSet:
+          description: Множество названий ролей пользователя
           type: array
           items:
-            allOf:
-              - description: Роль пользователя
-                type: string
-                example: role
+            description: Роль пользователя
+            type: string
+            example: role
         jwt:
           description: Токен доступа в формате jwt
           type: string
@@ -2071,10 +1853,9 @@ components:
           description: Множество названий ролей администратора
           type: array
           items:
-            allOf:
-              - description: Название роли
-                type: string
-                example: name
+            description: Название роли
+            type: string
+            example: name
     AdminAdd:
       description: Объект запроса для добавления администратора
       properties:
@@ -2126,6 +1907,11 @@ components:
           description: Информация типа критерия
           type: string
           example: info
+        shortCriterionSet:
+          description: Множество кратких информаций о кртитериях типа критерия
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectShortInfo'
     CriterionTypeAdd:
       description: Объект запроса для добавления типа критерия
       properties:
@@ -2169,10 +1955,8 @@ components:
           description: Информация критерия
           type: string
           example: info
-        nameCriterionType:
-          description: Название типа критерия критерия
-          type: string
-          example: name
+        shortCriterionType:
+          $ref: '#/components/schemas/ObjectShortInfo'
     CriterionAdd:
       description: Объект запроса для добавления критерия
       properties:
@@ -2233,6 +2017,16 @@ components:
           description: Информация города
           type: string
           example: info
+        shortBenefitSet:
+          description: Множество кратких информаций о пособиях города
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectShortInfo'
+        shortInstitutionSet:
+          description: Множество кратких информаций об учреждениях города
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectShortInfo'
     CityAdd:
       description: Объект запроса для добавления города
       properties:
@@ -2244,6 +2038,13 @@ components:
           description: Информация города
           type: string
           example: info
+        idBenefitSet:
+          description: Множество ID пособий города
+          type: array
+          items:
+            description: ID пособия
+            type: integer
+            example: 1222333444
     CityUpdate:
       description: Объект запроса для обновления города
       properties:
@@ -2259,6 +2060,22 @@ components:
           description: Информация города
           type: string
           example: info
+        idBenefitSet:
+          description: Множество ID пособий города
+          type: array
+          items:
+            description: ID пособия
+            type: integer
+            example: 1222333444
+    CityInitData:
+      description: Дополнительные данные для добавления или обновления города
+        Содержат в себе множество кратких информаций о пособиях
+      properties:
+        shortBenefitSet:
+          description: Множество кратких информаций о пособиях
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectShortInfo'
 
 
     InstitutionInfo:
@@ -2288,10 +2105,13 @@ components:
           description: График работы учреждения
           type: string
           example: График
-        nameCity:
-          description: Название города учреждения
-          type: string
-          example: name
+        shortCity:
+          $ref: '#/components/schemas/ObjectShortInfo'
+        shortBenefitSet:
+          description: Множество кратких информаций о пособиях учреждения
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectShortInfo'
     InstitutionAdd:
       description: Объект запроса для добавления учреждения
       properties:
@@ -2319,6 +2139,13 @@ components:
           description: ID города учреждения
           type: integer
           example: 1222333444
+        idBenefitSet:
+          description: Множество ID пособий учреждения
+          type: array
+          items:
+            description: ID пособия
+            type: integer
+            example: 1222333444
     InstitutionUpdate:
       description: Объект запроса для обновления учреждения
       properties:
@@ -2350,12 +2177,24 @@ components:
           description: ID города учреждения
           type: integer
           example: 1222333444
+        idBenefitSet:
+          description: Множество ID пособий учреждения
+          type: array
+          items:
+            description: ID пособия
+            type: integer
+            example: 1222333444
     InstitutionInitData:
       description: Дополнительные данные для добавления или обновления учреждения
-        Содержат в себе множество кратких информаций о городах
+        Содержат в себе множество кратких информаций о городах и пособиях
       properties:
         shortCitySet:
           description: Множество кратких информаций о городах
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectShortInfo'
+        shortBenefitSet:
+          description: Множество кратких информаций о пособиях
           type: array
           items:
             $ref: '#/components/schemas/ObjectShortInfo'
@@ -2380,6 +2219,21 @@ components:
           description: Документы для получения пособия
           type: string
           example: documents
+        shortCitySet:
+          description: Множество кратких информаций о городах пособия
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectShortInfo'
+        shortInstitutionSet:
+          description: Множество кратких информаций об учреждениях пособия
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectShortInfo'
+        shortCriteriaSet:
+          description: Множество кратких информаций о критериях пособия
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectShortInfo'
     BenefitAdd:
       description: Объект запроса для добавления пособия
       properties:
@@ -2399,26 +2253,23 @@ components:
           description: Множество ID городов пособия
           type: array
           items:
-            allOf:
-              - description: ID города
-                type: integer
-                example: 1222333444
+            description: ID города
+            type: integer
+            example: 1222333444
         idInstitutionSet:
           description: Множество ID учреждений пособия
           type: array
           items:
-            allOf:
-              - description: ID учреждения
-                type: integer
-                example: 1222333444
+            description: ID учреждения
+            type: integer
+            example: 1222333444
         idCriterionSet:
           description: Множество ID критерий пособия
           type: array
           items:
-            allOf:
-              - description: ID критерия
-                type: integer
-                example: 1222333444
+            description: ID критерия
+            type: integer
+            example: 1222333444
     BenefitUpdate:
       description: Объект запроса для обновления пособия
       properties:
@@ -2442,29 +2293,26 @@ components:
           description: Множество ID городов пособия
           type: array
           items:
-            allOf:
-              - description: ID города
-                type: integer
-                example: 1222333444
+            description: ID города
+            type: integer
+            example: 1222333444
         idInstitutionSet:
           description: Множество ID учреждений пособия
           type: array
           items:
-            allOf:
-              - description: ID учреждения
-                type: integer
-                example: 1222333444
+            description: ID учреждения
+            type: integer
+            example: 1222333444
         idCriterionSet:
           description: Множество ID критерий пособия
           type: array
           items:
-            allOf:
-              - description: ID критерия
-                type: integer
-                example: 1222333444
+            description: ID критерия
+            type: integer
+            example: 1222333444
     BenefitInitData:
       description: Дополнительные данные для добавления или обновления пособия
-        Содержат в себе множества кратких информаций о городах, учреждениях и критериях
+        Содержат в себе множества кратких информаций о городах, учреждениях и полных критериях
       properties:
         shortCitySet:
           description: Множество кратких информаций о городах
@@ -2476,8 +2324,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ObjectShortInfo'
-        shortCriterionSet:
-          description: Множество кратких информаций о критериях
+        criterionSet:
+          description: Множество информаций о критериях
           type: array
           items:
             $ref: '#/components/schemas/ObjectShortInfo'
