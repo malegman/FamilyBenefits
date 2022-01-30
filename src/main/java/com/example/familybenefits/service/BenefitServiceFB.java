@@ -17,10 +17,12 @@ import com.example.familybenefits.dao.repository.CriterionRepository;
 import com.example.familybenefits.dao.repository.InstitutionRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.security.service.DBIntegrityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -162,12 +164,14 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public BenefitInfo read(BigInteger idBenefit) throws NotFoundException {
 
-    // Проверка существование пособия по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        benefitRepository::existsById, idBenefit,
-        "Benefit with ID %s not found");
+    Optional<BenefitEntity> optBenefitEntity = benefitRepository.findById(idBenefit);
 
-    return BenefitConverter.toInfo(benefitRepository.getById(idBenefit));
+    if (optBenefitEntity.isEmpty()) {
+      throw new NotFoundException(String.format(
+          "Benefit with ID %s not found", idBenefit));
+    }
+
+    return BenefitConverter.toInfo(optBenefitEntity.get());
   }
 
   /**
@@ -213,7 +217,7 @@ public class BenefitServiceFB implements BenefitService {
   }
 
   /**
-   * Возваращает дополнительные данные для пособия.
+   * Возвращает дополнительные данные для пособия.
    * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
    * @return дополнительные данные для пособия
    * @throws NotFoundException если данные не найдены

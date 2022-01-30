@@ -14,10 +14,12 @@ import com.example.familybenefits.dao.repository.CityRepository;
 import com.example.familybenefits.dao.repository.InstitutionRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.security.service.DBIntegrityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -145,12 +147,14 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public InstitutionInfo read(BigInteger idInstitution) throws NotFoundException {
 
-    // Проверка существования учреждения по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        institutionRepository::existsById, idInstitution,
-        "Institution with ID %s not found");
+    Optional<InstitutionEntity> optInstitutionEntity = institutionRepository.findById(idInstitution);
 
-    return InstitutionConverter.toInfo(institutionRepository.getById(idInstitution));
+    if (optInstitutionEntity.isEmpty()) {
+      throw new NotFoundException(String.format(
+          "Institution with ID %s not found", idInstitution));
+    }
+
+    return InstitutionConverter.toInfo(optInstitutionEntity.get());
   }
 
   /**
@@ -175,7 +179,7 @@ public class InstitutionServiceFB implements InstitutionService {
   }
 
   /**
-   * Возваращает дополнительные данные для учреждения.
+   * Возвращает дополнительные данные для учреждения.
    * Данные содержат в себе множество кратких информаций о городах.
    * @return дополнительные данные для учреждения
    * @throws NotFoundException если данные не найдены

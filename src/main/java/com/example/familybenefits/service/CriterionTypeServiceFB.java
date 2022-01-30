@@ -8,10 +8,12 @@ import com.example.familybenefits.dao.entity.CriterionTypeEntity;
 import com.example.familybenefits.dao.repository.CriterionTypeRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.security.service.DBIntegrityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -105,12 +107,14 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
    */
   public CriterionTypeInfo read(BigInteger idCriterionType) throws NotFoundException {
 
-    // Проверка существования типа критерия по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        criterionTypeRepository::existsById, idCriterionType,
-        "Criterion type with ID %s not found");
+    Optional<CriterionTypeEntity> optCriterionTypeEntity = criterionTypeRepository.findById(idCriterionType);
 
-    return CriterionTypeConverter.toInfo(criterionTypeRepository.getById(idCriterionType));
+    if (optCriterionTypeEntity.isEmpty()) {
+      throw new NotFoundException(String.format(
+          "Criterion type with ID %s not found", idCriterionType));
+    }
+
+    return CriterionTypeConverter.toInfo(optCriterionTypeEntity.get());
   }
 
   /**

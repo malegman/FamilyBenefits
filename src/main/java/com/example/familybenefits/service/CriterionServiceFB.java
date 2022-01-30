@@ -12,10 +12,12 @@ import com.example.familybenefits.dao.repository.CriterionRepository;
 import com.example.familybenefits.dao.repository.CriterionTypeRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.security.service.DBIntegrityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -130,12 +132,14 @@ public class CriterionServiceFB implements CriterionService {
   @Override
   public CriterionInfo read(BigInteger idCriterion) throws NotFoundException {
 
-    // Проверка существования критерия по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        criterionTypeRepository::existsById, idCriterion,
-        "Criterion with ID %s not found");
+    Optional<CriterionEntity> optionalCriterionEntity = criterionRepository.findById(idCriterion);
 
-    return CriterionConverter.toInfo(criterionRepository.getById(idCriterion));
+    if (optionalCriterionEntity.isEmpty()) {
+      throw new NotFoundException(String.format(
+          "Criterion with ID %s not found", idCriterion));
+    }
+
+    return CriterionConverter.toInfo(optionalCriterionEntity.get());
   }
 
   /**

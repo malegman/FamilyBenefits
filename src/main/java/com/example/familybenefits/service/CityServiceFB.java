@@ -12,10 +12,12 @@ import com.example.familybenefits.dao.repository.BenefitRepository;
 import com.example.familybenefits.dao.repository.CityRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.security.service.DBIntegrityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -130,12 +132,14 @@ public class CityServiceFB implements CityService {
   @Override
   public CityInfo read(BigInteger idCity) throws NotFoundException {
 
-    // Проверка существование города по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        cityRepository::existsById, idCity,
-        "City with ID %s not found");
+    Optional<CityEntity> optCityEntity = cityRepository.findById(idCity);
 
-    return CityConverter.toInfo(cityRepository.getById(idCity));
+    if (optCityEntity.isEmpty()) {
+      throw new NotFoundException(String.format(
+          "City with ID %s not found", idCity));
+    }
+
+    return CityConverter.toInfo(optCityEntity.get());
   }
 
   /**
@@ -160,7 +164,7 @@ public class CityServiceFB implements CityService {
   }
 
   /**
-   * Возваращает дополнительные данные для города.
+   * Возвращает дополнительные данные для города.
    * Данные содержат в себе множества кратких информаций о пособиях
    * @return дополнительные данные для города
    * @throws NotFoundException если данные не найдены
