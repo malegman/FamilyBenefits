@@ -1,7 +1,5 @@
 package com.example.familybenefits.service;
 
-import com.example.familybenefits.api_model.benefit.BenefitInfo;
-import com.example.familybenefits.api_model.city.CityInfo;
 import com.example.familybenefits.api_model.institution.InstitutionAdd;
 import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.api_model.institution.InstitutionInitData;
@@ -61,20 +59,4 @@ public interface InstitutionService {
    * @throws NotFoundException если учреждения не найдены
    */
   Set<InstitutionInfo> readAll() throws NotFoundException;
-
-  /**
-   * Возвращает информацию о городе учреждения.
-   * @param idInstitution ID учреждения
-   * @return информация о городе учреждения
-   * @throws NotFoundException если учреждение не найдено
-   */
-  CityInfo readCity(BigInteger idInstitution) throws NotFoundException;
-
-  /**
-   * Возваращает множество пособий учреждения
-   * @param idInstitution ID учреждения
-   * @return множество пособий учреждений
-   * @throws NotFoundException если пособия учреждения не найдены или учреждение не найдено
-   */
-  Set<BenefitInfo> readBenefits(BigInteger idInstitution) throws NotFoundException;
 }

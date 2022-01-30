@@ -1,7 +1,5 @@
 package com.example.familybenefits.service;
 
-import com.example.familybenefits.api_model.benefit.BenefitInfo;
-import com.example.familybenefits.api_model.city.CityInfo;
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.api_model.institution.InstitutionAdd;
 import com.example.familybenefits.api_model.institution.InstitutionInfo;
@@ -74,17 +72,25 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public void add(InstitutionAdd institutionAdd) throws AlreadyExistsException, NotFoundException {
 
+    // Проверка существования города и пособий по их ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         cityRepository::existsById, institutionAdd.getIdCity(),
         "City with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        cityRepository::existsById, institutionAdd.getIdBenefitSet(),
+        "Benefit with ID %s not found");
 
+    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
+    InstitutionEntity institutionEntityFromAdd = (InstitutionEntity) InstitutionConverter
+        .fromAdd(institutionAdd)
+        .prepareForDB(dbIntegrityService::preparePostgreSQLString);
+
+    // Проверка отсутствия учреждения по его названию
     dbIntegrityService.checkAbsenceByUniqStrElseThrow(
-        institutionRepository::existsByName, institutionAdd.getName(),
+        institutionRepository::existsByName, institutionEntityFromAdd.getName(),
         "The institution %s already exists");
 
-    institutionRepository.saveAndFlush((InstitutionEntity) InstitutionConverter
-        .fromAdd(institutionAdd)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString));
+    institutionRepository.saveAndFlush(institutionEntityFromAdd);
   }
 
   /**
@@ -95,14 +101,20 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public void update(InstitutionUpdate institutionUpdate) throws NotFoundException {
 
+    // Проверка существования города и пособий по их ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         cityRepository::existsById, institutionUpdate.getIdCity(),
         "City with ID %s not found");
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        cityRepository::existsById, institutionUpdate.getIdBenefitSet(),
+        "Benefit with ID %s not found");
 
+    // Проверка существования учреждения по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         institutionRepository::existsById, institutionUpdate.getId(),
         "Institution with ID %s not found");
 
+    // Сохранение полученной модели таблицы из запроса с подготовленными строковыми значениями для БД
     institutionRepository.saveAndFlush((InstitutionEntity) InstitutionConverter
         .fromUpdate(institutionUpdate)
         .prepareForDB(dbIntegrityService::preparePostgreSQLString));
@@ -116,6 +128,7 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public void delete(BigInteger idInstitution) throws NotFoundException {
 
+    // Проверка существования учреждения по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         institutionRepository::existsById, idInstitution,
         "Institution with ID %s not found");
@@ -132,34 +145,12 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public InstitutionInfo read(BigInteger idInstitution) throws NotFoundException {
 
+    // Проверка существования учреждения по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         institutionRepository::existsById, idInstitution,
         "Institution with ID %s not found");
 
     return InstitutionConverter.toInfo(institutionRepository.getById(idInstitution));
-  }
-
-  /**
-   * Возваращает дополнительные данные для учреждения.
-   * Данные содержат в себе множество кратких информаций о городах.
-   * @return дополнительные данные для учреждения
-   * @throws NotFoundException если данные не найдены
-   */
-  public InstitutionInitData getInitData() throws NotFoundException {
-
-    Set<ObjectShortInfo> cityShortInfoSet = cityRepository
-        .findAll()
-        .stream()
-        .map(CityConverter::toShortInfo)
-        .collect(Collectors.toSet());
-    if (cityShortInfoSet.isEmpty()) {
-      throw new NotFoundException("Cities not found");
-    }
-
-    return InstitutionInitData
-        .builder()
-        .shortCitySet(cityShortInfoSet)
-        .build();
   }
 
   /**
@@ -175,6 +166,7 @@ public class InstitutionServiceFB implements InstitutionService {
         .stream()
         .map(InstitutionConverter::toInfo)
         .collect(Collectors.toSet());
+
     if (institutionInfoSet.isEmpty()) {
       throw new NotFoundException("Institutions not found");
     }
@@ -183,42 +175,40 @@ public class InstitutionServiceFB implements InstitutionService {
   }
 
   /**
-   * Возвращает информацию о городе учреждения
-   * @param idInstitution ID учреждения
-   * @return информация о городе учреждения
-   * @throws NotFoundException если учреждение не найдено
+   * Возваращает дополнительные данные для учреждения.
+   * Данные содержат в себе множество кратких информаций о городах.
+   * @return дополнительные данные для учреждения
+   * @throws NotFoundException если данные не найдены
    */
-  public CityInfo readCity(BigInteger idInstitution) throws NotFoundException {
+  @Override
+  public InstitutionInitData getInitData() throws NotFoundException {
 
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        institutionRepository::existsById, idInstitution,
-        "Institution with ID %s not found");
-
-    return CityConverter.toInfo(institutionRepository.getById(idInstitution).getCityEntity());
-  }
-
-  /**
-   * Возваращает множество пособий учреждения
-   * @param idInstitution ID учреждения
-   * @return множество пособий учреждений
-   * @throws NotFoundException если пособия учреждения не найдены или учреждение не найдено
-   */
-  public Set<BenefitInfo> readBenefits(BigInteger idInstitution) throws NotFoundException {
-
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        institutionRepository::existsById, idInstitution,
-        "Institution with ID %s not found");
-
-    Set<BenefitInfo> benefitInfoSet = benefitRepository
-        .findAllFullWhereInstitutionIdEquals(idInstitution)
+    // Получение множества кратких информаций о всех городах
+    Set<ObjectShortInfo> cityShortInfoSet = cityRepository
+        .findAll()
         .stream()
-        .map(BenefitConverter::toInfo)
+        .map(CityConverter::toShortInfo)
         .collect(Collectors.toSet());
-    if (benefitInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Benefits of institution with id %s not found", idInstitution));
+
+    if (cityShortInfoSet.isEmpty()) {
+      throw new NotFoundException("Cities not found");
     }
 
-    return benefitInfoSet;
+    // Получение множества кратких информаций о всех полных пособиях
+    Set<ObjectShortInfo> benefitShortInfoSet = benefitRepository
+        .findAllFull()
+        .stream()
+        .map(BenefitConverter::toShortInfo)
+        .collect(Collectors.toSet());
+
+    if (benefitShortInfoSet.isEmpty()) {
+      throw new NotFoundException("Benefits not found");
+    }
+
+    return InstitutionInitData
+        .builder()
+        .shortCitySet(cityShortInfoSet)
+        .shortBenefitSet(benefitShortInfoSet)
+        .build();
   }
 }
