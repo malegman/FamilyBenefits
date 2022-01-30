@@ -1,17 +1,15 @@
 package com.example.familybenefits.service;
 
-import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.city.CityAdd;
 import com.example.familybenefits.api_model.city.CityInfo;
+import com.example.familybenefits.api_model.city.CityInitData;
 import com.example.familybenefits.api_model.city.CityUpdate;
-import com.example.familybenefits.api_model.institution.InstitutionInfo;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.convert.BenefitConverter;
 import com.example.familybenefits.convert.CityConverter;
-import com.example.familybenefits.convert.InstitutionConverter;
 import com.example.familybenefits.dao.entity.CityEntity;
 import com.example.familybenefits.dao.repository.BenefitRepository;
 import com.example.familybenefits.dao.repository.CityRepository;
-import com.example.familybenefits.dao.repository.InstitutionRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +31,6 @@ public class CityServiceFB implements CityService {
   private final CityRepository cityRepository;
 
   /**
-   * Репозиторий, работающий с моделью таблицы "institution"
-   */
-  private final InstitutionRepository institutionRepository;
-
-  /**
    * Репозиторий, работающий с моделью таблицы "benefit"
    */
   private final BenefitRepository benefitRepository;
@@ -50,15 +43,13 @@ public class CityServiceFB implements CityService {
   /**
    * Конструктор для инициализации интерфейсов репозиториев
    * @param cityRepository репозиторий, работающий с моделью таблицы "city"
-   * @param institutionRepository репозиторий, работающий с моделью таблицы "institution"
    * @param benefitRepository репозиторий, работающий с моделью таблицы "benefit"
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    */
   @Autowired
-  public CityServiceFB(CityRepository cityRepository, InstitutionRepository institutionRepository,
-                       BenefitRepository benefitRepository, DBIntegrityService dbIntegrityService) {
+  public CityServiceFB(CityRepository cityRepository, BenefitRepository benefitRepository,
+                       DBIntegrityService dbIntegrityService) {
     this.cityRepository = cityRepository;
-    this.institutionRepository = institutionRepository;
     this.benefitRepository = benefitRepository;
     this.dbIntegrityService = dbIntegrityService;
   }
@@ -69,15 +60,24 @@ public class CityServiceFB implements CityService {
    * @throws AlreadyExistsException если город с указанным названием уже существует
    */
   @Override
-  public void add(CityAdd cityAdd) throws AlreadyExistsException {
+  public void add(CityAdd cityAdd) throws AlreadyExistsException, NotFoundException {
 
+    // Проверка существования пособий их ID
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        cityRepository::existsById, cityAdd.getIdBenefitSet(),
+        "Benefit with ID %s not found");
+
+    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
+    CityEntity cityEntityFromAdd = (CityEntity) CityConverter
+        .fromAdd(cityAdd)
+        .prepareForDB(dbIntegrityService::preparePostgreSQLString);
+
+    // Проверка отсутствия города по его названию
     dbIntegrityService.checkAbsenceByUniqStrElseThrow(
-        cityRepository::existsByName, cityAdd.getName(),
+        cityRepository::existsByName, cityEntityFromAdd.getName(),
         "The city with name %s already exists");
 
-    cityRepository.saveAndFlush((CityEntity) CityConverter
-        .fromAdd(cityAdd)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString));
+    cityRepository.saveAndFlush(cityEntityFromAdd);
   }
 
   /**
@@ -88,10 +88,17 @@ public class CityServiceFB implements CityService {
   @Override
   public void update(CityUpdate cityUpdate) throws NotFoundException {
 
+    // Проверка существования пособий их ID
+    dbIntegrityService.checkExistenceByIdElseThrow(
+        cityRepository::existsById, cityUpdate.getIdBenefitSet(),
+        "Benefit with ID %s not found");
+
+    // Проверка существование города по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         cityRepository::existsById, cityUpdate.getId(),
         "City with ID %s not found");
 
+    // Сохранение полученной модели таблицы из запроса с подготовленными строковыми значениями для БД
     cityRepository.saveAndFlush((CityEntity) CityConverter
         .fromUpdate(cityUpdate)
         .prepareForDB(dbIntegrityService::preparePostgreSQLString));
@@ -105,6 +112,7 @@ public class CityServiceFB implements CityService {
   @Override
   public void delete(BigInteger idCity) throws NotFoundException {
 
+    // Проверка существование города по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         cityRepository::existsById, idCity,
         "City with ID %s not found");
@@ -121,6 +129,7 @@ public class CityServiceFB implements CityService {
   @Override
   public CityInfo read(BigInteger idCity) throws NotFoundException {
 
+    // Проверка существование города по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         cityRepository::existsById, idCity,
         "City with ID %s not found");
@@ -141,6 +150,7 @@ public class CityServiceFB implements CityService {
         .stream()
         .map(CityConverter::toInfo)
         .collect(Collectors.toSet());
+
     if (cityInfoSet.isEmpty()) {
       throw new NotFoundException("Cities not found");
     }
@@ -149,54 +159,28 @@ public class CityServiceFB implements CityService {
   }
 
   /**
-   * Возвращает множество всех учреждений города
-   * @param idCity ID города
-   * @return множество информаций о городах
-   * @throws NotFoundException если учреждения не найдены или город с указынным ID не найден
+   * Возваращает дополнительные данные для пособия.
+   * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
+   * @return дополнительные данные для пособия
+   * @throws NotFoundException если данные не найдены
    */
   @Override
-  public Set<InstitutionInfo> readInstitutions(BigInteger idCity) throws NotFoundException {
+  public CityInitData getInitData() throws NotFoundException {
 
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        cityRepository::existsById, idCity,
-        "City with ID %s not found");
-
-    Set<InstitutionInfo> institutionInfoSet = institutionRepository
-        .findAllByCityEntity(new CityEntity(idCity))
+    // Получение множества кратких информаций о всех полных пособиях
+    Set<ObjectShortInfo> benefitShortInfoSet = benefitRepository
+        .findAllFull()
         .stream()
-        .map(InstitutionConverter::toInfo)
+        .map(BenefitConverter::toShortInfo)
         .collect(Collectors.toSet());
-    if (institutionInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Institutions of city with id %s not found", idCity));
+
+    if (benefitShortInfoSet.isEmpty()) {
+      throw new NotFoundException("Benefits not found");
     }
 
-    return institutionInfoSet;
-  }
-
-  /**
-   * Возвращает множество всех полных пособий города
-   * @param idCity ID города
-   * @return множество информаций о городах
-   * @throws NotFoundException если пособия не найдены или город с указынным ID не найден
-   */
-  @Override
-  public Set<BenefitInfo> readBenefits(BigInteger idCity) throws NotFoundException {
-
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        cityRepository::existsById, idCity,
-        "City with ID %s not found");
-
-    Set<BenefitInfo> benefitInfoSet = benefitRepository
-        .findAllFullWhereCityIdEquals(idCity)
-        .stream()
-        .map(BenefitConverter::toInfo)
-        .collect(Collectors.toSet());
-    if (benefitInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Benefits of city with id %s not found", idCity));
-    }
-
-    return benefitInfoSet;
+    return CityInitData
+        .builder()
+        .shortBenefitSet(benefitShortInfoSet)
+        .build();
   }
 }

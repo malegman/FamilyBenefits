@@ -1,10 +1,9 @@
 package com.example.familybenefits.service;
 
-import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.city.CityAdd;
 import com.example.familybenefits.api_model.city.CityInfo;
+import com.example.familybenefits.api_model.city.CityInitData;
 import com.example.familybenefits.api_model.city.CityUpdate;
-import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 
@@ -20,8 +19,9 @@ public interface CityService {
    * Добавляет город по запросу на добавление
    * @param cityAdd объект запроса на добавление города
    * @throws AlreadyExistsException если город с указанным названием уже существует
+   * @throws NotFoundException если пособие города с указанным ID не найдено
    */
-  void add(CityAdd cityAdd) throws AlreadyExistsException;
+  void add(CityAdd cityAdd) throws AlreadyExistsException, NotFoundException;
 
   /**
    * Обновляет город по запросу на обновление
@@ -53,18 +53,10 @@ public interface CityService {
   Set<CityInfo> readAll() throws NotFoundException;
 
   /**
-   * Возвращает множество всех учреждений города
-   * @param idCity ID города
-   * @return множество информаций о городах
-   * @throws NotFoundException если учреждения не найдены или город с указынным ID не найден
+   * Возваращает дополнительные данные для города.
+   * Данные содержат в себе множества кратких информаций о пособиях
+   * @return дополнительные данные для города
+   * @throws NotFoundException если данные не найдены
    */
-  Set<InstitutionInfo> readInstitutions(BigInteger idCity) throws NotFoundException;
-
-  /**
-   * Возвращает множество всех полных пособий города
-   * @param idCity ID города
-   * @return множество информаций о городах
-   * @throws NotFoundException если пособия не найдены или город с указынным ID не найден
-   */
-  Set<BenefitInfo> readBenefits(BigInteger idCity) throws NotFoundException;
+  CityInitData getInitData() throws NotFoundException;
 }
