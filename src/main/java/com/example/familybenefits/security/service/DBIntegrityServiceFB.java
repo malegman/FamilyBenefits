@@ -1,16 +1,18 @@
-package com.example.familybenefits.service;
+package com.example.familybenefits.security.service;
 
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.util.Set;
 import java.util.function.Function;
 
 /**
- * Интерфейс сервиса, отвечающего за целостность базы данных
+ * Реализация сервиса, отвечающего за целостность базы данных
  */
-public interface DBIntegrityService {
+@Service
+public class DBIntegrityServiceFB implements DBIntegrityService {
 
   /**
    * Проверяет существование объекта по его ID
@@ -19,7 +21,13 @@ public interface DBIntegrityService {
    * @param messagePattern шаблон сообщения об ошибке
    * @throws NotFoundException если объект с указанным ID не найден
    */
-  void checkExistenceByIdElseThrow(Function<BigInteger, Boolean> existFunc, BigInteger idObject, String messagePattern) throws NotFoundException;
+  @Override
+  public void checkExistenceByIdElseThrow(Function<BigInteger, Boolean> existFunc, BigInteger idObject, String messagePattern) throws NotFoundException {
+
+    if (!existFunc.apply(idObject)) {
+      throw new NotFoundException(String.format(messagePattern, idObject));
+    }
+  }
 
   /**
    * Проверяет существование объекта по его ID
@@ -28,7 +36,13 @@ public interface DBIntegrityService {
    * @param messagePattern шаблон сообщения об ошибке
    * @throws NotFoundException если объект с указанным ID не найден
    */
-  void checkExistenceByIdElseThrow(Function<BigInteger, Boolean> existFunc, Set<BigInteger> idObjectSet, String messagePattern) throws NotFoundException;
+  @Override
+  public void checkExistenceByIdElseThrow(Function<BigInteger, Boolean> existFunc, Set<BigInteger> idObjectSet, String messagePattern) throws NotFoundException {
+
+    for (BigInteger idObject : idObjectSet) {
+      checkExistenceByIdElseThrow(existFunc, idObject, messagePattern);
+    }
+  }
 
   /**
    * Проверяет отсутствие объекта по его уникальному строковому параметру
@@ -37,12 +51,26 @@ public interface DBIntegrityService {
    * @param messagePattern шаблон сообщения об ошибке
    * @throws AlreadyExistsException если объект с указанным строковым параметром существует
    */
-  void checkAbsenceByUniqStrElseThrow(Function<String, Boolean> existFunc, String uniqStrObject, String messagePattern) throws AlreadyExistsException;
+  @Override
+  public void checkAbsenceByUniqStrElseThrow(Function<String, Boolean> existFunc, String uniqStrObject, String messagePattern) throws AlreadyExistsException {
+
+    if (existFunc.apply(uniqStrObject)) {
+      throw new AlreadyExistsException(String.format(messagePattern, uniqStrObject));
+    }
+  }
 
   /**
    * Подготавливает строку для вставки в SQL запрос, диалект PostgreSQL
    * @param content проверяемая строка
    * @return обработанная строка
    */
-  String preparePostgreSQLString(String content);
+  @Override
+  public String preparePostgreSQLString(String content) {
+
+    if (content == null) {
+      return null;
+    }
+
+    return content.replace("'", "''");
+  }
 }

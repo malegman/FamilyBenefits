@@ -1,4 +1,4 @@
-package com.example.familybenefits.service;
+package com.example.familybenefits.security.service;
 
 import com.example.familybenefits.exception.InvalidEmailException;
 import com.example.familybenefits.exception.PasswordNotEqualsException;
