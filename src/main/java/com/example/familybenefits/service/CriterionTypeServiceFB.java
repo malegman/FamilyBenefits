@@ -1,13 +1,10 @@
 package com.example.familybenefits.service;
 
-import com.example.familybenefits.api_model.criterion.CriterionInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeAdd;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeUpdate;
-import com.example.familybenefits.convert.CriterionConverter;
 import com.example.familybenefits.convert.CriterionTypeConverter;
 import com.example.familybenefits.dao.entity.CriterionTypeEntity;
-import com.example.familybenefits.dao.repository.CriterionRepository;
 import com.example.familybenefits.dao.repository.CriterionTypeRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
@@ -30,11 +27,6 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
   private final CriterionTypeRepository criterionTypeRepository;
 
   /**
-   * Репозиторий, работающий с моделью таблицы "criterion"
-   */
-  private final CriterionRepository criterionRepository;
-
-  /**
    * Интерфейс сервиса, отвечающего за целостность базы данных
    */
   private final DBIntegrityService dbIntegrityService;
@@ -42,14 +34,11 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
   /**
    * Конструктор для инициализации интерфейсов репозиториев
    * @param criterionTypeRepository репозиторий, работающий с моделью таблицы "criterion_type"
-   * @param criterionRepository репозиторий, работающий с моделью таблицы "criterion"
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    */
   @Autowired
-  public CriterionTypeServiceFB(CriterionTypeRepository criterionTypeRepository, CriterionRepository criterionRepository,
-                                DBIntegrityService dbIntegrityService) {
+  public CriterionTypeServiceFB(CriterionTypeRepository criterionTypeRepository, DBIntegrityService dbIntegrityService) {
     this.criterionTypeRepository = criterionTypeRepository;
-    this.criterionRepository = criterionRepository;
     this.dbIntegrityService = dbIntegrityService;
   }
 
@@ -61,13 +50,17 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
   @Override
   public void add(CriterionTypeAdd criterionTypeAdd) throws AlreadyExistsException {
 
+    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
+    CriterionTypeEntity criterionTypeEntity = (CriterionTypeEntity) CriterionTypeConverter
+        .fromAdd(criterionTypeAdd)
+        .prepareForDB(dbIntegrityService::preparePostgreSQLString);
+
+    // Проверка отсутствия типа критерия по его названию
     dbIntegrityService.checkAbsenceByUniqStrElseThrow(
-        criterionTypeRepository::existsByName, criterionTypeAdd.getName(),
+        criterionTypeRepository::existsByName, criterionTypeEntity.getName(),
         "The criterion type with name %s already exists");
 
-    criterionTypeRepository.saveAndFlush((CriterionTypeEntity) CriterionTypeConverter
-        .fromAdd(criterionTypeAdd)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString));
+    criterionTypeRepository.saveAndFlush(criterionTypeEntity);
   }
 
   /**
@@ -78,10 +71,12 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
   @Override
   public void update(CriterionTypeUpdate criterionTypeUpdate) throws NotFoundException {
 
+    // Проверка существования типа критерия по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         criterionTypeRepository::existsById, criterionTypeUpdate.getId(),
         "Criterion type with ID %s not found");
 
+    // Сохранение полученной модели таблицы из запроса с подготовленными строковыми значениями для БД
     criterionTypeRepository.saveAndFlush((CriterionTypeEntity) CriterionTypeConverter
         .fromUpdate(criterionTypeUpdate)
         .prepareForDB(dbIntegrityService::preparePostgreSQLString));
@@ -94,6 +89,7 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
    */
   public void delete(BigInteger idCriterionType) throws NotFoundException {
 
+    // Проверка существования типа критерия по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         criterionTypeRepository::existsById, idCriterionType,
         "Criterion type with ID %s not found");
@@ -109,6 +105,7 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
    */
   public CriterionTypeInfo read(BigInteger idCriterionType) throws NotFoundException {
 
+    // Проверка существования типа критерия по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         criterionTypeRepository::existsById, idCriterionType,
         "Criterion type with ID %s not found");
@@ -128,35 +125,11 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
         .stream()
         .map(CriterionTypeConverter::toInfo)
         .collect(Collectors.toSet());
+
     if (criterionTypeInfoSet.isEmpty()) {
       throw new NotFoundException("Criterion types not found");
     }
 
     return criterionTypeInfoSet;
-  }
-
-  /**
-   * Возвращает множество всех критерий типа критерия
-   * @param idCriterionType ID типа критерия
-   * @return множество информаций о критериях типа критерия
-   * @throws NotFoundException если критерии не найдены или тип критерия с указынным ID не найден
-   */
-  public Set<CriterionInfo> readCriteria(BigInteger idCriterionType) throws NotFoundException {
-
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        criterionTypeRepository::existsById, idCriterionType,
-        "Criterion type with ID %s not found");
-
-    Set<CriterionInfo> criterionInfoSet = criterionRepository
-        .findAllByCriterionType(new CriterionTypeEntity(idCriterionType))
-        .stream()
-        .map(CriterionConverter::toInfo)
-        .collect(Collectors.toSet());
-    if (criterionInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Criteria of criterion type with id %s not found", idCriterionType));
-    }
-
-    return criterionInfoSet;
   }
 }
