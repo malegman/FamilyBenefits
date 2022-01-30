@@ -1,7 +1,5 @@
 package com.example.familybenefits.controller;
 
-import com.example.familybenefits.api_model.benefit.BenefitInfo;
-import com.example.familybenefits.api_model.city.CityInfo;
 import com.example.familybenefits.api_model.institution.InstitutionAdd;
 import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.api_model.institution.InstitutionInitData;
@@ -41,7 +39,8 @@ public class InstitutionController {
   }
 
   /**
-   * Добавляет новое учреждение
+   * Обрабатывает POST запрос "/institution" на добавление нового учреждения.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param institutionAdd объект запроса для добавления учреждения
    * @return код ответа, результат обработки запроса
    */
@@ -49,7 +48,7 @@ public class InstitutionController {
   public ResponseEntity<?> addInstitution(@RequestBody InstitutionAdd institutionAdd) {
 
     if (institutionAdd == null) {
-      log.warn("Request body \"institutionAdd\" is empty");
+      log.warn("POST \"/institution\": " + "Request body \"institutionAdd\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -57,18 +56,21 @@ public class InstitutionController {
       institutionService.add(institutionAdd);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
-    } catch (NotFoundException nfe) {
-      log.error(nfe.getMessage());
+    } catch (NotFoundException e) {
+      // Не найдены города или пособия
+      log.error("POST \"/institution\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
-    } catch (AlreadyExistsException aee) {
-      log.error(aee.getMessage());
+    } catch (AlreadyExistsException e) {
+      // Учреждение с указанным названием существует
+      log.error("POST \"/institution\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
   /**
-   * Обновляет данные учреждения
+   * Обрабатывает PUT запрос "/institution" на обновление учреждения.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param institutionUpdate объект запроса для обновления учреждения
    * @return код ответа, результат обработки запроса
    */
@@ -76,7 +78,7 @@ public class InstitutionController {
   public ResponseEntity<?> updateInstitution(@RequestBody InstitutionUpdate institutionUpdate) {
 
     if (institutionUpdate == null) {
-      log.warn("Request body \"institutionUpdate\" is empty");
+      log.warn("PUT \"/institution\": " + "Request body \"institutionUpdate\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -85,31 +87,15 @@ public class InstitutionController {
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException e) {
-      log.error(e.getMessage());
+      // Не найдено учреждение
+      log.error("PUT \"/institution\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Возвращает информацию об учреждении
-   * @param idInstitution ID учреждения
-   * @return информация об учреждении, если запрос выполнен успешно, и код ответа
-   */
-  @GetMapping(value = "/institution/{id}")
-  public ResponseEntity<InstitutionInfo> getInstitution(@PathVariable(name = "id")BigInteger idInstitution) {
-
-    try {
-      InstitutionInfo institutionInfo = institutionService.read(idInstitution);
-      return ResponseEntity.status(HttpStatus.OK).body(institutionInfo);
-
-    } catch (NotFoundException e) {
-      log.error(e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Удаляет учреждение
+   * Обрабатывает DELETE запрос "/institution/{id}" на удаление учреждения.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idInstitution ID учреждения
    * @return код ответа, результат обработки запроса
    */
@@ -121,31 +107,35 @@ public class InstitutionController {
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException e) {
-      log.error(e.getMessage());
+      // Не найдено учреждение
+      log.error("DELETE \"/institution/{id}\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Возвращает дополнительные данные для учреждения.
-   * Данные содержат в себе множество кратких информаций о городах
-   * @return дополнительные данные для учреждения и код ответа
+   * Обрабатывает GET запрос "/institution/{id}" на получение информации об учреждении.
+   * Выполнить запрос может любой клиент
+   * @param idInstitution ID учреждения
+   * @return информация об учреждении, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/institution/initdata")
-  public ResponseEntity<InstitutionInitData> getInstitutionInitData() {
+  @GetMapping(value = "/institution/{id}")
+  public ResponseEntity<InstitutionInfo> getInstitution(@PathVariable(name = "id")BigInteger idInstitution) {
 
     try {
-      InstitutionInitData institutionInitData = institutionService.getInitData();
-      return ResponseEntity.status(HttpStatus.OK).body(institutionInitData);
+      InstitutionInfo institutionInfo = institutionService.read(idInstitution);
+      return ResponseEntity.status(HttpStatus.OK).body(institutionInfo);
 
     } catch (NotFoundException e) {
-      log.error(e.getMessage());
+      // Не найдено учреждение
+      log.error("GET \"/institution/{id}\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Возвращает множество всех учреждений
+   * Обрабатывает GET запрос "/institution/{id}" на получение множества всех учреждений
+   * Выполнить запрос может любой клиент
    * @return множество учреждений и код ответа
    */
   @GetMapping(value = "/institution/all")
@@ -156,44 +146,28 @@ public class InstitutionController {
       return ResponseEntity.status(HttpStatus.OK).body(institutionInfoSet);
 
     } catch (NotFoundException e) {
-      log.error(e.getMessage());
+      // Не найдены учреждения
+      log.error("GET \"/institution/all\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
     }
   }
 
   /**
-   * Возвращает информацию о городе учреждения
-   * @param idInstitution ID учреждения
-   * @return информация о городе учреждения
+   * Обрабатывает GET запрос "/institution/{id}" на получение дополнительных данных для учреждения.
+   * Данные содержат в себе множество кратких информаций о городах и пособиях
+   * @return дополнительные данные для учреждения и код ответа
    */
-  @GetMapping(value = "/institution/{id}/city")
-  public ResponseEntity<CityInfo> getInstitutionCity(@PathVariable(name = "id") BigInteger idInstitution) {
+  @GetMapping(value = "/institution/initdata")
+  public ResponseEntity<InstitutionInitData> getInstitutionInitData() {
 
     try {
-      CityInfo cityInfo = institutionService.readCity(idInstitution);
-      return ResponseEntity.status(HttpStatus.OK).body(cityInfo);
+      InstitutionInitData institutionInitData = institutionService.getInitData();
+      return ResponseEntity.status(HttpStatus.OK).body(institutionInitData);
 
     } catch (NotFoundException e) {
-      log.error(e.getMessage());
+      // Не найдены города или пособия
+      log.error("GET \"/institution/initdata\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Возвращает множество полных пособий учреждения
-   * @param idInstitution ID учреждения
-   * @return множество пособий учреждения и код ответа
-   */
-  @GetMapping(value = "/institution/{id}/benefits")
-  public ResponseEntity<Set<BenefitInfo>> getInstitutionBenefits(@PathVariable(name = "id") BigInteger idInstitution) {
-
-    try {
-      Set<BenefitInfo> benefitInfoSet = institutionService.readBenefits(idInstitution);
-      return ResponseEntity.status(HttpStatus.OK).body(benefitInfoSet);
-
-    } catch (NotFoundException e) {
-      log.error(e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
     }
   }
 }
