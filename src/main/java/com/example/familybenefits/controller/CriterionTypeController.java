@@ -1,6 +1,5 @@
 package com.example.familybenefits.controller;
 
-import com.example.familybenefits.api_model.criterion.CriterionInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeAdd;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeUpdate;
@@ -39,7 +38,8 @@ public class CriterionTypeController {
   }
 
   /**
-   * Добавляет новый тип критерия
+   * Обрабатывает POST запрос "/criteriontype" на добавление нового типа критерия.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param criterionTypeAdd объект запроса для добавления типа критерия
    * @return код ответа, результат обработки запроса
    */
@@ -47,7 +47,7 @@ public class CriterionTypeController {
   public ResponseEntity<?> addCriterionType(@RequestBody CriterionTypeAdd criterionTypeAdd) {
 
     if (criterionTypeAdd == null) {
-      log.warn("Request body \"criterionTypeAdd\" is empty");
+      log.warn("POST \"/criteriontype\": " + "Request body \"criterionTypeAdd\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -56,13 +56,15 @@ public class CriterionTypeController {
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (AlreadyExistsException e) {
-      log.error(e.getMessage());
+      // Тип критерия с указанным названием существует
+      log.error("POST \"/criteriontype\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
   /**
-   * Обновляет данные типа критерия
+   * Обрабатывает PUT запрос "/criteriontype" на обновление типа критерия.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param criterionTypeUpdate объект запроса для обновления типа критерия
    * @return код ответа, результат обработки запроса
    */
@@ -70,7 +72,7 @@ public class CriterionTypeController {
   public ResponseEntity<?> updateCriterionType(@RequestBody CriterionTypeUpdate criterionTypeUpdate) {
 
     if (criterionTypeUpdate == null) {
-      log.warn("Request body \"criterionTypeUpdate\" is empty");
+      log.warn("PUT \"/criteriontype\": " + "Request body \"criterionTypeUpdate\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -79,31 +81,15 @@ public class CriterionTypeController {
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException e) {
-      log.error(e.getMessage());
+      // Не найден тип критерия
+      log.error("PUT \"/criteriontype\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Возвращает информацию о типе критерия
-   * @param idCriterionType ID типа критерия
-   * @return информация о типе критерия, если запрос выполнен успешно, и код ответа
-   */
-  @GetMapping(value = "/criteriontype/{id}")
-  public ResponseEntity<CriterionTypeInfo> getCriterionType(@PathVariable(name = "id")BigInteger idCriterionType) {
-
-    try {
-      CriterionTypeInfo criterionTypeInfo = criterionTypeService.read(idCriterionType);
-      return ResponseEntity.status(HttpStatus.OK).body(criterionTypeInfo);
-
-    } catch (NotFoundException e) {
-      log.error(e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Удаляет тип критерия
+   * Обрабатывает DELETE запрос "/criteriontype/{id}" на удаление типа критерия.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idCriterionType ID типа критерия
    * @return код ответа, результат обработки запроса
    */
@@ -115,13 +101,35 @@ public class CriterionTypeController {
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException e) {
-      log.error(e.getMessage());
+      // Не найден тип критерия
+      log.error("DELETE \"/criteriontype/{id}\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Возвращает множество всех типов критерий
+   * Обрабатывает GET запрос "/criteriontype/{id}" на получение информации о типе критерия.
+   * Выполнить запрос может любой клиент
+   * @param idCriterionType ID типа критерия
+   * @return информация о типе критерия, если запрос выполнен успешно, и код ответа
+   */
+  @GetMapping(value = "/criteriontype/{id}")
+  public ResponseEntity<CriterionTypeInfo> getCriterionType(@PathVariable(name = "id")BigInteger idCriterionType) {
+
+    try {
+      CriterionTypeInfo criterionTypeInfo = criterionTypeService.read(idCriterionType);
+      return ResponseEntity.status(HttpStatus.OK).body(criterionTypeInfo);
+
+    } catch (NotFoundException e) {
+      // Не найден тип критерия
+      log.error("GET \"/criteriontype/{id}\": " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  /**
+   * Обрабатывает GET запрос "/criteriontype/{id}" на получение множества всех типов критерий
+   * Выполнить запрос может любой клиент
    * @return множество типов критерий и код ответа
    */
   @GetMapping(value = "/criteriontype/all")
@@ -132,25 +140,8 @@ public class CriterionTypeController {
       return ResponseEntity.status(HttpStatus.OK).body(criterionTypeInfoSet);
 
     } catch (NotFoundException e) {
-      log.error(e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
-    }
-  }
-
-  /**
-   * Возвращает множество критерий типа критерия
-   * @param idCriterionType ID типа критерия
-   * @return множество критерий типа критерия и код ответа
-   */
-  @GetMapping(value = "/criteriontype/{id}/criteria")
-  public ResponseEntity<Set<CriterionInfo>> getCityBenefits(@PathVariable(name = "id") BigInteger idCriterionType) {
-
-    try {
-      Set<CriterionInfo> criterionInfoSet = criterionTypeService.readCriteria(idCriterionType);
-      return ResponseEntity.status(HttpStatus.OK).body(criterionInfoSet);
-
-    } catch (NotFoundException e) {
-      log.error(e.getMessage());
+      // Не найдены типы критерий
+      log.error("GET \"/criteriontype/{id}\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
     }
   }
