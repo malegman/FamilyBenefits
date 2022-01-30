@@ -4,7 +4,6 @@ import com.example.familybenefits.api_model.criterion.CriterionAdd;
 import com.example.familybenefits.api_model.criterion.CriterionInfo;
 import com.example.familybenefits.api_model.criterion.CriterionInitData;
 import com.example.familybenefits.api_model.criterion.CriterionUpdate;
-import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 
@@ -67,12 +66,4 @@ public interface CriterionService {
    * @throws NotFoundException если данные не найдены
    */
   CriterionInitData getInitData() throws NotFoundException;
-
-  /**
-   * Возвращает информацию о типе критерия критерия.
-   * @param idCriterion ID критерия
-   * @return информация о типе критерия критерия
-   * @throws NotFoundException если тип критерия не найден или критерий не найден
-   */
-  CriterionTypeInfo readCriterionType(BigInteger idCriterion) throws NotFoundException;
 }
