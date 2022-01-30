@@ -4,9 +4,6 @@ import com.example.familybenefits.api_model.benefit.BenefitAdd;
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.benefit.BenefitInitData;
 import com.example.familybenefits.api_model.benefit.BenefitUpdate;
-import com.example.familybenefits.api_model.city.CityInfo;
-import com.example.familybenefits.api_model.criterion.CriterionInfo;
-import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 
@@ -49,14 +46,6 @@ public interface BenefitService {
   BenefitInfo read(BigInteger idBenefit) throws NotFoundException;
 
   /**
-   * Возваращает дополнительные данные для пособия.
-   * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
-   * @return дополнительные данные для пособия
-   * @throws NotFoundException если данные не найдены
-   */
-  BenefitInitData getInitData() throws NotFoundException;
-
-  /**
    * Возвращает множество всех полных пособий - с городом, учреждением и критерием
    * @return множество информаций о пособиях
    * @throws NotFoundException если пособия не найдены
@@ -71,26 +60,10 @@ public interface BenefitService {
   Set<BenefitInfo> readAllPartial() throws NotFoundException;
 
   /**
-   * Возваращает множество городов учреждения
-   * @param idBenefit ID пособия
-   * @return множество городов пособия
-   * @throws NotFoundException если города пособия не найдены или пособие не найдено
+   * Возваращает дополнительные данные для пособия.
+   * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
+   * @return дополнительные данные для пособия
+   * @throws NotFoundException если данные не найдены
    */
-  Set<CityInfo> readCities(BigInteger idBenefit) throws NotFoundException;
-
-  /**
-   * Возваращает множество учреждений учреждения
-   * @param idBenefit ID пособия
-   * @return множество учреждений пособия
-   * @throws NotFoundException если учреждения пособия не найдены или пособие не найдено
-   */
-  Set<InstitutionInfo> readInstitutions(BigInteger idBenefit) throws NotFoundException;
-
-  /**
-   * Возваращает множество полных критерий учреждения
-   * @param idBenefit ID пособия
-   * @return множество критерий пособия
-   * @throws NotFoundException если критерия пособия не найдены или пособие не найдено
-   */
-  Set<CriterionInfo> readCriteria(BigInteger idBenefit) throws NotFoundException;
+  BenefitInitData getInitData() throws NotFoundException;
 }

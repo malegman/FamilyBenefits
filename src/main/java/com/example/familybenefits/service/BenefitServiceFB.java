@@ -4,10 +4,8 @@ import com.example.familybenefits.api_model.benefit.BenefitAdd;
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.benefit.BenefitInitData;
 import com.example.familybenefits.api_model.benefit.BenefitUpdate;
-import com.example.familybenefits.api_model.city.CityInfo;
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.api_model.criterion.CriterionInfo;
-import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.convert.BenefitConverter;
 import com.example.familybenefits.convert.CityConverter;
 import com.example.familybenefits.convert.CriterionConverter;
@@ -85,6 +83,7 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public void add(BenefitAdd benefitAdd) throws AlreadyExistsException, NotFoundException {
 
+    // Проверка существования городов, критерий и учреждений по их ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         cityRepository::existsById, benefitAdd.getIdCitySet(),
         "City with ID %s not found");
@@ -95,13 +94,17 @@ public class BenefitServiceFB implements BenefitService {
         institutionRepository::existsById, benefitAdd.getIdInstitutionSet(),
         "Institution with ID %s not found");
 
+    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
+    BenefitEntity benefitEntityFromAdd = (BenefitEntity) BenefitConverter
+        .fromAdd(benefitAdd)
+        .prepareForDB(dbIntegrityService::preparePostgreSQLString);
+
+    // Проверка отсутствия пособия по его названию
     dbIntegrityService.checkAbsenceByUniqStrElseThrow(
-        benefitRepository::existsByName, benefitAdd.getName(),
+        benefitRepository::existsByName, benefitEntityFromAdd.getName(),
         "The benefit with name %s already exists");
 
-    benefitRepository.saveAndFlush((BenefitEntity) BenefitConverter
-        .fromAdd(benefitAdd)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString));
+    benefitRepository.saveAndFlush(benefitEntityFromAdd);
   }
 
   /**
@@ -112,6 +115,7 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public void update(BenefitUpdate benefitUpdate) throws NotFoundException {
 
+    // Проверка существования городов, критерий и учреждений по их ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         cityRepository::existsById, benefitUpdate.getIdCitySet(),
         "City with ID %s not found");
@@ -122,10 +126,12 @@ public class BenefitServiceFB implements BenefitService {
         institutionRepository::existsById, benefitUpdate.getIdInstitutionSet(),
         "Institution with ID %s not found");
 
+    // Проверка отсутствия пособия по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         benefitRepository::existsById, benefitUpdate.getId(),
         "Benefit with ID %s not found");
 
+    // Сохранение полученной модели таблицы из запроса с подготовленными строковыми значениями для БД
     benefitRepository.saveAndFlush((BenefitEntity) BenefitConverter
         .fromUpdate(benefitUpdate)
         .prepareForDB(dbIntegrityService::preparePostgreSQLString));
@@ -139,6 +145,7 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public void delete(BigInteger idBenefit) throws NotFoundException {
 
+    // Проверка существование пособия по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         benefitRepository::existsById, idBenefit,
         "Benefit with ID %s not found");
@@ -155,55 +162,12 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public BenefitInfo read(BigInteger idBenefit) throws NotFoundException {
 
+    // Проверка существование пособия по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         benefitRepository::existsById, idBenefit,
         "Benefit with ID %s not found");
 
     return BenefitConverter.toInfo(benefitRepository.getById(idBenefit));
-  }
-
-  /**
-   * Возваращает дополнительные данные для пособия.
-   * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
-   * @return дополнительные данные для пособия
-   * @throws NotFoundException если данные не найдены
-   */
-  @Override
-  public BenefitInitData getInitData() throws NotFoundException {
-
-    Set<ObjectShortInfo> cityShortInfoSet = cityRepository
-        .findAll()
-        .stream()
-        .map(CityConverter::toShortInfo)
-        .collect(Collectors.toSet());
-    if (cityShortInfoSet.isEmpty()) {
-      throw new NotFoundException("Cities not found");
-    }
-
-    Set<ObjectShortInfo> criterionShortInfoSet = criterionRepository
-        .findAllByCriterionTypeIsNotNull()
-        .stream()
-        .map(CriterionConverter::toShortInfo)
-        .collect(Collectors.toSet());
-    if (criterionShortInfoSet.isEmpty()) {
-      throw new NotFoundException("Criteria not found");
-    }
-
-    Set<ObjectShortInfo> institutionShortInfoSet = institutionRepository
-        .findAll()
-        .stream()
-        .map(InstitutionConverter::toShortInfo)
-        .collect(Collectors.toSet());
-    if (institutionShortInfoSet.isEmpty()) {
-      throw new NotFoundException("Institutions not found");
-    }
-
-    return BenefitInitData
-        .builder()
-        .shortCitySet(cityShortInfoSet)
-        .shortCriterionSet(criterionShortInfoSet)
-        .shortInstitutionSet(institutionShortInfoSet)
-        .build();
   }
 
   /**
@@ -219,6 +183,7 @@ public class BenefitServiceFB implements BenefitService {
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());
+
     if (benefitInfoSet.isEmpty()) {
       throw new NotFoundException("Benefits not found");
     }
@@ -239,6 +204,7 @@ public class BenefitServiceFB implements BenefitService {
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());
+
     if (benefitInfoSet.isEmpty()) {
       throw new NotFoundException("Benefits not found");
     }
@@ -247,80 +213,52 @@ public class BenefitServiceFB implements BenefitService {
   }
 
   /**
-   * Возваращает множество городов учреждения
-   * @param idBenefit ID пособия
-   * @return множество городов пособия
-   * @throws NotFoundException если города пособия не найдены или пособие не найдено
+   * Возваращает дополнительные данные для пособия.
+   * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
+   * @return дополнительные данные для пособия
+   * @throws NotFoundException если данные не найдены
    */
   @Override
-  public Set<CityInfo> readCities(BigInteger idBenefit) throws NotFoundException {
+  public BenefitInitData getInitData() throws NotFoundException {
 
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        benefitRepository::existsById, idBenefit,
-        "Benefit with ID %s not found");
-
-    Set<CityInfo> cityInfoSet = cityRepository
-        .findAllWhereBenefitIdEquals(idBenefit)
+    // Получение множества кратких информаций о всех городах
+    Set<ObjectShortInfo> cityShortInfoSet = cityRepository
+        .findAll()
         .stream()
-        .map(CityConverter::toInfo)
+        .map(CityConverter::toShortInfo)
         .collect(Collectors.toSet());
-    if (cityInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Cities of benefit with id %s not found", idBenefit));
+
+    if (cityShortInfoSet.isEmpty()) {
+      throw new NotFoundException("Cities not found");
     }
 
-    return cityInfoSet;
-  }
-
-  /**
-   * Возваращает множество учреждений учреждения
-   * @param idBenefit ID пособия
-   * @return множество учреждений пособия
-   * @throws NotFoundException если учреждения пособия не найдены или пособие не найдено
-   */
-  @Override
-  public Set<InstitutionInfo> readInstitutions(BigInteger idBenefit) throws NotFoundException {
-
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        benefitRepository::existsById, idBenefit,
-        "Benefit with ID %s not found");
-
-    Set<InstitutionInfo> institutionInfoSet = institutionRepository
-        .findAllWhereBenefitIdEquals(idBenefit)
-        .stream()
-        .map(InstitutionConverter::toInfo)
-        .collect(Collectors.toSet());
-    if (institutionInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Institutions of benefit with id %s not found", idBenefit));
-    }
-
-    return institutionInfoSet;
-  }
-
-  /**
-   * Возваращает множество полных критерий учреждения
-   * @param idBenefit ID пособия
-   * @return множество критерий пособия
-   * @throws NotFoundException если критерия пособия не найдены или пособие не найдено
-   */
-  @Override
-  public Set<CriterionInfo> readCriteria(BigInteger idBenefit) throws NotFoundException {
-
-    dbIntegrityService.checkExistenceByIdElseThrow(
-        benefitRepository::existsById, idBenefit,
-        "Benefit with ID %s not found");
-
+    // Получение множества информаций о всех критериях с типом
     Set<CriterionInfo> criterionInfoSet = criterionRepository
-        .findAllFullWhereBenefitIdEquals(idBenefit)
+        .findAllByCriterionTypeIsNotNull()
         .stream()
         .map(CriterionConverter::toInfo)
         .collect(Collectors.toSet());
+
     if (criterionInfoSet.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Criteria of benefit with id %s not found", idBenefit));
+      throw new NotFoundException("Criteria not found");
     }
 
-    return criterionInfoSet;
+    // Получение множества кратких информаций о всех учреждениях
+    Set<ObjectShortInfo> institutionShortInfoSet = institutionRepository
+        .findAll()
+        .stream()
+        .map(InstitutionConverter::toShortInfo)
+        .collect(Collectors.toSet());
+
+    if (institutionShortInfoSet.isEmpty()) {
+      throw new NotFoundException("Institutions not found");
+    }
+
+    return BenefitInitData
+        .builder()
+        .shortCitySet(cityShortInfoSet)
+        .criterionSet(criterionInfoSet)
+        .shortInstitutionSet(institutionShortInfoSet)
+        .build();
   }
 }
