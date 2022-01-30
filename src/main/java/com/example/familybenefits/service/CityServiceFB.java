@@ -58,6 +58,7 @@ public class CityServiceFB implements CityService {
    * Добавляет город по запросу на добавление
    * @param cityAdd объект запроса на добавление города
    * @throws AlreadyExistsException если город с указанным названием уже существует
+   * @throws NotFoundException если пособие города с указанным ID не найдено
    */
   @Override
   public void add(CityAdd cityAdd) throws AlreadyExistsException, NotFoundException {
@@ -159,9 +160,9 @@ public class CityServiceFB implements CityService {
   }
 
   /**
-   * Возваращает дополнительные данные для пособия.
-   * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
-   * @return дополнительные данные для пособия
+   * Возваращает дополнительные данные для города.
+   * Данные содержат в себе множества кратких информаций о пособиях
+   * @return дополнительные данные для города
    * @throws NotFoundException если данные не найдены
    */
   @Override

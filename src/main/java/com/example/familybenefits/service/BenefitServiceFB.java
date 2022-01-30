@@ -126,7 +126,7 @@ public class BenefitServiceFB implements BenefitService {
         institutionRepository::existsById, benefitUpdate.getIdInstitutionSet(),
         "Institution with ID %s not found");
 
-    // Проверка отсутствия пособия по его ID
+    // Проверка существования пособия по его ID
     dbIntegrityService.checkExistenceByIdElseThrow(
         benefitRepository::existsById, benefitUpdate.getId(),
         "Benefit with ID %s not found");
