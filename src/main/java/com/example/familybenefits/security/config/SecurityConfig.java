@@ -23,13 +23,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   /**
-   * Фильтр для фильрации клиентских запросов, с использованием JWT
+   * Фильтр для фильтрации клиентских запросов, с использованием JWT
    */
   private final JwtFilter jwtFilter;
 
   /**
-   * Консутруктор для инициализации интерфейса сервиса
-   * @param jwtFilter фильтр для фильрации клиентских запросов, с использованием JWT
+   * Конструктор для инициализации интерфейса сервиса
+   * @param jwtFilter фильтр для фильтрации клиентских запросов, с использованием JWT
    */
   @Autowired
   public SecurityConfig(JwtFilter jwtFilter) {
@@ -52,7 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
         .authorizeRequests()
 
-        // requests: service
+        // requests: system
         .antMatchers(HttpMethod.POST, "/logout", "/verifemail").hasAnyRole("ADMIN", "USER")
         .antMatchers(HttpMethod.PUT, "/changepwd", "/verifemail").hasAnyRole("ADMIN", "USER")
         .antMatchers(HttpMethod.POST, "/login", "/recoverpwd", "/refresh").permitAll()
@@ -75,34 +75,35 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.POST, "/city").hasRole("ADMIN")
         .antMatchers(HttpMethod.PUT, "/city").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/city/{id}").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/city/{id}", "/city/{id}/*", "/city/all").permitAll()
+        .antMatchers(HttpMethod.GET, "/city/initdata").hasRole("ADMIN")
+        .antMatchers(HttpMethod.GET, "/city/{id}", "/city/all").permitAll()
 
         // requests: benefit
         .antMatchers(HttpMethod.POST, "/benefit").hasRole("ADMIN")
         .antMatchers(HttpMethod.PUT, "/benefit").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/benefit/{id}").hasRole("ADMIN")
         .antMatchers(HttpMethod.GET, "/benefit/initdata", "/benefit/allpartial").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/benefit/{id}", "/benefit/{id}/*", "/benefit/all").permitAll()
+        .antMatchers(HttpMethod.GET, "/benefit/{id}", "/benefit/all").permitAll()
 
         // requests: institution
         .antMatchers(HttpMethod.POST, "/institution").hasRole("ADMIN")
         .antMatchers(HttpMethod.PUT, "/institution").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/institution/{id}").hasRole("ADMIN")
         .antMatchers(HttpMethod.GET, "/institution/initdata").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/institution/{id}", "/institution/{id}/*", "/institution/all").permitAll()
+        .antMatchers(HttpMethod.GET, "/institution/{id}", "/institution/all").permitAll()
 
         // requests: criterion
         .antMatchers(HttpMethod.POST, "/criterion").hasRole("ADMIN")
         .antMatchers(HttpMethod.PUT, "/criterion").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/criterion/{id}").hasRole("ADMIN")
         .antMatchers(HttpMethod.GET, "/criterion/initdata", "/criterion/allpartial").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/criterion/{id}", "/criterion/{id}/*", "/criterion/all").permitAll()
+        .antMatchers(HttpMethod.GET, "/criterion/{id}", "/criterion/all").permitAll()
 
         // requests: criterion type
         .antMatchers(HttpMethod.POST, "/criteriontype").hasRole("ADMIN")
         .antMatchers(HttpMethod.PUT, "/criteriontype").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/criteriontype/{id}").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/criteriontype/{id}", "/criteriontype/{id}/*", "/criteriontype/all").permitAll()
+        .antMatchers(HttpMethod.GET, "/criteriontype/{id}", "/criteriontype/all").permitAll()
 
         .and()
         .anonymous().disable()
@@ -114,8 +115,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   }
 
   /**
-   * Предоставляет объект для хэширования пароля
-   * @return объект для хэширования пароля
+   * Предоставляет объект для хеширования пароля
+   * @return объект для хеширования пароля
    */
   @Bean
   public PasswordEncoder passwordEncoder() {
