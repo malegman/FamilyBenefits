@@ -4,9 +4,6 @@ import com.example.familybenefits.api_model.benefit.BenefitAdd;
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.benefit.BenefitInitData;
 import com.example.familybenefits.api_model.benefit.BenefitUpdate;
-import com.example.familybenefits.api_model.city.CityInfo;
-import com.example.familybenefits.api_model.criterion.CriterionInfo;
-import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.service.BenefitService;
@@ -42,7 +39,8 @@ public class BenefitController {
   }
 
   /**
-   * Добавляет новое пособие
+   * Обрабатывает POST запрос "/benefit" на добавление нового пособия.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param benefitAdd объект запроса для добавления пособия
    * @return код ответа, результат обработки запроса
    */
@@ -50,7 +48,7 @@ public class BenefitController {
   public ResponseEntity<?> addBenefit(@RequestBody BenefitAdd benefitAdd) {
 
     if (benefitAdd == null) {
-      log.warn("Request body \"benefitAdd\" is empty");
+      log.warn("POST \"/benefit\": " + "Request body \"benefitAdd\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -58,18 +56,21 @@ public class BenefitController {
       benefitService.add(benefitAdd);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
-    } catch (NotFoundException nfe) {
-      log.error(nfe.getMessage());
+    } catch (NotFoundException e) {
+      // Не найдены города, критерии или учреждения
+      log.error("POST \"/benefit\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
-    } catch (AlreadyExistsException aee) {
-      log.error(aee.getMessage());
+    } catch (AlreadyExistsException e) {
+      // Пособие с указанным названием существует
+      log.error("POST \"/benefit\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
   /**
-   * Обновляет пособие
+   * Обрабатывает PUT запрос "/benefit" на обновление пособия.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param benefitUpdate объект запроса для обновления пособия
    * @return код ответа, результат обработки запроса
    */
@@ -77,7 +78,7 @@ public class BenefitController {
   public ResponseEntity<?> updateBenefit(@RequestBody BenefitUpdate benefitUpdate) {
 
     if (benefitUpdate == null) {
-      log.warn("Request body \"benefitUpdate\" is empty");
+      log.warn("PUT \"/benefit\": " + "Request body \"benefitUpdate\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -86,31 +87,15 @@ public class BenefitController {
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException e) {
-      log.error(e.getMessage());
+      // Не найдено пособие или не найдены города, критерии или учреждения
+      log.error("PUT \"/benefit\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Возвращает информацию о пособии
-   * @param idBenefit ID пособия
-   * @return информация о пособии, если запрос выполнен успешно, и код ответа
-   */
-  @GetMapping(value = "/benefit/{id}")
-  public ResponseEntity<BenefitInfo> getBenefit(@PathVariable(name = "id") BigInteger idBenefit) {
-
-    try {
-      BenefitInfo benefitInfo = benefitService.read(idBenefit);
-      return ResponseEntity.status(HttpStatus.OK).body(benefitInfo);
-
-    } catch (NotFoundException e) {
-      log.error(e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Удаляет пособие
+   * Обрабатывает DELETE запрос "/benefit/{id}" на удаление пособия.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idBenefit ID пособия
    * @return код ответа, результат обработки запроса
    */
@@ -122,14 +107,74 @@ public class BenefitController {
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException e) {
-      log.error(e.getMessage());
+      // Не найдено пособие
+      log.error("DELETE \"/benefit/{id}\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Возвращает дополнительные данные для критерия.
-   * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
+   * Обрабатывает GET запрос "/benefit/{id}" на получение информации о пособии.
+   * Выполнить запрос может любой клиент
+   * @param idBenefit ID пособия
+   * @return информация о пособии, если запрос выполнен успешно, и код ответа
+   */
+  @GetMapping(value = "/benefit/{id}")
+  public ResponseEntity<BenefitInfo> getBenefit(@PathVariable(name = "id") BigInteger idBenefit) {
+
+    try {
+      BenefitInfo benefitInfo = benefitService.read(idBenefit);
+      return ResponseEntity.status(HttpStatus.OK).body(benefitInfo);
+
+    } catch (NotFoundException e) {
+      // Не найдено пособие
+      log.error("GET \"/benefit/{id}\": " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  /**
+   * Обрабатывает GET запрос "/benefit/all" на получение множества всех полных пособий: с городом, учреждением и критерием.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @return множество пособий, если запрос выполнен успешно, и код ответа
+   */
+  @GetMapping(value = "/benefit/all")
+  public ResponseEntity<Set<BenefitInfo>> getBenefits() {
+
+    try {
+      Set<BenefitInfo> benefitInfoSet = benefitService.readAllFull();
+      return ResponseEntity.status(HttpStatus.OK).body(benefitInfoSet);
+
+    } catch (NotFoundException e) {
+      // Не найдены полные пособия
+      log.error("GET \"/benefit/all\": " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
+    }
+  }
+
+  /**
+   * Обрабатывает GET запрос "/benefit/all" на получение множества всех неполных пособий: без города, учреждения или критерия.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @return множество пособий, если запрос выполнен успешно, и код ответа
+   */
+  @GetMapping(value = "/benefit/allpartial")
+  public ResponseEntity<Set<BenefitInfo>> getPartialBenefits() {
+
+    try {
+      Set<BenefitInfo> benefitInfoSet = benefitService.readAllPartial();
+      return ResponseEntity.status(HttpStatus.OK).body(benefitInfoSet);
+
+    } catch (NotFoundException e) {
+      // Не найдены неполные пособия
+      log.error("GET \"/benefit/allpartial\": " + e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
+    }
+  }
+
+  /**
+   * Обрабатывает GET запрос "/benefit/initdata" на получение дополнительных данных для критерия.
+   * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @return дополнительные данные для критерия и код ответа
    */
   @GetMapping(value = "/benefit/initdata")
@@ -140,96 +185,9 @@ public class BenefitController {
       return ResponseEntity.status(HttpStatus.OK).body(benefitInitData);
 
     } catch (NotFoundException e) {
-      log.error(e.getMessage());
+      // Не найдены города, критерии или учреждения
+      log.error("GET \"/benefit/initdata\": " + e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Возвращает множество всех полных пособий - с городом, учреждением и критерием
-   * @return множество критерий и код ответа
-   */
-  @GetMapping(value = "/benefit/all")
-  public ResponseEntity<Set<BenefitInfo>> getBenefits() {
-
-    try {
-      Set<BenefitInfo> benefitInfoSet = benefitService.readAllFull();
-      return ResponseEntity.status(HttpStatus.OK).body(benefitInfoSet);
-
-    } catch (NotFoundException e) {
-      log.error(e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
-    }
-  }
-
-  /**
-   * Возвращает множество всех неполных пособий - без города, учреждения или критерия
-   * @return множество критерий и код ответа
-   */
-  @GetMapping(value = "/benefit/allpartial")
-  public ResponseEntity<Set<BenefitInfo>> getPartialBenefits() {
-
-    try {
-      Set<BenefitInfo> benefitInfoSet = benefitService.readAllPartial();
-      return ResponseEntity.status(HttpStatus.OK).body(benefitInfoSet);
-
-    } catch (NotFoundException e) {
-      log.error(e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
-    }
-  }
-
-  /**
-   * Возвращает множество городов пособия
-   * @param idBenefit ID пособия
-   * @return множество городов пособия и код ответа
-   */
-  @GetMapping(value = "/benefit/{id}/cities")
-  public ResponseEntity<Set<CityInfo>> getBenefitCities(@PathVariable(name = "id") BigInteger idBenefit) {
-
-    try {
-      Set<CityInfo> cityInfoSet = benefitService.readCities(idBenefit);
-      return ResponseEntity.status(HttpStatus.OK).body(cityInfoSet);
-
-    } catch (NotFoundException e) {
-      log.error(e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
-    }
-  }
-
-  /**
-   * Возвращает множество учреждений пособия
-   * @param idBenefit ID пособия
-   * @return множество учреждений пособия и код ответа
-   */
-  @GetMapping(value = "/benefit/{id}/institutions")
-  public ResponseEntity<Set<InstitutionInfo>> getBenefitInstitutions(@PathVariable(name = "id") BigInteger idBenefit) {
-
-    try {
-      Set<InstitutionInfo> institutionInfoSet = benefitService.readInstitutions(idBenefit);
-      return ResponseEntity.status(HttpStatus.OK).body(institutionInfoSet);
-
-    } catch (NotFoundException e) {
-      log.error(e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
-    }
-  }
-
-  /**
-   * Возвращает множество полных критерий пособия
-   * @param idBenefit ID пособия
-   * @return множество критерий пособия и код ответа
-   */
-  @GetMapping(value = "/benefit/{id}/criteria")
-  public ResponseEntity<Set<CriterionInfo>> getBenefitCriteria(@PathVariable(name = "id") BigInteger idBenefit) {
-
-    try {
-      Set<CriterionInfo> criterionInfoSet = benefitService.readCriteria(idBenefit);
-      return ResponseEntity.status(HttpStatus.OK).body(criterionInfoSet);
-
-    } catch (NotFoundException e) {
-      log.error(e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
     }
   }
 }
