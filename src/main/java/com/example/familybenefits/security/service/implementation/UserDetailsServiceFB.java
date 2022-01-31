@@ -1,4 +1,4 @@
-package com.example.familybenefits.security.service;
+package com.example.familybenefits.security.service.implementation;
 
 import com.example.familybenefits.dao.entity.UserEntity;
 import com.example.familybenefits.dao.repository.UserRepository;
@@ -8,8 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 /**
  * Реализация сервиса для работы с объектом пользователя для авторизации
@@ -23,7 +21,7 @@ public class UserDetailsServiceFB implements UserDetailsService {
   private final UserRepository userRepository;
 
   /**
-   * Конструктор для иниуиализации интерфейса сервиса
+   * Конструктор для инициализации интерфейса сервиса
    * @param userRepository репозиторий, работающий с моделью таблицы "user"
    */
   @Autowired
@@ -40,12 +38,11 @@ public class UserDetailsServiceFB implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-    Optional<UserEntity> optUserEntity = userRepository.findByEmail(username);
-    if (optUserEntity.isEmpty()) {
-      throw new UsernameNotFoundException(String.format(
-          "Объект с email %s не найден", username));
-    }
+    // Получение пользователя по его email, если пользователь существует
+    UserEntity userEntityFromRequest = userRepository.findByEmail(username)
+        .orElseThrow(() -> new UsernameNotFoundException(String.format(
+            "User with username (email) %s not found", username)));
 
-    return UserDetailsFB.fromUserEntity(optUserEntity.get());
+    return UserDetailsFB.fromUserEntity(userEntityFromRequest);
   }
 }
