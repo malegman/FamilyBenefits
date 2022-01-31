@@ -1,4 +1,4 @@
-package com.example.familybenefits.service;
+package com.example.familybenefits.service.s_interface;
 
 import com.example.familybenefits.api_model.city.CityAdd;
 import com.example.familybenefits.api_model.city.CityInfo;
@@ -53,7 +53,7 @@ public interface CityService {
   Set<CityInfo> readAll() throws NotFoundException;
 
   /**
-   * Возваращает дополнительные данные для города.
+   * Возвращает дополнительные данные для города.
    * Данные содержат в себе множества кратких информаций о пособиях
    * @return дополнительные данные для города
    * @throws NotFoundException если данные не найдены

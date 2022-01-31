@@ -1,4 +1,4 @@
-package com.example.familybenefits.service;
+package com.example.familybenefits.service.s_interface;
 
 import com.example.familybenefits.api_model.benefit.BenefitAdd;
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
@@ -60,7 +60,7 @@ public interface BenefitService {
   Set<BenefitInfo> readAllPartial() throws NotFoundException;
 
   /**
-   * Возваращает дополнительные данные для пособия.
+   * Возвращает дополнительные данные для пособия.
    * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
    * @return дополнительные данные для пособия
    * @throws NotFoundException если данные не найдены

@@ -6,7 +6,7 @@ import com.example.familybenefits.api_model.criterion.CriterionInitData;
 import com.example.familybenefits.api_model.criterion.CriterionUpdate;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.service.CriterionService;
+import com.example.familybenefits.service.s_interface.CriterionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Контроллер запросов, звязанных с критерием
+ * Контроллер запросов, связанных с критерием
  */
 @Slf4j
 @RestController
@@ -48,7 +48,7 @@ public class CriterionController {
   public ResponseEntity<?> addCriterion(@RequestBody CriterionAdd criterionAdd) {
 
     if (criterionAdd == null) {
-      log.warn("POST \"/criterion\": " + "Request body \"criterionAdd\" is empty");
+      log.warn("POST \"/criterion\": {}", "Request body \"criterionAdd\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -58,12 +58,12 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найден тип критерия
-      log.error("POST \"/criterion\": " + e.getMessage());
+      log.error("POST \"/criterion\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException e) {
       // Критерий с указанным названием существует
-      log.error("POST \"/criterion\": " + e.getMessage());
+      log.error("POST \"/criterion\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -78,7 +78,7 @@ public class CriterionController {
   public ResponseEntity<?> updateCriterion(@RequestBody CriterionUpdate criterionUpdate) {
 
     if (criterionUpdate == null) {
-      log.warn("PUT \"/criterion\": " + "Request body \"criterionUpdate\" is empty");
+      log.warn("PUT \"/criterion\": {}", "Request body \"criterionUpdate\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -88,7 +88,7 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найден критерий или тип критерия
-      log.error("PUT \"/criterion\": " + e.getMessage());
+      log.error("PUT \"/criterion\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -108,7 +108,7 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найден критерий
-      log.error("DELETE \"/criterion/{id}\": " + e.getMessage());
+      log.error("DELETE \"/criterion/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -128,13 +128,13 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найден критерий
-      log.error("GET \"/criterion/{id}\": " + e.getMessage());
+      log.error("GET \"/criterion/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Обрабатывает GET запрос "/criterion/all" на получение множества всех полных критерий: с типом критерия
+   * Обрабатывает GET запрос "/criterion/all" на получение множества всех полных критерий: с типом критерия.
    * Выполнить запрос может любой клиент
    * @return множество критерий, если запрос выполнен успешно, и код ответа
    */
@@ -147,7 +147,7 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найдены полные критерии
-      log.error("GET \"/criterion/all\": " + e.getMessage());
+      log.error("GET \"/criterion/all\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
     }
   }
@@ -166,14 +166,14 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найдены неполные критерии
-      log.error("GET \"/criterion/allpartial\": " + e.getMessage());
+      log.error("GET \"/criterion/allpartial\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
     }
   }
 
   /**
    * Обрабатывает GET запрос "/criterion/initdata" на получение дополнительных данных для критерия.
-   * Данные содержат в себе множетсво кратких информаций о типах критерий
+   * Данные содержат в себе множество кратких информаций о типах критерий
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @return дополнительные данные для критерия, если запрос выполнен успешно, и код ответа
    */
@@ -186,7 +186,7 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найдены типы критерия
-      log.error("GET \"/criterion/initdata\": " + e.getMessage());
+      log.error("GET \"/criterion/initdata\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }

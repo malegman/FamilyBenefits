@@ -1,12 +1,12 @@
 package com.example.familybenefits.exception;
 
 /**
- * Исключение, которое сигнализирует, что email некорректный
+ * Исключение, связанное с некорректным форматом email
  */
 public class InvalidEmailException extends Exception {
 
   /**
-   * Конуструктор, создает исключение с описанием исключения
+   * Конструктор, создает исключение с описанием исключения
    * @param message описание исключения
    */
   public InvalidEmailException(String message) {

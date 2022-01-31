@@ -1,12 +1,12 @@
 package com.example.familybenefits.exception;
 
 /**
- * Исключение, которое сигнализирует, что объект уже существует в базе данных
+ * Исключение, связанное с существованием объекта в базе данных
  */
 public class AlreadyExistsException extends Exception {
 
   /**
-   * Конуструктор, создает исключение с описанием исключения
+   * Конструктор, создает исключение с описанием исключения
    * @param message описание исключения
    */
   public AlreadyExistsException(String message) {

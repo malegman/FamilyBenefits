@@ -5,7 +5,7 @@ import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeUpdate;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.service.CriterionTypeService;
+import com.example.familybenefits.service.s_interface.CriterionTypeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Контроллер запросов, звязанных с типом критерия
+ * Контроллер запросов, связанных с типом критерия
  */
 @Slf4j
 @RestController
@@ -47,7 +47,7 @@ public class CriterionTypeController {
   public ResponseEntity<?> addCriterionType(@RequestBody CriterionTypeAdd criterionTypeAdd) {
 
     if (criterionTypeAdd == null) {
-      log.warn("POST \"/criteriontype\": " + "Request body \"criterionTypeAdd\" is empty");
+      log.warn("POST \"/criteriontype\": {}", "Request body \"criterionTypeAdd\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -57,7 +57,7 @@ public class CriterionTypeController {
 
     } catch (AlreadyExistsException e) {
       // Тип критерия с указанным названием существует
-      log.error("POST \"/criteriontype\": " + e.getMessage());
+      log.error("POST \"/criteriontype\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -72,7 +72,7 @@ public class CriterionTypeController {
   public ResponseEntity<?> updateCriterionType(@RequestBody CriterionTypeUpdate criterionTypeUpdate) {
 
     if (criterionTypeUpdate == null) {
-      log.warn("PUT \"/criteriontype\": " + "Request body \"criterionTypeUpdate\" is empty");
+      log.warn("PUT \"/criteriontype\": {}", "Request body \"criterionTypeUpdate\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -82,7 +82,7 @@ public class CriterionTypeController {
 
     } catch (NotFoundException e) {
       // Не найден тип критерия
-      log.error("PUT \"/criteriontype\": " + e.getMessage());
+      log.error("PUT \"/criteriontype\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -102,7 +102,7 @@ public class CriterionTypeController {
 
     } catch (NotFoundException e) {
       // Не найден тип критерия
-      log.error("DELETE \"/criteriontype/{id}\": " + e.getMessage());
+      log.error("DELETE \"/criteriontype/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -122,13 +122,13 @@ public class CriterionTypeController {
 
     } catch (NotFoundException e) {
       // Не найден тип критерия
-      log.error("GET \"/criteriontype/{id}\": " + e.getMessage());
+      log.error("GET \"/criteriontype/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Обрабатывает GET запрос "/criteriontype/{id}" на получение множества всех типов критерий
+   * Обрабатывает GET запрос "/criteriontype/{id}" на получение множества всех типов критерий.
    * Выполнить запрос может любой клиент
    * @return множество типов критерий и код ответа
    */
@@ -141,7 +141,7 @@ public class CriterionTypeController {
 
     } catch (NotFoundException e) {
       // Не найдены типы критерий
-      log.error("GET \"/criteriontype/{id}\": " + e.getMessage());
+      log.error("GET \"/criteriontype/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
     }
   }

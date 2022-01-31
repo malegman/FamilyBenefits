@@ -6,7 +6,7 @@ import com.example.familybenefits.api_model.city.CityInitData;
 import com.example.familybenefits.api_model.city.CityUpdate;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.service.CityService;
+import com.example.familybenefits.service.s_interface.CityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Контроллер запросов, звязанных с городом
+ * Контроллер запросов, связанных с городом
  */
 @Slf4j
 @RestController
@@ -48,7 +48,7 @@ public class CityController {
   public ResponseEntity<?> addCity(@RequestBody CityAdd cityAdd) {
 
     if (cityAdd == null) {
-      log.warn("POST \"/city/\": " + "Request body \"cityAdd\" is empty");
+      log.warn("POST \"/city/\": {}", "Request body \"cityAdd\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -58,12 +58,12 @@ public class CityController {
 
     } catch (AlreadyExistsException e) {
       // Город с указанным названием существует
-      log.error("POST \"/city/\": " + e.getMessage());
+      log.error("POST \"/city/\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
     } catch (NotFoundException e) {
       // Не найдены пособия
-      log.error("POST \"/city/\": " + e.getMessage());
+      log.error("POST \"/city/\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -78,7 +78,7 @@ public class CityController {
   public ResponseEntity<?> updateCity(@RequestBody CityUpdate cityUpdate) {
 
     if (cityUpdate == null) {
-      log.warn("PUT \"/city/\": " + "Request body \"cityUpdate\" is empty");
+      log.warn("PUT \"/city/\": {}", "Request body \"cityUpdate\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -88,7 +88,7 @@ public class CityController {
 
     } catch (NotFoundException e) {
       // Не найден город или не найдены пособия
-      log.error("PUT \"/city/\": " + e.getMessage());
+      log.error("PUT \"/city/\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -108,7 +108,7 @@ public class CityController {
 
     } catch (NotFoundException e) {
       // Не найден город
-      log.error("DELETE \"/city/{id}\": " + e.getMessage());
+      log.error("DELETE \"/city/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -128,13 +128,13 @@ public class CityController {
 
     } catch (NotFoundException e) {
       // Не найден город
-      log.error("GET \"/city/{id}\": " + e.getMessage());
+      log.error("GET \"/city/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Обрабатывает GET запрос "/city/all" на получение множества всех городов
+   * Обрабатывает GET запрос "/city/all" на получение множества всех городов.
    * Выполнить запрос может любой клиент
    * @return множество городов, если запрос выполнен успешно, и код ответа
    */
@@ -147,7 +147,7 @@ public class CityController {
 
     } catch (NotFoundException e) {
       // Не найдены города
-      log.error("GET \"/city/all\": " + e.getMessage());
+      log.error("GET \"/city/all\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
     }
   }
@@ -167,7 +167,7 @@ public class CityController {
 
     } catch (NotFoundException e) {
       // Не найдены пособия
-      log.error("GET \"/city/initdata\": " + e.getMessage());
+      log.error("GET \"/city/initdata\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }

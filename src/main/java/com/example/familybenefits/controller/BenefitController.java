@@ -6,7 +6,7 @@ import com.example.familybenefits.api_model.benefit.BenefitInitData;
 import com.example.familybenefits.api_model.benefit.BenefitUpdate;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.service.BenefitService;
+import com.example.familybenefits.service.s_interface.BenefitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,7 +48,7 @@ public class BenefitController {
   public ResponseEntity<?> addBenefit(@RequestBody BenefitAdd benefitAdd) {
 
     if (benefitAdd == null) {
-      log.warn("POST \"/benefit\": " + "Request body \"benefitAdd\" is empty");
+      log.warn("POST \"/benefit\": {}", "Request body \"benefitAdd\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -58,12 +58,12 @@ public class BenefitController {
 
     } catch (NotFoundException e) {
       // Не найдены города, критерии или учреждения
-      log.error("POST \"/benefit\": " + e.getMessage());
+      log.error("POST \"/benefit\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException e) {
       // Пособие с указанным названием существует
-      log.error("POST \"/benefit\": " + e.getMessage());
+      log.error("POST \"/benefit\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -78,7 +78,7 @@ public class BenefitController {
   public ResponseEntity<?> updateBenefit(@RequestBody BenefitUpdate benefitUpdate) {
 
     if (benefitUpdate == null) {
-      log.warn("PUT \"/benefit\": " + "Request body \"benefitUpdate\" is empty");
+      log.warn("PUT \"/benefit\": {}", "Request body \"benefitUpdate\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -88,7 +88,7 @@ public class BenefitController {
 
     } catch (NotFoundException e) {
       // Не найдено пособие или не найдены города, критерии или учреждения
-      log.error("PUT \"/benefit\": " + e.getMessage());
+      log.error("PUT \"/benefit\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -108,7 +108,7 @@ public class BenefitController {
 
     } catch (NotFoundException e) {
       // Не найдено пособие
-      log.error("DELETE \"/benefit/{id}\": " + e.getMessage());
+      log.error("DELETE \"/benefit/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -128,7 +128,7 @@ public class BenefitController {
 
     } catch (NotFoundException e) {
       // Не найдено пособие
-      log.error("GET \"/benefit/{id}\": " + e.getMessage());
+      log.error("GET \"/benefit/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -147,7 +147,7 @@ public class BenefitController {
 
     } catch (NotFoundException e) {
       // Не найдены полные пособия
-      log.error("GET \"/benefit/all\": " + e.getMessage());
+      log.error("GET \"/benefit/all\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
     }
   }
@@ -166,7 +166,7 @@ public class BenefitController {
 
     } catch (NotFoundException e) {
       // Не найдены неполные пособия
-      log.error("GET \"/benefit/allpartial\": " + e.getMessage());
+      log.error("GET \"/benefit/allpartial\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
     }
   }
@@ -186,7 +186,7 @@ public class BenefitController {
 
     } catch (NotFoundException e) {
       // Не найдены города, критерии или учреждения
-      log.error("GET \"/benefit/initdata\": " + e.getMessage());
+      log.error("GET \"/benefit/initdata\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }

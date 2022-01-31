@@ -1,4 +1,4 @@
-package com.example.familybenefits.service;
+package com.example.familybenefits.service.s_interface;
 
 import com.example.familybenefits.api_model.criterion.CriterionAdd;
 import com.example.familybenefits.api_model.criterion.CriterionInfo;
@@ -60,8 +60,8 @@ public interface CriterionService {
   Set<CriterionInfo> readAllPartial() throws NotFoundException;
 
   /**
-   * Возваращает дополнительные данные для критерия.
-   * Данные содержат в себе множетсво кратких информаций о типах критерий
+   * Возвращает дополнительные данные для критерия.
+   * Данные содержат в себе множество кратких информаций о типах критерий
    * @return дополнительные данные для критерия
    * @throws NotFoundException если данные не найдены
    */

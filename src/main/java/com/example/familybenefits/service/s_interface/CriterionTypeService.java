@@ -1,6 +1,5 @@
-package com.example.familybenefits.service;
+package com.example.familybenefits.service.s_interface;
 
-import com.example.familybenefits.api_model.criterion.CriterionInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeAdd;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeUpdate;

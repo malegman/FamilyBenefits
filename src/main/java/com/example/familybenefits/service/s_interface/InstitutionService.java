@@ -1,4 +1,4 @@
-package com.example.familybenefits.service;
+package com.example.familybenefits.service.s_interface;
 
 import com.example.familybenefits.api_model.institution.InstitutionAdd;
 import com.example.familybenefits.api_model.institution.InstitutionInfo;
@@ -46,7 +46,7 @@ public interface InstitutionService {
   InstitutionInfo read(BigInteger idInstitution) throws NotFoundException;
 
   /**
-   * Возваращает дополнительные данные для учреждения.
+   * Возвращает дополнительные данные для учреждения.
    * Данные содержат в себе множество кратких информаций о городах.
    * @return дополнительные данные для учреждения
    * @throws NotFoundException если данные не найдены
