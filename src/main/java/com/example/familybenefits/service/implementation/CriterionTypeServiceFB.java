@@ -1,4 +1,4 @@
-package com.example.familybenefits.service;
+package com.example.familybenefits.service.implementation;
 
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeAdd;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
@@ -8,12 +8,12 @@ import com.example.familybenefits.dao.entity.CriterionTypeEntity;
 import com.example.familybenefits.dao.repository.CriterionTypeRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.security.service.DBIntegrityService;
+import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
+import com.example.familybenefits.service.s_interface.CriterionTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,7 +58,7 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
         .prepareForDB(dbIntegrityService::preparePostgreSQLString);
 
     // Проверка отсутствия типа критерия по его названию
-    dbIntegrityService.checkAbsenceByUniqStrElseThrow(
+    dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
         criterionTypeRepository::existsByName, criterionTypeEntity.getName(),
         "The criterion type with name %s already exists");
 
@@ -74,7 +74,7 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
   public void update(CriterionTypeUpdate criterionTypeUpdate) throws NotFoundException {
 
     // Проверка существования типа критерия по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         criterionTypeRepository::existsById, criterionTypeUpdate.getId(),
         "Criterion type with ID %s not found");
 
@@ -92,7 +92,7 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
   public void delete(BigInteger idCriterionType) throws NotFoundException {
 
     // Проверка существования типа критерия по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         criterionTypeRepository::existsById, idCriterionType,
         "Criterion type with ID %s not found");
 
@@ -107,14 +107,12 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
    */
   public CriterionTypeInfo read(BigInteger idCriterionType) throws NotFoundException {
 
-    Optional<CriterionTypeEntity> optCriterionTypeEntity = criterionTypeRepository.findById(idCriterionType);
+    // Получение типа критерия по его ID, если тип критерия существует
+    CriterionTypeEntity criterionTypeEntityFromRequest = criterionTypeRepository.findById(idCriterionType)
+        .orElseThrow(() -> new NotFoundException(String.format(
+            "Criterion type with ID %s not found", idCriterionType)));
 
-    if (optCriterionTypeEntity.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Criterion type with ID %s not found", idCriterionType));
-    }
-
-    return CriterionTypeConverter.toInfo(optCriterionTypeEntity.get());
+    return CriterionTypeConverter.toInfo(criterionTypeEntityFromRequest);
   }
 
   /**

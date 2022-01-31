@@ -1,4 +1,4 @@
-package com.example.familybenefits.service;
+package com.example.familybenefits.service.implementation;
 
 import com.example.familybenefits.api_model.benefit.BenefitAdd;
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
@@ -17,12 +17,12 @@ import com.example.familybenefits.dao.repository.CriterionRepository;
 import com.example.familybenefits.dao.repository.InstitutionRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.security.service.DBIntegrityService;
+import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
+import com.example.familybenefits.service.s_interface.BenefitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -86,13 +86,13 @@ public class BenefitServiceFB implements BenefitService {
   public void add(BenefitAdd benefitAdd) throws AlreadyExistsException, NotFoundException {
 
     // Проверка существования городов, критерий и учреждений по их ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         cityRepository::existsById, benefitAdd.getIdCitySet(),
         "City with ID %s not found");
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         criterionRepository::existsById, benefitAdd.getIdCriterionSet(),
         "Criterion with ID %s not found");
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         institutionRepository::existsById, benefitAdd.getIdInstitutionSet(),
         "Institution with ID %s not found");
 
@@ -102,7 +102,7 @@ public class BenefitServiceFB implements BenefitService {
         .prepareForDB(dbIntegrityService::preparePostgreSQLString);
 
     // Проверка отсутствия пособия по его названию
-    dbIntegrityService.checkAbsenceByUniqStrElseThrow(
+    dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
         benefitRepository::existsByName, benefitEntityFromAdd.getName(),
         "The benefit with name %s already exists");
 
@@ -118,18 +118,18 @@ public class BenefitServiceFB implements BenefitService {
   public void update(BenefitUpdate benefitUpdate) throws NotFoundException {
 
     // Проверка существования городов, критерий и учреждений по их ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         cityRepository::existsById, benefitUpdate.getIdCitySet(),
         "City with ID %s not found");
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         criterionRepository::existsById, benefitUpdate.getIdCriterionSet(),
         "Criterion with ID %s not found");
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         institutionRepository::existsById, benefitUpdate.getIdInstitutionSet(),
         "Institution with ID %s not found");
 
     // Проверка существования пособия по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         benefitRepository::existsById, benefitUpdate.getId(),
         "Benefit with ID %s not found");
 
@@ -148,7 +148,7 @@ public class BenefitServiceFB implements BenefitService {
   public void delete(BigInteger idBenefit) throws NotFoundException {
 
     // Проверка существование пособия по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         benefitRepository::existsById, idBenefit,
         "Benefit with ID %s not found");
 
@@ -164,14 +164,12 @@ public class BenefitServiceFB implements BenefitService {
   @Override
   public BenefitInfo read(BigInteger idBenefit) throws NotFoundException {
 
-    Optional<BenefitEntity> optBenefitEntity = benefitRepository.findById(idBenefit);
+    // Получение пособия по его ID, если пособие существует
+    BenefitEntity benefitEntityFromRequest = benefitRepository.findById(idBenefit)
+        .orElseThrow(() -> new NotFoundException(String.format(
+            "Benefit with ID %s not found", idBenefit)));
 
-    if (optBenefitEntity.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Benefit with ID %s not found", idBenefit));
-    }
-
-    return BenefitConverter.toInfo(optBenefitEntity.get());
+    return BenefitConverter.toInfo(benefitEntityFromRequest);
   }
 
   /**

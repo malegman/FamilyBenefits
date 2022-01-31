@@ -1,4 +1,4 @@
-package com.example.familybenefits.service;
+package com.example.familybenefits.service.implementation;
 
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.api_model.institution.InstitutionAdd;
@@ -14,12 +14,12 @@ import com.example.familybenefits.dao.repository.CityRepository;
 import com.example.familybenefits.dao.repository.InstitutionRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.security.service.DBIntegrityService;
+import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
+import com.example.familybenefits.service.s_interface.InstitutionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,10 +75,10 @@ public class InstitutionServiceFB implements InstitutionService {
   public void add(InstitutionAdd institutionAdd) throws AlreadyExistsException, NotFoundException {
 
     // Проверка существования города и пособий по их ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         cityRepository::existsById, institutionAdd.getIdCity(),
         "City with ID %s not found");
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         cityRepository::existsById, institutionAdd.getIdBenefitSet(),
         "Benefit with ID %s not found");
 
@@ -88,7 +88,7 @@ public class InstitutionServiceFB implements InstitutionService {
         .prepareForDB(dbIntegrityService::preparePostgreSQLString);
 
     // Проверка отсутствия учреждения по его названию
-    dbIntegrityService.checkAbsenceByUniqStrElseThrow(
+    dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
         institutionRepository::existsByName, institutionEntityFromAdd.getName(),
         "The institution %s already exists");
 
@@ -104,15 +104,15 @@ public class InstitutionServiceFB implements InstitutionService {
   public void update(InstitutionUpdate institutionUpdate) throws NotFoundException {
 
     // Проверка существования города и пособий по их ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         cityRepository::existsById, institutionUpdate.getIdCity(),
         "City with ID %s not found");
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         cityRepository::existsById, institutionUpdate.getIdBenefitSet(),
         "Benefit with ID %s not found");
 
     // Проверка существования учреждения по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         institutionRepository::existsById, institutionUpdate.getId(),
         "Institution with ID %s not found");
 
@@ -131,7 +131,7 @@ public class InstitutionServiceFB implements InstitutionService {
   public void delete(BigInteger idInstitution) throws NotFoundException {
 
     // Проверка существования учреждения по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         institutionRepository::existsById, idInstitution,
         "Institution with ID %s not found");
 
@@ -147,14 +147,12 @@ public class InstitutionServiceFB implements InstitutionService {
   @Override
   public InstitutionInfo read(BigInteger idInstitution) throws NotFoundException {
 
-    Optional<InstitutionEntity> optInstitutionEntity = institutionRepository.findById(idInstitution);
+    // Получение учреждения по его ID, если учреждение существует
+    InstitutionEntity institutionEntityFromRequest = institutionRepository.findById(idInstitution)
+        .orElseThrow(() -> new NotFoundException(String.format(
+            "Institution with ID %s not found", idInstitution)));
 
-    if (optInstitutionEntity.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "Institution with ID %s not found", idInstitution));
-    }
-
-    return InstitutionConverter.toInfo(optInstitutionEntity.get());
+    return InstitutionConverter.toInfo(institutionEntityFromRequest);
   }
 
   /**

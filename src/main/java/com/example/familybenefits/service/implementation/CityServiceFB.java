@@ -1,4 +1,4 @@
-package com.example.familybenefits.service;
+package com.example.familybenefits.service.implementation;
 
 import com.example.familybenefits.api_model.city.CityAdd;
 import com.example.familybenefits.api_model.city.CityInfo;
@@ -12,12 +12,12 @@ import com.example.familybenefits.dao.repository.BenefitRepository;
 import com.example.familybenefits.dao.repository.CityRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.security.service.DBIntegrityService;
+import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
+import com.example.familybenefits.service.s_interface.CityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -66,7 +66,7 @@ public class CityServiceFB implements CityService {
   public void add(CityAdd cityAdd) throws AlreadyExistsException, NotFoundException {
 
     // Проверка существования пособий их ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         cityRepository::existsById, cityAdd.getIdBenefitSet(),
         "Benefit with ID %s not found");
 
@@ -76,7 +76,7 @@ public class CityServiceFB implements CityService {
         .prepareForDB(dbIntegrityService::preparePostgreSQLString);
 
     // Проверка отсутствия города по его названию
-    dbIntegrityService.checkAbsenceByUniqStrElseThrow(
+    dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
         cityRepository::existsByName, cityEntityFromAdd.getName(),
         "The city with name %s already exists");
 
@@ -92,12 +92,12 @@ public class CityServiceFB implements CityService {
   public void update(CityUpdate cityUpdate) throws NotFoundException {
 
     // Проверка существования пособий их ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         cityRepository::existsById, cityUpdate.getIdBenefitSet(),
         "Benefit with ID %s not found");
 
     // Проверка существование города по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         cityRepository::existsById, cityUpdate.getId(),
         "City with ID %s not found");
 
@@ -116,7 +116,7 @@ public class CityServiceFB implements CityService {
   public void delete(BigInteger idCity) throws NotFoundException {
 
     // Проверка существование города по его ID
-    dbIntegrityService.checkExistenceByIdElseThrow(
+    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
         cityRepository::existsById, idCity,
         "City with ID %s not found");
 
@@ -132,14 +132,12 @@ public class CityServiceFB implements CityService {
   @Override
   public CityInfo read(BigInteger idCity) throws NotFoundException {
 
-    Optional<CityEntity> optCityEntity = cityRepository.findById(idCity);
+    // Получение города по его ID, если город существует
+    CityEntity cityEntityFromRequest = cityRepository.findById(idCity)
+        .orElseThrow(() -> new NotFoundException(String.format(
+            "City with ID %s not found", idCity)));
 
-    if (optCityEntity.isEmpty()) {
-      throw new NotFoundException(String.format(
-          "City with ID %s not found", idCity));
-    }
-
-    return CityConverter.toInfo(optCityEntity.get());
+    return CityConverter.toInfo(cityEntityFromRequest);
   }
 
   /**
