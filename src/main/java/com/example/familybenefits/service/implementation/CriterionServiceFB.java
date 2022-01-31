@@ -43,7 +43,7 @@ public class CriterionServiceFB implements CriterionService {
   private final DBIntegrityService dbIntegrityService;
 
   /**
-   * Конструктор для инициализации интерфейсов репозиториев
+   * Конструктор для инициализации интерфейсов репозиториев и сервиса
    * @param criterionRepository репозиторий, работающий с моделью таблицы "criterion"
    * @param criterionTypeRepository репозиторий, работающий с моделью таблицы "criterion_type"
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных

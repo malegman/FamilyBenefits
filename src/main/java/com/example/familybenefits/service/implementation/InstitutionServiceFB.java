@@ -50,7 +50,7 @@ public class InstitutionServiceFB implements InstitutionService {
   private final DBIntegrityService dbIntegrityService;
 
   /**
-   * Конструктор для инициализации интерфейсов репозиториев
+   * Конструктор для инициализации интерфейсов репозиториев и сервиса
    * @param institutionRepository репозиторий, работающий с моделью таблицы "institution"
    * @param cityRepository репозиторий, работающий с моделью таблицы "city"
    * @param benefitRepository репозиторий, работающий с моделью таблицы "benefit"

@@ -58,7 +58,7 @@ public class BenefitServiceFB implements BenefitService {
   private final DBIntegrityService dbIntegrityService;
 
   /**
-   * Конструктор для инициализации интерфейсов репозиториев
+   * Конструктор для инициализации интерфейсов репозиториев и сервиса
    * @param benefitRepository репозиторий, работающий с моделью таблицы "benefit"
    * @param cityRepository репозиторий, работающий с моделью таблицы "city"
    * @param institutionRepository репозиторий, работающий с моделью таблицы "institution"

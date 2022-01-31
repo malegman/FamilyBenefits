@@ -43,7 +43,7 @@ public class AdminServiceFB implements AdminService {
   private final PasswordEncoder passwordEncoder;
 
   /**
-   * Конструктор для инициализации интерфейсов репозиториев
+   * Конструктор для инициализации интерфейсов репозиториев и сервисов
    * @param userRepository репозиторий, работающий с моделью таблицы "user"
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    * @param userSecurityService интерфейс сервиса, отвечающего за данные пользователя

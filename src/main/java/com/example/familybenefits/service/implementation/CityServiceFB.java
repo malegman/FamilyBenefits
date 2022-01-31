@@ -43,7 +43,7 @@ public class CityServiceFB implements CityService {
   private final DBIntegrityService dbIntegrityService;
 
   /**
-   * Конструктор для инициализации интерфейсов репозиториев
+   * Конструктор для инициализации интерфейсов репозиториев и сервиса
    * @param cityRepository репозиторий, работающий с моделью таблицы "city"
    * @param benefitRepository репозиторий, работающий с моделью таблицы "benefit"
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
