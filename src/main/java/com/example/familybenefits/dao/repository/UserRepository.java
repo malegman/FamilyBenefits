@@ -27,33 +27,7 @@ public interface UserRepository extends JpaRepository<UserEntity, BigInteger> {
   boolean existsByEmail(String email);
 
   /**
-   * Проверяет наличие администратора с указанным email
-   * @param email email администратора
-   * @return true, если администратор с указанным email существует
-   */
-  @Query(nativeQuery = true,
-      value = "SELECT EXISTS(" +
-          "SELECT * FROM family_benefit.user " +
-          "INNER JOIN family_benefit.users_roles ON family_benefit.user.id = family_benefit.users_roles.id_user " +
-          "INNER JOIN family_benefit.role ON family_benefit.users_roles.id_role = family_benefit.role.id " +
-          "WHERE family_benefit.role.name LIKE 'ROLE_ADMIN');")
-  boolean existsAdminByEmail(String email);
-
-  /**
-   * Проверяет наличие пользователя с указанным email
-   * @param email email пользователя
-   * @return true, если пользователь с указанным email существует
-   */
-  @Query(nativeQuery = true,
-      value = "SELECT EXISTS(" +
-          "SELECT * FROM family_benefit.user " +
-          "INNER JOIN family_benefit.users_roles ON family_benefit.user.id = family_benefit.users_roles.id_user " +
-          "INNER JOIN family_benefit.role ON family_benefit.users_roles.id_role = family_benefit.role.id " +
-          "WHERE family_benefit.role.name LIKE 'ROLE_USER');")
-  boolean existsUserByEmail(String email);
-
-  /**
-   * Возращает пользователя с ролью "ROLE_SUPER_ADMIN"
+   * Возвращает пользователя с ролью "ROLE_SUPER_ADMIN"
    * @return пользователь с ролью "ROLE_SUPER_ADMIN"
    */
   @Query(nativeQuery = true,
