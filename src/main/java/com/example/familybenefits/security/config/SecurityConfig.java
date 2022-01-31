@@ -1,6 +1,6 @@
 package com.example.familybenefits.security.config;
 
-import com.example.familybenefits.security.service.JwtFilter;
+import com.example.familybenefits.security.service.implementation.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -66,7 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.GET, "/user/initdata").permitAll()
 
         // requests: admin
-        .antMatchers(HttpMethod.POST, "/admin", "/admin/fromuser/{id}", "/admin/{id}/touser").hasRole("SUPER_ADMIN")
+        .antMatchers(HttpMethod.POST, "/admin", "/admin/fromuser/{id}", "/admin/{id}/touser", "/admin/{id}/tosuper").hasRole("SUPER_ADMIN")
         .antMatchers(HttpMethod.PUT, "/admin").hasRole("ADMIN")
         .antMatchers(HttpMethod.GET, "/admin/{id}").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/admin/{id}").hasRole("SUPER_ADMIN")
