@@ -472,9 +472,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserInitData'
-        '404':
-          description: Дополнительные данные пользователя не найдены
-          content: { }
       security: [ ]
 
 
@@ -864,9 +861,9 @@ paths:
     get:
       tags:
         - city
-      summary: Возвращает множество всех городов
+      summary: Возвращает множество городов, в которых есть учреждения и пособия
       description:
-        Возвращает множество всех городов.
+        Возвращает множество городов, в которых есть учреждения и пособия.
       operationId: getCities
       responses:
         '200':
@@ -877,10 +874,35 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CityInfo'
-        '404':
-          description: Города не найдены
-          content: { }
       security: [ ]
+  /city/allpartial:
+    get:
+      tags:
+        - city
+      summary: Возвращает множество городов, в которых нет учреждений или пособий
+      description:
+        Возвращает множество городов, в которых нет учреждений или пособий.
+        Для администратора.
+        Необходима авторизация.
+      operationId: getPartialCities
+      responses:
+        '200':
+          description: Множество городов получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CityInfo'
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
   /city/initdata:
     get:
       tags:
@@ -888,7 +910,7 @@ paths:
       summary: Возвращает дополнительные данные для города
       description:
         Возвращает дополнительные данные для добавления или обновления города.
-        Данные содержат в себе множества кратких информаций о пособиях.
+        Данные содержат в себе множество кратких информаций о пособиях.
       operationId: getCityInitData
       responses:
         '200':
@@ -902,9 +924,6 @@ paths:
           content: { }
         '403':
           description: Нет доступа
-          content: { }
-        '404':
-          description: Дополнительные данные города не найдены
           content: { }
       security:
         - cookieAuth: [ ]
@@ -1038,9 +1057,9 @@ paths:
     get:
       tags:
         - benefit
-      summary: Возвращает множество всех полных пособий
+      summary: Возвращает множество пособий, в которых есть города, учреждения и критерии
       description:
-        Возвращает множество всех полных пособий - с городом, учреждением и критерием.
+        Возвращает множество пособий, в которых есть города, учреждения и критерии.
       operationId: getBenefits
       responses:
         '200':
@@ -1051,23 +1070,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BenefitInfo'
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пособия не найдены
-          content: { }
       security: [ ]
   /benefit/allpartial:
     get:
       tags:
         - benefit
-      summary: Возвращает множество всех неполных пособий
+      summary: Возвращает множество пособий, в которых нет городов, учреждений или критерий
       description:
-        Возвращает множество всех неполных пособий - без города, учреждения или критерия.
+        Возвращает множество пособий, в которых нет городов, учреждений или критерий.
         Для администратора.
         Необходима авторизация.
       operationId: getPartialBenefits
@@ -1085,9 +1095,6 @@ paths:
           content: { }
         '403':
           description: Нет доступа
-          content: { }
-        '404':
-          description: Пособия не найдены
           content: { }
       security:
         - cookieAuth: [ ]
@@ -1115,9 +1122,6 @@ paths:
           content: { }
         '403':
           description: Нет доступа
-          content: { }
-        '404':
-          description: Дополнительные данные пособия не найдены
           content: { }
       security:
         - cookieAuth: [ ]
@@ -1251,9 +1255,9 @@ paths:
     get:
       tags:
         - institution
-      summary: Возвращает множество всех учреждений
+      summary: Возвращает множество учреждений, в которых есть пособия
       description:
-        Возвращает множество всех учреждений.
+        Возвращает множество учреждений, в которых есть пособия.
       operationId: getInstitutions
       responses:
         '200':
@@ -1264,10 +1268,35 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InstitutionInfo'
-        '404':
-          description: Учреждения не найдены
-          content: { }
       security: [ ]
+  /institution/allpartial:
+    get:
+      tags:
+        - institution
+      summary: Возвращает множество учреждений, в которых нет пособий
+      description:
+        Возвращает множество учреждений, в которых нет пособий
+        Для администратора.
+        Необходима авторизация.
+      operationId: getPartialInstitutions
+      responses:
+        '200':
+          description: Множество учреждений получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InstitutionInfo'
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
   /institution/initdata:
     get:
       tags:
@@ -1291,9 +1320,6 @@ paths:
           content: { }
         '403':
           description: Нет доступа
-          content: { }
-        '404':
-          description: Дополнительные данные учреждения не найдены
           content: { }
       security:
         - cookieAuth: [ ]
@@ -1427,9 +1453,9 @@ paths:
     get:
       tags:
         - criterion
-      summary: Возвращает множество всех полных критерий
+      summary: Возвращает множество критерий, в которых есть пособия
       description:
-        Возвращает множество всех полных критерий - с типом критерия
+        Возвращает множество критерий, в которых есть пособия
       operationId: getCriteria
       responses:
         '200':
@@ -1440,17 +1466,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CriterionInfo'
-        '404':
-          description: Критерия не найдены
-          content: { }
       security: [ ]
   /criterion/allpartial:
     get:
       tags:
         - criterion
-      summary: Возвращает множество всех неполных критерий
+      summary: Возвращает множество критерий, в которых нет пособий
       description:
-        Возвращает множество всех неполных критерий - без типа критерия.
+        Возвращает множество критерий, в которых нет пособий.
         Для администратора.
         Необходима авторизация.
       operationId: getPartialCriteria
@@ -1468,9 +1491,6 @@ paths:
           content: { }
         '403':
           description: Нет доступа
-          content: { }
-        '404':
-          description: Критерии не найдены
           content: { }
       security:
         - cookieAuth: [ ]
@@ -1498,9 +1518,6 @@ paths:
           content: { }
         '403':
           description: Нет доступа
-          content: { }
-        '404':
-          description: Дополнительные данные критерия не найдены
           content: { }
       security:
         - cookieAuth: [ ]
@@ -1634,23 +1651,48 @@ paths:
     get:
       tags:
         - criterion type
-      summary: Возвращает множество всех типов критерия
+      summary: Возвращает множество типов критерия, в которых есть критерии
       description:
-        Возвращает множество всех типов критерий
+        Возвращает множество типов критерия, в которых есть критерии
       operationId: getCriterionTypes
       responses:
         '200':
-          description: Множество типов критерий получено
+          description: Множество типов критерия получено
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Типы критерий не найдены
-          content: { }
+                  $ref: '#/components/schemas/CriterionTypeInfo'
       security: [ ]
+  /criteriontype/allpartial:
+    get:
+      tags:
+        - criterion type
+      summary: Возвращает множество типов критерия, в которых нет критерий
+      description:
+        Возвращает множество типов критерия, в которых нет критерий.
+        Для администратора.
+        Необходима авторизация.
+      operationId: getPartialCriterionTypes
+      responses:
+        '200':
+          description: Множество типов критерия получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CriterionTypeInfo'
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+      security:
+        - cookieAuth: [ ]
+        - bearerAuth: [ ]
 
 
 components:
@@ -2005,6 +2047,11 @@ components:
           example: info
         shortCriterionType:
           $ref: '#/components/schemas/ObjectShortInfo'
+        shortBenefitSet:
+          description: Множество кратких информаций о пособиях критерия
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectShortInfo'
     CriterionAdd:
       description: Объект запроса для добавления критерия
       properties:
