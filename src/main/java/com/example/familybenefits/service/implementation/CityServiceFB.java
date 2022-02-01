@@ -4,16 +4,16 @@ import com.example.familybenefits.api_model.city.CityAdd;
 import com.example.familybenefits.api_model.city.CityInfo;
 import com.example.familybenefits.api_model.city.CityInitData;
 import com.example.familybenefits.api_model.city.CityUpdate;
-import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.convert.BenefitConverter;
 import com.example.familybenefits.convert.CityConverter;
+import com.example.familybenefits.dao.entity.BenefitEntity;
 import com.example.familybenefits.dao.entity.CityEntity;
-import com.example.familybenefits.dao.repository.BenefitRepository;
 import com.example.familybenefits.dao.repository.CityRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.service.s_interface.CityService;
+import com.example.familybenefits.service.s_interface.PartEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * Реализация сервиса, управляющего объектом "город"
  */
 @Service
-public class CityServiceFB implements CityService {
+public class CityServiceFB implements CityService, PartEntityService<CityEntity> {
 
   /**
    * Репозиторий, работающий с моделью таблицы "city"
@@ -33,9 +33,9 @@ public class CityServiceFB implements CityService {
   private final CityRepository cityRepository;
 
   /**
-   * Репозиторий, работающий с моделью таблицы "benefit"
+   * Интерфейс сервиса для моделей таблицы "benefit", целостность которых зависит от связанных таблиц
    */
-  private final BenefitRepository benefitRepository;
+  private final PartEntityService<BenefitEntity> benefitPartEntityService;
 
   /**
    * Интерфейс сервиса, отвечающего за целостность базы данных
@@ -45,14 +45,15 @@ public class CityServiceFB implements CityService {
   /**
    * Конструктор для инициализации интерфейсов репозиториев и сервиса
    * @param cityRepository репозиторий, работающий с моделью таблицы "city"
-   * @param benefitRepository репозиторий, работающий с моделью таблицы "benefit"
+   * @param benefitPartEntityService интерфейс сервиса для моделей таблицы "benefit", целостность которых зависит от связанных таблиц
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    */
   @Autowired
-  public CityServiceFB(CityRepository cityRepository, BenefitRepository benefitRepository,
+  public CityServiceFB(CityRepository cityRepository,
+                       PartEntityService<BenefitEntity> benefitPartEntityService,
                        DBIntegrityService dbIntegrityService) {
     this.cityRepository = cityRepository;
-    this.benefitRepository = benefitRepository;
+    this.benefitPartEntityService = benefitPartEntityService;
     this.dbIntegrityService = dbIntegrityService;
   }
 
@@ -141,49 +142,87 @@ public class CityServiceFB implements CityService {
   }
 
   /**
-   * Возвращает множество всех городов
+   * Возвращает множество городов, в которых есть учреждения и пособия
    * @return множество информаций о городах
-   * @throws NotFoundException если города не найдены
    */
   @Override
-  public Set<CityInfo> readAll() throws NotFoundException {
+  public Set<CityInfo> getAll() {
 
-    Set<CityInfo> cityInfoSet = cityRepository
-        .findAll()
+    return findAllFull()
         .stream()
         .map(CityConverter::toInfo)
         .collect(Collectors.toSet());
+  }
 
-    if (cityInfoSet.isEmpty()) {
-      throw new NotFoundException("Cities not found");
-    }
+  /**
+   * Возвращает множество городов, в которых нет учреждений или пособий
+   * @return множество информаций о городах
+   */
+  @Override
+  public Set<CityInfo> getAllPartial() {
 
-    return cityInfoSet;
+    return findAllPartial()
+        .stream()
+        .map(CityConverter::toInfo)
+        .collect(Collectors.toSet());
   }
 
   /**
    * Возвращает дополнительные данные для города.
    * Данные содержат в себе множества кратких информаций о пособиях
    * @return дополнительные данные для города
-   * @throws NotFoundException если данные не найдены
    */
   @Override
-  public CityInitData getInitData() throws NotFoundException {
-
-    // Получение множества кратких информаций о всех полных пособиях
-    Set<ObjectShortInfo> benefitShortInfoSet = benefitRepository
-        .findAllFull()
-        .stream()
-        .map(BenefitConverter::toShortInfo)
-        .collect(Collectors.toSet());
-
-    if (benefitShortInfoSet.isEmpty()) {
-      throw new NotFoundException("Benefits not found");
-    }
+  public CityInitData getInitData() {
 
     return CityInitData
         .builder()
-        .shortBenefitSet(benefitShortInfoSet)
+        .shortBenefitSet(benefitPartEntityService
+                             .findAllFull()
+                             .stream()
+                             .map(BenefitConverter::toShortInfo)
+                             .collect(Collectors.toSet()))
         .build();
+  }
+
+  /**
+   * Проверяет существование модели таблицы "city" по ID
+   * @param id ID модели
+   * @return true, если модель существует
+   */
+  @Override
+  public boolean existsById(BigInteger id) {
+
+    return cityRepository.existsById(id);
+  }
+
+  /**
+   * Возвращает множество моделей таблицы "city", в которых есть модели пособий и учреждений
+   * @return множество моделей таблиц
+   */
+  @Override
+  public Set<CityEntity> findAllFull() {
+
+    return cityRepository
+        .findAll()
+        .stream()
+        .filter(cityEntity -> !cityEntity.getBenefitEntitySet().isEmpty()
+            && !cityEntity.getInstitutionEntitySet().isEmpty())
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Возвращает множество моделей таблицы "city", в которых нет моделей пособий или учреждений
+   * @return множество моделей таблиц
+   */
+  @Override
+  public Set<CityEntity> findAllPartial() {
+
+    return cityRepository
+        .findAll()
+        .stream()
+        .filter(cityEntity -> cityEntity.getBenefitEntitySet().isEmpty()
+            || cityEntity.getInstitutionEntitySet().isEmpty())
+        .collect(Collectors.toSet());
   }
 }

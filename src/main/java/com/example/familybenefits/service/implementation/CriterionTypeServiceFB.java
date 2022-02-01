@@ -10,6 +10,7 @@ import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.service.s_interface.CriterionTypeService;
+import com.example.familybenefits.service.s_interface.PartEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
  * Реализация сервиса, управляющего объектом "тип критерия"
  */
 @Service
-public class CriterionTypeServiceFB implements CriterionTypeService {
+public class CriterionTypeServiceFB implements CriterionTypeService, PartEntityService<CriterionTypeEntity> {
 
   /**
    * Репозиторий, работающий с моделью таблицы "criterion_type"
@@ -89,6 +90,7 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
    * @param idCriterionType ID типа критерия
    * @throws NotFoundException если тип критерия с указанным ID не найден
    */
+  @Override
   public void delete(BigInteger idCriterionType) throws NotFoundException {
 
     // Проверка существования типа критерия по его ID
@@ -105,6 +107,7 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
    * @return информация о типе критерия
    * @throws NotFoundException если тип критерия с указанным ID не найден
    */
+  @Override
   public CriterionTypeInfo read(BigInteger idCriterionType) throws NotFoundException {
 
     // Получение типа критерия по его ID, если тип критерия существует
@@ -116,22 +119,67 @@ public class CriterionTypeServiceFB implements CriterionTypeService {
   }
 
   /**
-   * Возвращает множество всех типов критерий
+   * Возвращает множество типов критерия, в которых есть критерии
    * @return множество информаций о типах критерий
-   * @throws NotFoundException если типы критерий не найдены
    */
-  public Set<CriterionTypeInfo> readAll() throws NotFoundException {
+  @Override
+  public Set<CriterionTypeInfo> getAll() {
 
-    Set<CriterionTypeInfo> criterionTypeInfoSet = criterionTypeRepository
-        .findAll()
+    return findAllFull()
         .stream()
         .map(CriterionTypeConverter::toInfo)
         .collect(Collectors.toSet());
+  }
 
-    if (criterionTypeInfoSet.isEmpty()) {
-      throw new NotFoundException("Criterion types not found");
-    }
+  /**
+   * Возвращает множество типов критерия, в которых нет критерий
+   * @return множество информаций о типах критерий
+   */
+  @Override
+  public Set<CriterionTypeInfo> getAllPartial() {
 
-    return criterionTypeInfoSet;
+    return findAllPartial()
+        .stream()
+        .map(CriterionTypeConverter::toInfo)
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Проверяет существование модели таблицы "criterion_type" по ID
+   * @param id ID модели
+   * @return true, если модель существует
+   */
+  @Override
+  public boolean existsById(BigInteger id) {
+
+    return criterionTypeRepository.existsById(id);
+  }
+
+  /**
+   * Возвращает множество моделей таблицы "criterion_type", в которых есть модели критерий
+   * @return множество моделей таблиц
+   */
+  @Override
+  public Set<CriterionTypeEntity> findAllFull() {
+
+    return criterionTypeRepository
+        .findAll()
+        .stream()
+        .filter(criterionTypeEntity -> !criterionTypeEntity.getCriterionEntitySet().isEmpty())
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Возвращает множество моделей таблицы "criterion_type", в которых нет моделей критерий
+   * @return множество моделей таблиц
+   */
+  @Override
+  public Set<CriterionTypeEntity> findAllPartial() {
+
+    return criterionTypeRepository
+        .findAll()
+        .stream()
+        .filter(criterionTypeEntity -> criterionTypeEntity.getCriterionEntitySet().isEmpty())
+        .collect(Collectors.toSet());
   }
 }

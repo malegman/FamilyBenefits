@@ -1,6 +1,5 @@
 package com.example.familybenefits.service.implementation;
 
-import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.api_model.institution.InstitutionAdd;
 import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.api_model.institution.InstitutionInitData;
@@ -8,14 +7,15 @@ import com.example.familybenefits.api_model.institution.InstitutionUpdate;
 import com.example.familybenefits.convert.BenefitConverter;
 import com.example.familybenefits.convert.CityConverter;
 import com.example.familybenefits.convert.InstitutionConverter;
+import com.example.familybenefits.dao.entity.BenefitEntity;
+import com.example.familybenefits.dao.entity.CityEntity;
 import com.example.familybenefits.dao.entity.InstitutionEntity;
-import com.example.familybenefits.dao.repository.BenefitRepository;
-import com.example.familybenefits.dao.repository.CityRepository;
 import com.example.familybenefits.dao.repository.InstitutionRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.service.s_interface.InstitutionService;
+import com.example.familybenefits.service.s_interface.PartEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * Реализация сервиса, управляющего объектом "учреждение"
  */
 @Service
-public class InstitutionServiceFB implements InstitutionService {
+public class InstitutionServiceFB implements InstitutionService, PartEntityService<InstitutionEntity> {
 
   /**
    * Репозиторий, работающий с моделью таблицы "institution"
@@ -35,14 +35,14 @@ public class InstitutionServiceFB implements InstitutionService {
   private final InstitutionRepository institutionRepository;
 
   /**
-   * Репозиторий, работающий с моделью таблицы "city"
+   * Интерфейс сервиса для моделей таблицы "city", целостность которых зависит от связанных таблиц
    */
-  private final CityRepository cityRepository;
+  private final PartEntityService<CityEntity> cityPartEntityService;
 
   /**
-   * Репозиторий, работающий с моделью таблицы "benefit"
+   * Интерфейс сервиса для моделей таблицы "benefit", целостность которых зависит от связанных таблиц
    */
-  private final BenefitRepository benefitRepository;
+  private final PartEntityService<BenefitEntity> benefitPartEntityService;
 
   /**
    * Интерфейс сервиса, отвечающего за целостность базы данных
@@ -52,16 +52,18 @@ public class InstitutionServiceFB implements InstitutionService {
   /**
    * Конструктор для инициализации интерфейсов репозиториев и сервиса
    * @param institutionRepository репозиторий, работающий с моделью таблицы "institution"
-   * @param cityRepository репозиторий, работающий с моделью таблицы "city"
-   * @param benefitRepository репозиторий, работающий с моделью таблицы "benefit"
+   * @param cityPartEntityService интерфейс сервиса для моделей таблицы "city", целостность которых зависит от связанных таблиц
+   * @param benefitPartEntityService интерфейс сервиса для моделей таблицы "benefit", целостность которых зависит от связанных таблиц
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    */
   @Autowired
-  public InstitutionServiceFB(InstitutionRepository institutionRepository, CityRepository cityRepository,
-                              BenefitRepository benefitRepository, DBIntegrityService dbIntegrityService) {
+  public InstitutionServiceFB(InstitutionRepository institutionRepository,
+                              PartEntityService<CityEntity> cityPartEntityService,
+                              PartEntityService<BenefitEntity> benefitPartEntityService,
+                              DBIntegrityService dbIntegrityService) {
     this.institutionRepository = institutionRepository;
-    this.cityRepository = cityRepository;
-    this.benefitRepository = benefitRepository;
+    this.cityPartEntityService = cityPartEntityService;
+    this.benefitPartEntityService = benefitPartEntityService;
     this.dbIntegrityService = dbIntegrityService;
   }
 
@@ -76,10 +78,10 @@ public class InstitutionServiceFB implements InstitutionService {
 
     // Проверка существования города и пособий по их ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityRepository::existsById, institutionAdd.getIdCity(),
+        cityPartEntityService::existsById, institutionAdd.getIdCity(),
         "City with ID %s not found");
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityRepository::existsById, institutionAdd.getIdBenefitSet(),
+        benefitPartEntityService::existsById, institutionAdd.getIdBenefitSet(),
         "Benefit with ID %s not found");
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
@@ -105,10 +107,10 @@ public class InstitutionServiceFB implements InstitutionService {
 
     // Проверка существования города и пособий по их ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityRepository::existsById, institutionUpdate.getIdCity(),
+        cityPartEntityService::existsById, institutionUpdate.getIdCity(),
         "City with ID %s not found");
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityRepository::existsById, institutionUpdate.getIdBenefitSet(),
+        benefitPartEntityService::existsById, institutionUpdate.getIdBenefitSet(),
         "Benefit with ID %s not found");
 
     // Проверка существования учреждения по его ID
@@ -156,61 +158,91 @@ public class InstitutionServiceFB implements InstitutionService {
   }
 
   /**
-   * Возвращает множество всех учреждений
+   * Возвращает множество учреждений, в которых есть пособия
    * @return множество информаций об учреждениях
-   * @throws NotFoundException если учреждения не найдены
    */
   @Override
-  public Set<InstitutionInfo> readAll() throws NotFoundException {
+  public Set<InstitutionInfo> getAll() {
 
-    Set<InstitutionInfo> institutionInfoSet = institutionRepository
-        .findAll()
+    return findAllFull()
         .stream()
         .map(InstitutionConverter::toInfo)
         .collect(Collectors.toSet());
+  }
 
-    if (institutionInfoSet.isEmpty()) {
-      throw new NotFoundException("Institutions not found");
-    }
+  /**
+   * Возвращает множество учреждений, в которых нет пособий
+   * @return множество информаций об учреждениях
+   */
+  @Override
+  public Set<InstitutionInfo> getAllPartial() {
 
-    return institutionInfoSet;
+    return findAllPartial()
+        .stream()
+        .map(InstitutionConverter::toInfo)
+        .collect(Collectors.toSet());
   }
 
   /**
    * Возвращает дополнительные данные для учреждения.
    * Данные содержат в себе множество кратких информаций о городах.
    * @return дополнительные данные для учреждения
-   * @throws NotFoundException если данные не найдены
    */
   @Override
-  public InstitutionInitData getInitData() throws NotFoundException {
-
-    // Получение множества кратких информаций о всех городах
-    Set<ObjectShortInfo> cityShortInfoSet = cityRepository
-        .findAll()
-        .stream()
-        .map(CityConverter::toShortInfo)
-        .collect(Collectors.toSet());
-
-    if (cityShortInfoSet.isEmpty()) {
-      throw new NotFoundException("Cities not found");
-    }
-
-    // Получение множества кратких информаций о всех полных пособиях
-    Set<ObjectShortInfo> benefitShortInfoSet = benefitRepository
-        .findAllFull()
-        .stream()
-        .map(BenefitConverter::toShortInfo)
-        .collect(Collectors.toSet());
-
-    if (benefitShortInfoSet.isEmpty()) {
-      throw new NotFoundException("Benefits not found");
-    }
+  public InstitutionInitData getInitData() {
 
     return InstitutionInitData
         .builder()
-        .shortCitySet(cityShortInfoSet)
-        .shortBenefitSet(benefitShortInfoSet)
+        .shortCitySet(cityPartEntityService
+                          .findAllFull()
+                          .stream()
+                          .map(CityConverter::toShortInfo)
+                          .collect(Collectors.toSet()))
+        .shortBenefitSet(benefitPartEntityService
+                             .findAllFull()
+                             .stream()
+                             .map(BenefitConverter::toShortInfo)
+                             .collect(Collectors.toSet()))
         .build();
+  }
+
+  /**
+   * Проверяет существование модели таблицы "institution" по ID
+   * @param id ID модели
+   * @return true, если модель существует
+   */
+  @Override
+  public boolean existsById(BigInteger id) {
+
+    return institutionRepository.existsById(id);
+  }
+
+
+  /**
+   * Возвращает множество моделей таблицы "institution", в которых есть модели пособий
+   * @return множество моделей таблиц
+   */
+  @Override
+  public Set<InstitutionEntity> findAllFull() {
+
+    return institutionRepository
+        .findAll()
+        .stream()
+        .filter(institutionEntity -> !institutionEntity.getBenefitEntitySet().isEmpty())
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Возвращает множество моделей таблицы "institution", в которых нет моделей пособий
+   * @return множество моделей таблиц
+   */
+  @Override
+  public Set<InstitutionEntity> findAllPartial() {
+
+    return institutionRepository
+        .findAll()
+        .stream()
+        .filter(institutionEntity -> institutionEntity.getBenefitEntitySet().isEmpty())
+        .collect(Collectors.toSet());
   }
 }

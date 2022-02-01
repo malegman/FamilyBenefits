@@ -4,21 +4,20 @@ import com.example.familybenefits.api_model.benefit.BenefitAdd;
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.benefit.BenefitInitData;
 import com.example.familybenefits.api_model.benefit.BenefitUpdate;
-import com.example.familybenefits.api_model.common.ObjectShortInfo;
-import com.example.familybenefits.api_model.criterion.CriterionInfo;
 import com.example.familybenefits.convert.BenefitConverter;
 import com.example.familybenefits.convert.CityConverter;
 import com.example.familybenefits.convert.CriterionConverter;
 import com.example.familybenefits.convert.InstitutionConverter;
 import com.example.familybenefits.dao.entity.BenefitEntity;
+import com.example.familybenefits.dao.entity.CityEntity;
+import com.example.familybenefits.dao.entity.CriterionEntity;
+import com.example.familybenefits.dao.entity.InstitutionEntity;
 import com.example.familybenefits.dao.repository.BenefitRepository;
-import com.example.familybenefits.dao.repository.CityRepository;
-import com.example.familybenefits.dao.repository.CriterionRepository;
-import com.example.familybenefits.dao.repository.InstitutionRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.service.s_interface.BenefitService;
+import com.example.familybenefits.service.s_interface.PartEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
  * Реализация сервиса, управляющего объектом "пособие"
  */
 @Service
-public class BenefitServiceFB implements BenefitService {
+public class BenefitServiceFB implements BenefitService, PartEntityService<BenefitEntity> {
 
   /**
    * Репозиторий, работающий с моделью таблицы "benefit"
@@ -38,19 +37,19 @@ public class BenefitServiceFB implements BenefitService {
   private final BenefitRepository benefitRepository;
 
   /**
-   * Репозиторий, работающий с моделью таблицы "city"
+   * Интерфейс сервиса для моделей таблицы "city", целостность которых зависит от связанных таблиц
    */
-  private final CityRepository cityRepository;
+  private final PartEntityService<CityEntity> cityPartEntityService;
 
   /**
-   * Репозиторий, работающий с моделью таблицы "institution"
+   * Интерфейс сервиса для моделей таблицы "institution", целостность которых зависит от связанных таблиц
    */
-  private final InstitutionRepository institutionRepository;
+  private final PartEntityService<InstitutionEntity> institutionPartEntityService;
 
   /**
-   * Репозиторий, работающий с моделью таблицы "criterion"
+   * Интерфейс сервиса для моделей таблицы "criterion", целостность которых зависит от связанных таблиц
    */
-  private final CriterionRepository criterionRepository;
+  private final PartEntityService<CriterionEntity> criterionPartEntityService;
 
   /**
    * Интерфейс сервиса, отвечающего за целостность базы данных
@@ -58,21 +57,23 @@ public class BenefitServiceFB implements BenefitService {
   private final DBIntegrityService dbIntegrityService;
 
   /**
-   * Конструктор для инициализации интерфейсов репозиториев и сервиса
+   * Конструктор для инициализации интерфейсов репозиториев и сервисов
    * @param benefitRepository репозиторий, работающий с моделью таблицы "benefit"
-   * @param cityRepository репозиторий, работающий с моделью таблицы "city"
-   * @param institutionRepository репозиторий, работающий с моделью таблицы "institution"
-   * @param criterionRepository репозиторий, работающий с моделью таблицы "criterion"
+   * @param cityPartEntityService интерфейс сервиса для моделей таблицы "city", целостность которых зависит от связанных таблиц
+   * @param institutionPartEntityService интерфейс сервиса для моделей таблицы "institution", целостность которых зависит от связанных таблиц
+   * @param criterionPartEntityService интерфейс сервиса для моделей таблицы "criterion", целостность которых зависит от связанных таблиц
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    */
   @Autowired
-  public BenefitServiceFB(BenefitRepository benefitRepository, CityRepository cityRepository,
-                          InstitutionRepository institutionRepository, CriterionRepository criterionRepository,
+  public BenefitServiceFB(BenefitRepository benefitRepository,
+                          PartEntityService<CityEntity> cityPartEntityService,
+                          PartEntityService<InstitutionEntity> institutionPartEntityService,
+                          PartEntityService<CriterionEntity> criterionPartEntityService,
                           DBIntegrityService dbIntegrityService) {
     this.benefitRepository = benefitRepository;
-    this.cityRepository = cityRepository;
-    this.institutionRepository = institutionRepository;
-    this.criterionRepository = criterionRepository;
+    this.cityPartEntityService = cityPartEntityService;
+    this.institutionPartEntityService = institutionPartEntityService;
+    this.criterionPartEntityService = criterionPartEntityService;
     this.dbIntegrityService = dbIntegrityService;
   }
 
@@ -87,13 +88,13 @@ public class BenefitServiceFB implements BenefitService {
 
     // Проверка существования городов, критерий и учреждений по их ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityRepository::existsById, benefitAdd.getIdCitySet(),
+        cityPartEntityService::existsById, benefitAdd.getIdCitySet(),
         "City with ID %s not found");
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionRepository::existsById, benefitAdd.getIdCriterionSet(),
+        criterionPartEntityService::existsById, benefitAdd.getIdCriterionSet(),
         "Criterion with ID %s not found");
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        institutionRepository::existsById, benefitAdd.getIdInstitutionSet(),
+        institutionPartEntityService::existsById, benefitAdd.getIdInstitutionSet(),
         "Institution with ID %s not found");
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
@@ -119,13 +120,13 @@ public class BenefitServiceFB implements BenefitService {
 
     // Проверка существования городов, критерий и учреждений по их ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityRepository::existsById, benefitUpdate.getIdCitySet(),
+        cityPartEntityService::existsById, benefitUpdate.getIdCitySet(),
         "City with ID %s not found");
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionRepository::existsById, benefitUpdate.getIdCriterionSet(),
+        criterionPartEntityService::existsById, benefitUpdate.getIdCriterionSet(),
         "Criterion with ID %s not found");
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        institutionRepository::existsById, benefitUpdate.getIdInstitutionSet(),
+        institutionPartEntityService::existsById, benefitUpdate.getIdInstitutionSet(),
         "Institution with ID %s not found");
 
     // Проверка существования пособия по его ID
@@ -173,94 +174,99 @@ public class BenefitServiceFB implements BenefitService {
   }
 
   /**
-   * Возвращает множество всех полных пособий - с городом, учреждением и критерием
+   * Возвращает множество пособий, в которых есть города, учреждения и критерии
    * @return множество информаций о пособиях
-   * @throws NotFoundException если пособия не найдены
    */
   @Override
-  public Set<BenefitInfo> readAllFull() throws NotFoundException {
+  public Set<BenefitInfo> getAll() {
 
-    Set<BenefitInfo> benefitInfoSet = benefitRepository
-        .findAllFull()
+    return findAllFull()
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());
-
-    if (benefitInfoSet.isEmpty()) {
-      throw new NotFoundException("Benefits not found");
-    }
-
-    return benefitInfoSet;
   }
 
   /**
-   * Возвращает множество всех неполных пособий - без города, учреждения или критерия
+   * Возвращает множество пособий, в которых нет городов, учреждений или критерий
    * @return множество информаций о пособиях
-   * @throws NotFoundException если пособия не найдены
    */
   @Override
-  public Set<BenefitInfo> readAllPartial() throws NotFoundException {
+  public Set<BenefitInfo> getAllPartial() {
 
-    Set<BenefitInfo> benefitInfoSet = benefitRepository
-        .findAllPartial()
+    return findAllPartial()
         .stream()
         .map(BenefitConverter::toInfo)
         .collect(Collectors.toSet());
-
-    if (benefitInfoSet.isEmpty()) {
-      throw new NotFoundException("Benefits not found");
-    }
-
-    return benefitInfoSet;
   }
 
   /**
    * Возвращает дополнительные данные для пособия.
    * Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
    * @return дополнительные данные для пособия
-   * @throws NotFoundException если данные не найдены
    */
   @Override
-  public BenefitInitData getInitData() throws NotFoundException {
-
-    // Получение множества кратких информаций о всех городах
-    Set<ObjectShortInfo> cityShortInfoSet = cityRepository
-        .findAll()
-        .stream()
-        .map(CityConverter::toShortInfo)
-        .collect(Collectors.toSet());
-
-    if (cityShortInfoSet.isEmpty()) {
-      throw new NotFoundException("Cities not found");
-    }
-
-    // Получение множества информаций о всех критериях с типом
-    Set<CriterionInfo> criterionInfoSet = criterionRepository
-        .findAllByCriterionTypeIsNotNull()
-        .stream()
-        .map(CriterionConverter::toInfo)
-        .collect(Collectors.toSet());
-
-    if (criterionInfoSet.isEmpty()) {
-      throw new NotFoundException("Criteria not found");
-    }
-
-    // Получение множества кратких информаций о всех учреждениях
-    Set<ObjectShortInfo> institutionShortInfoSet = institutionRepository
-        .findAll()
-        .stream()
-        .map(InstitutionConverter::toShortInfo)
-        .collect(Collectors.toSet());
-
-    if (institutionShortInfoSet.isEmpty()) {
-      throw new NotFoundException("Institutions not found");
-    }
+  public BenefitInitData getInitData() {
 
     return BenefitInitData
         .builder()
-        .shortCitySet(cityShortInfoSet)
-        .criterionSet(criterionInfoSet)
-        .shortInstitutionSet(institutionShortInfoSet)
+        .shortCitySet(cityPartEntityService
+                          .findAllFull()
+                          .stream()
+                          .map(CityConverter::toShortInfo)
+                          .collect(Collectors.toSet()))
+        .criterionSet(criterionPartEntityService
+                          .findAllFull()
+                          .stream()
+                          .map(CriterionConverter::toInfo)
+                          .collect(Collectors.toSet()))
+        .shortInstitutionSet(institutionPartEntityService
+                                 .findAllFull()
+                                 .stream()
+                                 .map(InstitutionConverter::toShortInfo)
+                                 .collect(Collectors.toSet()))
         .build();
+  }
+
+  /**
+   * Проверяет существование модели таблицы "benefit" по ID
+   * @param id ID модели
+   * @return true, если модель существует
+   */
+  @Override
+  public boolean existsById(BigInteger id) {
+
+    return benefitRepository.existsById(id);
+  }
+
+  /**
+   * Возвращает множество моделей таблицы "benefit", в которых есть модели городов, учреждений и критерий
+   * @return множество моделей таблиц
+   */
+  @Override
+  public Set<BenefitEntity> findAllFull() {
+
+    return benefitRepository
+        .findAll()
+        .stream()
+        .filter(be -> !be.getCityEntitySet().isEmpty()
+            && !be.getInstitutionEntitySet().isEmpty()
+            && !be.getCriterionEntitySet().isEmpty())
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Возвращает множество моделей таблицы "benefit", в которых нет моделей городов, учреждений и критерий
+   * @return множество моделей таблиц
+   */
+  @Override
+  public Set<BenefitEntity> findAllPartial() {
+
+    return benefitRepository
+        .findAll()
+        .stream()
+        .filter(be -> be.getCityEntitySet().isEmpty()
+            || be.getInstitutionEntitySet().isEmpty()
+            || be.getCriterionEntitySet().isEmpty())
+        .collect(Collectors.toSet());
   }
 }
