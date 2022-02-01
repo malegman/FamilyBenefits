@@ -99,7 +99,7 @@ public class InstitutionConverter {
   /**
    * Преобразует модель таблицы "institution" в объект краткой информации об объекте
    * @param institutionEntity модель таблицы "institution"
-   * @return краткая информция об учреждении
+   * @return краткая информация об учреждении
    */
   static public ObjectShortInfo toShortInfo(InstitutionEntity institutionEntity) {
 

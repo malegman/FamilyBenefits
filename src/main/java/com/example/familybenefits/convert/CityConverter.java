@@ -89,7 +89,7 @@ public class CityConverter {
   /**
    * Преобразует модель таблицы "city" в объект краткой информации об объекте
    * @param cityEntity модель таблицы "city"
-   * @return краткая информция о городе
+   * @return краткая информация о городе
    */
   static public ObjectShortInfo toShortInfo(CityEntity cityEntity) {
 

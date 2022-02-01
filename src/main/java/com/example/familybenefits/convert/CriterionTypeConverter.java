@@ -76,7 +76,7 @@ public class CriterionTypeConverter {
   /**
    * Преобразует модель таблицы "criterion_type" в объект краткой информации об объекте
    * @param criterionTypeEntity модель таблицы "criterion_type"
-   * @return краткая информция о типе критерия
+   * @return краткая информация о типе критерия
    */
   static public ObjectShortInfo toShortInfo(CriterionTypeEntity criterionTypeEntity) {
 
