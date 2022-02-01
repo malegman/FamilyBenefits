@@ -46,17 +46,21 @@ public interface CityService {
   CityInfo read(BigInteger idCity) throws NotFoundException;
 
   /**
-   * Возвращает множество всех городов
+   * Возвращает множество городов, в которых есть учреждения и пособия
    * @return множество информаций о городах
-   * @throws NotFoundException если города не найдены
    */
-  Set<CityInfo> readAll() throws NotFoundException;
+  Set<CityInfo> getAll();
+
+  /**
+   * Возвращает множество городов, в которых нет учреждений или пособий
+   * @return множество информаций о городах
+   */
+  Set<CityInfo> getAllPartial();
 
   /**
    * Возвращает дополнительные данные для города.
    * Данные содержат в себе множества кратких информаций о пособиях
    * @return дополнительные данные для города
-   * @throws NotFoundException если данные не найдены
    */
-  CityInitData getInitData() throws NotFoundException;
+  CityInitData getInitData();
 }

@@ -46,17 +46,21 @@ public interface InstitutionService {
   InstitutionInfo read(BigInteger idInstitution) throws NotFoundException;
 
   /**
+   * Возвращает множество учреждений, в которых есть пособия
+   * @return множество информаций об учреждениях
+   */
+  Set<InstitutionInfo> getAll();
+
+  /**
+   * Возвращает множество учреждений, в которых нет пособий
+   * @return множество информаций об учреждениях
+   */
+  Set<InstitutionInfo> getAllPartial();
+
+  /**
    * Возвращает дополнительные данные для учреждения.
    * Данные содержат в себе множество кратких информаций о городах.
    * @return дополнительные данные для учреждения
-   * @throws NotFoundException если данные не найдены
    */
-  InstitutionInitData getInitData() throws NotFoundException;
-
-  /**
-   * Возвращает множество всех учреждений
-   * @return множество информаций об учреждениях
-   * @throws NotFoundException если учреждения не найдены
-   */
-  Set<InstitutionInfo> readAll() throws NotFoundException;
+  InstitutionInitData getInitData();
 }
