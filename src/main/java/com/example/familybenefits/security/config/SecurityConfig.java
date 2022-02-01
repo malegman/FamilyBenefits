@@ -75,7 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.POST, "/city").hasRole("ADMIN")
         .antMatchers(HttpMethod.PUT, "/city").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/city/{id}").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/city/initdata").hasRole("ADMIN")
+        .antMatchers(HttpMethod.GET, "/city/initdata", "/city/allpartial").hasRole("ADMIN")
         .antMatchers(HttpMethod.GET, "/city/{id}", "/city/all").permitAll()
 
         // requests: benefit
@@ -89,7 +89,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.POST, "/institution").hasRole("ADMIN")
         .antMatchers(HttpMethod.PUT, "/institution").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/institution/{id}").hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/institution/initdata").hasRole("ADMIN")
+        .antMatchers(HttpMethod.GET, "/institution/initdata", "/institution/allpartial").hasRole("ADMIN")
         .antMatchers(HttpMethod.GET, "/institution/{id}", "/institution/all").permitAll()
 
         // requests: criterion
@@ -103,6 +103,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.POST, "/criteriontype").hasRole("ADMIN")
         .antMatchers(HttpMethod.PUT, "/criteriontype").hasRole("ADMIN")
         .antMatchers(HttpMethod.DELETE, "/criteriontype/{id}").hasRole("ADMIN")
+        .antMatchers(HttpMethod.GET, "/criteriontype/allpartial").hasRole("ADMIN")
         .antMatchers(HttpMethod.GET, "/criteriontype/{id}", "/criteriontype/all").permitAll()
 
         .and()
