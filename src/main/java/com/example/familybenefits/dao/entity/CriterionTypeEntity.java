@@ -1,5 +1,6 @@
 package com.example.familybenefits.dao.entity;
 
+import com.example.familybenefits.security.service.s_interface.EntityPreparer;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
@@ -22,7 +23,7 @@ import java.util.function.Function;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class CriterionTypeEntity implements DBPreparer {
+public class CriterionTypeEntity implements EntityPreparer {
 
   /**
    * ID типа критерия
@@ -63,12 +64,12 @@ public class CriterionTypeEntity implements DBPreparer {
   }
 
   /**
-   * Обработывает строковые поля объекта перед записью в базу данных
+   * Обрабатывает строковые поля объекта перед записью в базу данных
    * @param prepareFunc функция обработки строки
    * @return объект с обработанными полями
    */
   @Override
-  public DBPreparer prepareForDB(Function<String, String> prepareFunc) {
+  public EntityPreparer prepareForDB(Function<String, String> prepareFunc) {
 
     name = prepareFunc.apply(name);
     info = prepareFunc.apply(info);

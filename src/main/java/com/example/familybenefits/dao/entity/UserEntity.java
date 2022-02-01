@@ -1,5 +1,6 @@
 package com.example.familybenefits.dao.entity;
 
+import com.example.familybenefits.security.service.s_interface.EntityPreparer;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
@@ -23,7 +24,7 @@ import java.util.function.Function;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class UserEntity implements DBPreparer {
+public class UserEntity implements EntityPreparer {
 
   /**
    * ID пользователя
@@ -41,7 +42,7 @@ public class UserEntity implements DBPreparer {
   private String name;
 
   /**
-   * Эллектронная почта пользователя
+   * Электронная почта пользователя
    */
   @NonNull
   @Column(name = "email")
@@ -116,7 +117,7 @@ public class UserEntity implements DBPreparer {
 
   /**
    * Проверяет наличие роли у пользователя
-   * @param nameRole название роли, наличие которой необходимр проверить
+   * @param nameRole название роли, наличие которой необходимо проверить
    * @return true, если пользователь имеет роль с указанным именем
    */
   public boolean hasRole(String nameRole) {
@@ -159,12 +160,12 @@ public class UserEntity implements DBPreparer {
   }
 
   /**
-   * Обработывает строковые поля объекта перед записью в базу данных
+   * Обрабатывает строковые поля объекта перед записью в базу данных
    * @param prepareFunc функция обработки строки
    * @return объект с обработанными полями
    */
   @Override
-  public DBPreparer prepareForDB(Function<String, String> prepareFunc) {
+  public EntityPreparer prepareForDB(Function<String, String> prepareFunc) {
 
     name = prepareFunc.apply(name);
     email = prepareFunc.apply(email);

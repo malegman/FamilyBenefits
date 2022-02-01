@@ -1,16 +1,16 @@
-package com.example.familybenefits.dao.entity;
+package com.example.familybenefits.security.service.s_interface;
 
 import java.util.function.Function;
 
 /**
  * Предоставляет функцию для обработки объекта перед записью в базу данных
  */
-public interface DBPreparer {
+public interface EntityPreparer {
 
   /**
-   * Обработывает строковые поля объекта перед записью в базу данных
+   * Обрабатывает строковые поля объекта перед записью в базу данных
    * @param prepareFunc функция обработки строки
    * @return объект с обработанными полями
    */
-  DBPreparer prepareForDB(Function<String, String> prepareFunc);
+  EntityPreparer prepareForDB(Function<String, String> prepareFunc);
 }
