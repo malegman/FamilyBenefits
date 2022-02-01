@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.math.BigInteger;
+import java.util.Set;
 
 /**
  * Критерий для подбора пособий
@@ -38,4 +39,10 @@ public class CriterionInfo {
    */
   @JsonProperty("shortCriterionType")
   private ObjectShortInfo shortCriterionType;
+
+  /**
+   * Множество кратких информаций о пособиях критерия
+   */
+  @JsonProperty("shortBenefitSet")
+  private Set<ObjectShortInfo> shortBenefitSet;
 }

@@ -1,5 +1,6 @@
 package com.example.familybenefits.dao.entity;
 
+import com.example.familybenefits.security.service.s_interface.EntityPreparer;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
@@ -8,6 +9,7 @@ import org.springframework.lang.Nullable;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -21,7 +23,7 @@ import java.util.function.Function;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class CriterionEntity implements DBPreparer {
+public class CriterionEntity implements EntityPreparer {
 
   /**
    * ID критерия
@@ -54,6 +56,14 @@ public class CriterionEntity implements DBPreparer {
   private CriterionTypeEntity criterionTypeEntity;
 
   /**
+   * Множество пособий критерия
+   */
+  @NonNull
+  @ToString.Exclude
+  @ManyToMany(mappedBy = "criterionEntitySet")
+  private Set<BenefitEntity> benefitEntitySet;
+
+  /**
    * Конструктор для создания модели по ID
    * @param id ID критерия
    */
@@ -62,12 +72,12 @@ public class CriterionEntity implements DBPreparer {
   }
 
   /**
-   * Обработывает строковые поля объекта перед записью в базу данных
+   * Обрабатывает строковые поля объекта перед записью в базу данных
    * @param prepareFunc функция обработки строки
    * @return объект с обработанными полями
    */
   @Override
-  public DBPreparer prepareForDB(Function<String, String> prepareFunc) {
+  public EntityPreparer prepareForDB(Function<String, String> prepareFunc) {
 
     name = prepareFunc.apply(name);
     info = prepareFunc.apply(info);
