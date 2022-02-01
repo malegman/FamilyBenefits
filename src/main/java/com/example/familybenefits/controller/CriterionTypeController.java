@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -128,21 +127,30 @@ public class CriterionTypeController {
   }
 
   /**
-   * Обрабатывает GET запрос "/criteriontype/{id}" на получение множества всех типов критерий.
+   * Обрабатывает GET запрос "/criteriontype/all" на получение множества типов критерия,
+   * в которых есть критерии.
    * Выполнить запрос может любой клиент
    * @return множество типов критерий и код ответа
    */
   @GetMapping(value = "/criteriontype/all")
   public ResponseEntity<Set<CriterionTypeInfo>> getCriterionTypes() {
 
-    try {
-      Set<CriterionTypeInfo> criterionTypeInfoSet = criterionTypeService.readAll();
-      return ResponseEntity.status(HttpStatus.OK).body(criterionTypeInfoSet);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(criterionTypeService.getAll());
+  }
 
-    } catch (NotFoundException e) {
-      // Не найдены типы критерий
-      log.error("GET \"/criteriontype/{id}\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
-    }
+  /**
+   * Обрабатывает GET запрос "/criteriontype/allpartial" на получение множества типов критерия,
+   * в которых нет критерий.
+   * Выполнить запрос может любой клиент
+   * @return множество типов критерий и код ответа
+   */
+  @GetMapping(value = "/criteriontype/allpartial")
+  public ResponseEntity<Set<CriterionTypeInfo>> getPartialCriterionTypes() {
+
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(criterionTypeService.getAllPartial());
   }
 }
