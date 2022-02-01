@@ -7,6 +7,8 @@ import com.example.familybenefits.api_model.criterion.CriterionUpdate;
 import com.example.familybenefits.dao.entity.CriterionEntity;
 import com.example.familybenefits.dao.entity.CriterionTypeEntity;
 
+import java.util.stream.Collectors;
+
 /**
  * Класс преобразования модели таблицы "criterion" в другие объекты и получения из других объектов
  */
@@ -68,13 +70,17 @@ public class CriterionConverter {
         .name(criterionEntity.getName())
         .info(criterionEntity.getInfo())
         .shortCriterionType(CriterionTypeConverter.toShortInfo(criterionEntity.getCriterionTypeEntity()))
+        .shortBenefitSet(criterionEntity.getBenefitEntitySet()
+                             .stream()
+                             .map(BenefitConverter::toShortInfo)
+                             .collect(Collectors.toSet()))
         .build();
   }
 
   /**
    * Преобразует модель таблицы "criterion" в объект краткой информации об объекте
    * @param criterionEntity модель таблицы "criterion"
-   * @return краткая информция о критерии
+   * @return краткая информация о критерии
    */
   static public ObjectShortInfo toShortInfo(CriterionEntity criterionEntity) {
 
