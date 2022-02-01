@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -134,41 +133,31 @@ public class CriterionController {
   }
 
   /**
-   * Обрабатывает GET запрос "/criterion/all" на получение множества всех полных критерий: с типом критерия.
+   * Обрабатывает GET запрос "/criterion/all" на получение множества критерий,
+   * в которых есть пособия.
    * Выполнить запрос может любой клиент
    * @return множество критерий, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/criterion/all")
   public ResponseEntity<Set<CriterionInfo>> getCriteria() {
 
-    try {
-      Set<CriterionInfo> criterionInfoSet = criterionService.readAllFull();
-      return ResponseEntity.status(HttpStatus.OK).body(criterionInfoSet);
-
-    } catch (NotFoundException e) {
-      // Не найдены полные критерии
-      log.error("GET \"/criterion/all\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
-    }
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(criterionService.getAll());
   }
 
   /**
-   * Обрабатывает GET запрос "/criterion/allpartial" на получение множества всех неполных критерий: без типа критерия
+   * Обрабатывает GET запрос "/criterion/allpartial" на получение множества критерий,
+   * в которых нет пособий.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @return множество критерий, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/criterion/allpartial")
   public ResponseEntity<Set<CriterionInfo>> getPartialCriteria() {
 
-    try {
-      Set<CriterionInfo> criterionInfoSet = criterionService.readAllPartial();
-      return ResponseEntity.status(HttpStatus.OK).body(criterionInfoSet);
-
-    } catch (NotFoundException e) {
-      // Не найдены неполные критерии
-      log.error("GET \"/criterion/allpartial\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
-    }
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(criterionService.getAllPartial());
   }
 
   /**
@@ -180,14 +169,8 @@ public class CriterionController {
   @GetMapping(value = "/criterion/initdata")
   public ResponseEntity<CriterionInitData> getCriterionInitData() {
 
-    try {
-      CriterionInitData criterionInitData = criterionService.getInitData();
-      return ResponseEntity.status(HttpStatus.OK).body(criterionInitData);
-
-    } catch (NotFoundException e) {
-      // Не найдены типы критерия
-      log.error("GET \"/criterion/initdata\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(criterionService.getInitData());
   }
 }

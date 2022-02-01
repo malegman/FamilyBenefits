@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -134,41 +133,44 @@ public class CityController {
   }
 
   /**
-   * Обрабатывает GET запрос "/city/all" на получение множества всех городов.
+   * Обрабатывает GET запрос "/city/all" на получение множества городов,
+   * в которых есть учреждения и пособия.
    * Выполнить запрос может любой клиент
    * @return множество городов, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/city/all")
   public ResponseEntity<Set<CityInfo>> getCities() {
 
-    try {
-      Set<CityInfo> cityInfoSet = cityService.readAll();
-      return ResponseEntity.status(HttpStatus.OK).body(cityInfoSet);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(cityService.getAll());
+  }
 
-    } catch (NotFoundException e) {
-      // Не найдены города
-      log.error("GET \"/city/all\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
-    }
+  /**
+   * Обрабатывает GET запрос "/city/allpartial" на получение множества городов,
+   * в которых нет учреждений или пособий.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @return множество городов, если запрос выполнен успешно, и код ответа
+   */
+  @GetMapping(value = "/city/allpartial")
+  public ResponseEntity<Set<CityInfo>> getPartialCities() {
+
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(cityService.getAllPartial());
   }
 
   /**
    * Обрабатывает GET запрос "/city/initdata" на получение дополнительных данных для города.
-   * Данные содержат в себе множества кратких информаций о пособиях.
+   * Данные содержат в себе множество кратких информаций о пособиях.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @return дополнительные данные для города, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/city/initdata")
   public ResponseEntity<CityInitData> getCityInitData() {
 
-    try {
-      CityInitData cityInitData = cityService.getInitData();
-      return ResponseEntity.status(HttpStatus.OK).body(cityInitData);
-
-    } catch (NotFoundException e) {
-      // Не найдены пособия
-      log.error("GET \"/city/initdata\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(cityService.getInitData());
   }
 }

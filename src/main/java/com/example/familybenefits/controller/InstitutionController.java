@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -134,40 +133,44 @@ public class InstitutionController {
   }
 
   /**
-   * Обрабатывает GET запрос "/institution/{id}" на получение множества всех учреждений.
+   * Обрабатывает GET запрос "/institution/all" на получение множества учреждений,
+   * в которых есть пособия.
    * Выполнить запрос может любой клиент
    * @return множество учреждений и код ответа
    */
   @GetMapping(value = "/institution/all")
   public ResponseEntity<Set<InstitutionInfo>> getInstitutions() {
 
-    try {
-      Set<InstitutionInfo> institutionInfoSet = institutionService.readAll();
-      return ResponseEntity.status(HttpStatus.OK).body(institutionInfoSet);
-
-    } catch (NotFoundException e) {
-      // Не найдены учреждения
-      log.error("GET \"/institution/all\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
-    }
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(institutionService.getAll());
   }
 
   /**
-   * Обрабатывает GET запрос "/institution/{id}" на получение дополнительных данных для учреждения.
-   * Данные содержат в себе множество кратких информаций о городах и пособиях
+   * Обрабатывает GET запрос "/institution/allpartial" на получение множества учреждений,
+   * в которых нет пособий.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @return множество учреждений и код ответа
+   */
+  @GetMapping(value = "/institution/allpartial")
+  public ResponseEntity<Set<InstitutionInfo>> getPartialInstitutions() {
+
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(institutionService.getAllPartial());
+  }
+
+  /**
+   * Обрабатывает GET запрос "/institution/initdata" на получение дополнительных данных для учреждения.
+   * Данные содержат в себе множество кратких информаций о городах и пособиях.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @return дополнительные данные для учреждения и код ответа
    */
   @GetMapping(value = "/institution/initdata")
   public ResponseEntity<InstitutionInitData> getInstitutionInitData() {
 
-    try {
-      InstitutionInitData institutionInitData = institutionService.getInitData();
-      return ResponseEntity.status(HttpStatus.OK).body(institutionInitData);
-
-    } catch (NotFoundException e) {
-      // Не найдены города или пособия
-      log.error("GET \"/institution/initdata\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(institutionService.getInitData());
   }
 }

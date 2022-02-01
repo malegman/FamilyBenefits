@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -134,41 +133,31 @@ public class BenefitController {
   }
 
   /**
-   * Обрабатывает GET запрос "/benefit/all" на получение множества всех полных пособий: с городом, учреждением и критерием.
+   * Обрабатывает GET запрос "/benefit/all" на получение множества пособий,
+   * в которых есть города, учреждения и критерии.
    * Выполнить запрос может любой клиент
    * @return множество пособий, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/benefit/all")
   public ResponseEntity<Set<BenefitInfo>> getBenefits() {
 
-    try {
-      Set<BenefitInfo> benefitInfoSet = benefitService.readAllFull();
-      return ResponseEntity.status(HttpStatus.OK).body(benefitInfoSet);
-
-    } catch (NotFoundException e) {
-      // Не найдены полные пособия
-      log.error("GET \"/benefit/all\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
-    }
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(benefitService.getAll());
   }
 
   /**
-   * Обрабатывает GET запрос "/benefit/all" на получение множества всех неполных пособий: без города, учреждения или критерия.
+   * Обрабатывает GET запрос "/benefit/allpartial" на получение множества пособий,
+   * в которых нет городов, учреждений или критерий.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @return множество пособий, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/benefit/allpartial")
   public ResponseEntity<Set<BenefitInfo>> getPartialBenefits() {
 
-    try {
-      Set<BenefitInfo> benefitInfoSet = benefitService.readAllPartial();
-      return ResponseEntity.status(HttpStatus.OK).body(benefitInfoSet);
-
-    } catch (NotFoundException e) {
-      // Не найдены неполные пособия
-      log.error("GET \"/benefit/allpartial\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
-    }
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(benefitService.getAllPartial());
   }
 
   /**
@@ -180,14 +169,8 @@ public class BenefitController {
   @GetMapping(value = "/benefit/initdata")
   public ResponseEntity<BenefitInitData> getBenefitInitData() {
 
-    try {
-      BenefitInitData benefitInitData = benefitService.getInitData();
-      return ResponseEntity.status(HttpStatus.OK).body(benefitInitData);
-
-    } catch (NotFoundException e) {
-      // Не найдены города, критерии или учреждения
-      log.error("GET \"/benefit/initdata\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(benefitService.getInitData());
   }
 }
