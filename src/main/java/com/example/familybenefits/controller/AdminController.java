@@ -52,23 +52,11 @@ public class AdminController {
       adminService.add(adminAdd);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
-    } catch (AlreadyExistsException e) {
-      //Администратор или пользователь с указанным email существует
-      log.error("POST \"/admin\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-
-    } catch (PasswordNotSafetyException e) {
-      // Пароль небезопасный
-      log.error("POST \"/admin\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-
-    } catch (InvalidEmailException e) {
-      // Строка в поле "email" не является email
-      log.error("POST \"/admin\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-
-    } catch (PasswordNotEqualsException e) {
-      // Пароли не совпадают
+    } catch (AlreadyExistsException | PasswordNotSafetyException | InvalidEmailException | PasswordNotEqualsException e) {
+      // Администратор или пользователь с указанным email существует.
+      // Пароль небезопасный.
+      // Строка в поле "email" не является email.
+      // Пароли не совпадают.
       log.error("POST \"/admin\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
