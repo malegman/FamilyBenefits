@@ -50,8 +50,10 @@ public class AdminServiceFB implements AdminService {
    * @param passwordEncoder интерфейс сервиса для шифрования паролей
    */
   @Autowired
-  public AdminServiceFB(UserRepository userRepository, DBIntegrityService dbIntegrityService,
-                        UserSecurityService userSecurityService, PasswordEncoder passwordEncoder) {
+  public AdminServiceFB(UserRepository userRepository,
+                        DBIntegrityService dbIntegrityService,
+                        UserSecurityService userSecurityService,
+                        PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
     this.dbIntegrityService = dbIntegrityService;
     this.userSecurityService = userSecurityService;
@@ -118,13 +120,8 @@ public class AdminServiceFB implements AdminService {
         adminUpdate.getEmail(),
         "Input value is not an email");
 
-    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    UserEntity userEntityFromUpdate = (UserEntity) AdminConverter
-        .fromUpdate(adminUpdate)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString);
-
     // Получение пользователя по его ID, если пользователь существует
-    UserEntity userEntityFromDB = userRepository.findById(userEntityFromUpdate.getId())
+    UserEntity userEntityFromDB = userRepository.findById(adminUpdate.getId())
         .orElseThrow(() -> new NotFoundException(String.format(
             "Administrator with ID %s not found", adminUpdate.getId())));
 
@@ -132,6 +129,11 @@ public class AdminServiceFB implements AdminService {
     userSecurityService.checkHasRoleElseThrowNotFound(
         userEntityFromDB, "ROLE_ADMIN",
         "Administrator with ID %s not found");
+
+    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
+    UserEntity userEntityFromUpdate = (UserEntity) AdminConverter
+        .fromUpdate(adminUpdate)
+        .prepareForDB(dbIntegrityService::preparePostgreSQLString);
 
     // Изменение email и сброс его подтверждения, если новое email
     if (!userEntityFromUpdate.getEmail().equals(userEntityFromDB.getEmail())) {
