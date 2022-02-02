@@ -6,8 +6,9 @@ CREATE TABLE family_benefit.user (
   "email" TEXT NOT NULL,
   "password" TEXT NOT NULL,
   "is_verified_email" BOOLEAN NOT NULL,
-  "date_birth" TIMESTAMP NOT NULL,
-  "date_select_benefit" TIMESTAMP NOT NULL,
+  "date_birth" DATE NOT NULL,
+  "date_select_criterion" DATE NOT NULL,
+  "is_fresh_benefits" BOOLEAN NOT NULL,
   "id_city" NUMERIC NULL,
 
   CONSTRAINT user_pk PRIMARY KEY ("id"),
@@ -22,7 +23,8 @@ COMMENT ON COLUMN family_benefit.user.id IS 'ID пользователя';
 COMMENT ON COLUMN family_benefit.user.name IS 'Имя пользователя';
 COMMENT ON COLUMN family_benefit.user.email IS 'Эл. почта пользователя';
 COMMENT ON COLUMN family_benefit.user.password IS 'Хэш пароля пользователя';
-COMMENT ON COLUMN family_benefit.user.is_verified_email IS 'Статус подтверждения почты';
+COMMENT ON COLUMN family_benefit.user.is_verified_email IS 'Флаг подтверждения почты';
 COMMENT ON COLUMN family_benefit.user.date_birth IS 'Дата рождения пользователя';
-COMMENT ON COLUMN family_benefit.user.date_select_benefit IS 'Дата подбора пособий пользователя';
+COMMENT ON COLUMN family_benefit.user.date_select_criterion IS 'Дата последнего выбора критерий пользователя';
+COMMENT ON COLUMN family_benefit.user.is_fresh_benefits IS 'Флаг свежести подобранных пособий';
 COMMENT ON COLUMN family_benefit.user.id_city IS 'ID города пользователя';
