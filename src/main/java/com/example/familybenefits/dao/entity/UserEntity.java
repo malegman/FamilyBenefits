@@ -8,7 +8,7 @@ import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
@@ -49,7 +49,7 @@ public class UserEntity implements EntityPreparer {
   private String email;
 
   /**
-   * Статус подтверждения почты
+   * Флаг подтверждения почты
    */
   @Column(name = "is_verified_email")
   private boolean isVerifiedEmail;
@@ -66,14 +66,20 @@ public class UserEntity implements EntityPreparer {
    */
   @NonNull
   @Column(name = "date_birth")
-  private Date dateBirth;
+  private LocalDate dateBirth;
 
   /**
-   * Дата подбора пособий пользователя
+   * Дата последнего выбора критерий пользователя
    */
   @NonNull
-  @Column(name = "date_select_benefit")
-  private Date dateSelectBenefit;
+  @Column(name = "date_select_criterion")
+  private LocalDate dateSelectCriterion;
+
+  /**
+   * Флаг свежести подобранных пособий
+   */
+  @Column(name = "is_fresh_benefits")
+  private boolean isFreshBenefits;
 
   /**
    * Город пользователя
@@ -94,6 +100,30 @@ public class UserEntity implements EntityPreparer {
       joinColumns = @JoinColumn(name = "id_user"),
       inverseJoinColumns = @JoinColumn(name = "id_child"))
   private Set<ChildEntity> childEntitySet;
+
+  /**
+   * Множество пособий пользователя
+   */
+  @NonNull
+  @ToString.Exclude
+  @ManyToMany
+  @JoinTable(
+      name = "users_criteria", schema = "family_benefit",
+      joinColumns = @JoinColumn(name = "id_user"),
+      inverseJoinColumns = @JoinColumn(name = "id_criterion"))
+  private Set<CriterionEntity> criterionEntitySet;
+
+  /**
+   * Множество пособий пользователя
+   */
+  @NonNull
+  @ToString.Exclude
+  @ManyToMany
+  @JoinTable(
+      name = "users_benefits", schema = "family_benefit",
+      joinColumns = @JoinColumn(name = "id_user"),
+      inverseJoinColumns = @JoinColumn(name = "id_benefit"))
+  private Set<BenefitEntity> benefitEntitySet;
 
   /**
    * Множество ролей пользователя
