@@ -10,7 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.math.BigInteger;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -39,7 +39,15 @@ public class ChildEntity {
    */
   @NonNull
   @Column(name = "date_birth")
-  private Date dateBirth;
+  private LocalDate dateBirth;
+
+  /**
+   * Конструктор для создания модели по дате рождения
+   * @param dateBirth дата рождения ребенка
+   */
+  public ChildEntity(@NonNull LocalDate dateBirth) {
+    this.dateBirth = dateBirth;
+  }
 
   @Override
   public boolean equals(@Nullable Object o) {
