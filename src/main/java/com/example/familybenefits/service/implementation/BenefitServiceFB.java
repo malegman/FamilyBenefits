@@ -19,6 +19,7 @@ import com.example.familybenefits.security.service.s_interface.DBIntegrityServic
 import com.example.familybenefits.service.s_interface.BenefitService;
 import com.example.familybenefits.service.s_interface.PartEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -66,8 +67,8 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
    */
   @Autowired
   public BenefitServiceFB(BenefitRepository benefitRepository,
-                          PartEntityService<CityEntity> cityPartEntityService,
-                          PartEntityService<InstitutionEntity> institutionPartEntityService,
+                          @Lazy PartEntityService<CityEntity> cityPartEntityService,
+                          @Lazy PartEntityService<InstitutionEntity> institutionPartEntityService,
                           PartEntityService<CriterionEntity> criterionPartEntityService,
                           DBIntegrityService dbIntegrityService) {
     this.benefitRepository = benefitRepository;

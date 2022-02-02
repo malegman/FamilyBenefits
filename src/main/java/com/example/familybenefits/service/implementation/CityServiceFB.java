@@ -15,6 +15,7 @@ import com.example.familybenefits.security.service.s_interface.DBIntegrityServic
 import com.example.familybenefits.service.s_interface.CityService;
 import com.example.familybenefits.service.s_interface.PartEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -50,7 +51,7 @@ public class CityServiceFB implements CityService, PartEntityService<CityEntity>
    */
   @Autowired
   public CityServiceFB(CityRepository cityRepository,
-                       PartEntityService<BenefitEntity> benefitPartEntityService,
+                       @Lazy PartEntityService<BenefitEntity> benefitPartEntityService,
                        DBIntegrityService dbIntegrityService) {
     this.cityRepository = cityRepository;
     this.benefitPartEntityService = benefitPartEntityService;
