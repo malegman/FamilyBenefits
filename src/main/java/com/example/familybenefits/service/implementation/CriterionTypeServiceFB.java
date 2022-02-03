@@ -8,6 +8,7 @@ import com.example.familybenefits.dao.entity.CriterionTypeEntity;
 import com.example.familybenefits.dao.repository.CriterionTypeRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.service.s_interface.CriterionTypeService;
 import com.example.familybenefits.service.s_interface.PartEntityService;
@@ -60,8 +61,7 @@ public class CriterionTypeServiceFB implements CriterionTypeService, PartEntityS
 
     // Проверка отсутствия типа критерия по его названию
     dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
-        criterionTypeRepository::existsByName, criterionTypeEntity.getName(),
-        "The criterion type with name %s already exists");
+        criterionTypeRepository::existsByName, criterionTypeEntity.getName(), R.NAME_OBJECT_CRITERION_TYPE);
 
     criterionTypeRepository.saveAndFlush(criterionTypeEntity);
   }
@@ -76,8 +76,7 @@ public class CriterionTypeServiceFB implements CriterionTypeService, PartEntityS
 
     // Проверка существования типа критерия по его ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionTypeRepository::existsById, criterionTypeUpdate.getId(),
-        "Criterion type with ID %s not found");
+        criterionTypeRepository::existsById, criterionTypeUpdate.getId(), R.NAME_OBJECT_CRITERION_TYPE);
 
     // Сохранение полученной модели таблицы из запроса с подготовленными строковыми значениями для БД
     criterionTypeRepository.saveAndFlush((CriterionTypeEntity) CriterionTypeConverter
@@ -95,8 +94,7 @@ public class CriterionTypeServiceFB implements CriterionTypeService, PartEntityS
 
     // Проверка существования типа критерия по его ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionTypeRepository::existsById, idCriterionType,
-        "Criterion type with ID %s not found");
+        criterionTypeRepository::existsById, idCriterionType, R.NAME_OBJECT_CRITERION_TYPE);
 
     criterionTypeRepository.deleteById(idCriterionType);
   }
@@ -113,7 +111,7 @@ public class CriterionTypeServiceFB implements CriterionTypeService, PartEntityS
     // Получение типа критерия по его ID, если тип критерия существует
     CriterionTypeEntity criterionTypeEntityFromRequest = criterionTypeRepository.findById(idCriterionType)
         .orElseThrow(() -> new NotFoundException(String.format(
-            "Criterion type with ID %s not found", idCriterionType)));
+            "Criterion type with ID \"%s\" not found", idCriterionType)));
 
     return CriterionTypeConverter.toInfo(criterionTypeEntityFromRequest);
   }

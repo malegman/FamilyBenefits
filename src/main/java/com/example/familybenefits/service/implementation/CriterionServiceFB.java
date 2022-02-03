@@ -11,6 +11,7 @@ import com.example.familybenefits.dao.entity.CriterionTypeEntity;
 import com.example.familybenefits.dao.repository.CriterionRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.service.s_interface.CriterionService;
 import com.example.familybenefits.service.s_interface.PartEntityService;
@@ -68,8 +69,7 @@ public class CriterionServiceFB implements CriterionService, PartEntityService<C
 
     // Проверка существования типа критерия по его ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionTypePartEntityService::existsById, criterionAdd.getIdCriterionType(),
-        "Criterion type with ID %s not found");
+        criterionTypePartEntityService::existsById, criterionAdd.getIdCriterionType(), R.NAME_OBJECT_CRITERION_TYPE);
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
     CriterionEntity criterionEntityFromAdd = (CriterionEntity) CriterionConverter
@@ -78,8 +78,7 @@ public class CriterionServiceFB implements CriterionService, PartEntityService<C
 
     // Проверка отсутствия критерия по его названию
     dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
-        criterionRepository::existsByName, criterionEntityFromAdd.getName(),
-        "The criterion with name %s already exists");
+        criterionRepository::existsByName, criterionEntityFromAdd.getName(), R.NAME_OBJECT_CRITERION);
 
     criterionRepository.saveAndFlush(criterionEntityFromAdd);
   }
@@ -94,13 +93,11 @@ public class CriterionServiceFB implements CriterionService, PartEntityService<C
 
     // Проверка существования типа критерия по его ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionTypePartEntityService::existsById, criterionUpdate.getIdCriterionType(),
-        "Criterion type with ID %s not found");
+        criterionTypePartEntityService::existsById, criterionUpdate.getIdCriterionType(), R.NAME_OBJECT_CRITERION_TYPE);
 
     // Проверка существования критерия по его ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionRepository::existsById, criterionUpdate.getId(),
-        "Criterion with ID %s not found");
+        criterionRepository::existsById, criterionUpdate.getId(), R.NAME_OBJECT_CRITERION);
 
     // Сохранение полученной модели таблицы из запроса с подготовленными строковыми значениями для БД
     criterionRepository.saveAndFlush((CriterionEntity) CriterionConverter
@@ -118,8 +115,7 @@ public class CriterionServiceFB implements CriterionService, PartEntityService<C
 
     // Проверка существования критерия по его ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionRepository::existsById, idCriterion,
-        "Criterion with ID %s not found");
+        criterionRepository::existsById, idCriterion, R.NAME_OBJECT_CRITERION);
 
     criterionRepository.deleteById(idCriterion);
   }
@@ -136,7 +132,7 @@ public class CriterionServiceFB implements CriterionService, PartEntityService<C
     // Получение критерия по его ID, если критерий существует
     CriterionEntity criterionEntityFromRequest = criterionRepository.findById(idCriterion)
         .orElseThrow(() -> new NotFoundException(String.format(
-            "Criterion with ID %s not found", idCriterion)));
+            "Criterion with ID \"%s\" not found", idCriterion)));
 
     return CriterionConverter.toInfo(criterionEntityFromRequest);
   }

@@ -11,6 +11,7 @@ import com.example.familybenefits.dao.entity.CityEntity;
 import com.example.familybenefits.dao.repository.CityRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.service.s_interface.CityService;
 import com.example.familybenefits.service.s_interface.PartEntityService;
@@ -69,8 +70,7 @@ public class CityServiceFB implements CityService, PartEntityService<CityEntity>
 
     // Проверка существования пособий их ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityRepository::existsById, cityAdd.getIdBenefitSet(),
-        "Benefit with ID %s not found");
+        benefitPartEntityService::existsById, cityAdd.getIdBenefitSet(), R.NAME_OBJECT_CITY);
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
     CityEntity cityEntityFromAdd = (CityEntity) CityConverter
@@ -79,8 +79,7 @@ public class CityServiceFB implements CityService, PartEntityService<CityEntity>
 
     // Проверка отсутствия города по его названию
     dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
-        cityRepository::existsByName, cityEntityFromAdd.getName(),
-        "The city with name %s already exists");
+        cityRepository::existsByName, cityEntityFromAdd.getName(), R.NAME_OBJECT_CITY);
 
     cityRepository.saveAndFlush(cityEntityFromAdd);
   }
@@ -95,13 +94,11 @@ public class CityServiceFB implements CityService, PartEntityService<CityEntity>
 
     // Проверка существования пособий их ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityRepository::existsById, cityUpdate.getIdBenefitSet(),
-        "Benefit with ID %s not found");
+        benefitPartEntityService::existsById, cityUpdate.getIdBenefitSet(), R.NAME_OBJECT_CITY);
 
     // Проверка существование города по его ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityRepository::existsById, cityUpdate.getId(),
-        "City with ID %s not found");
+        cityRepository::existsById, cityUpdate.getId(), R.NAME_OBJECT_CITY);
 
     // Сохранение полученной модели таблицы из запроса с подготовленными строковыми значениями для БД
     cityRepository.saveAndFlush((CityEntity) CityConverter
@@ -119,8 +116,7 @@ public class CityServiceFB implements CityService, PartEntityService<CityEntity>
 
     // Проверка существование города по его ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityRepository::existsById, idCity,
-        "City with ID %s not found");
+        cityRepository::existsById, idCity, R.NAME_OBJECT_CITY);
 
     cityRepository.deleteById(idCity);
   }
@@ -137,7 +133,7 @@ public class CityServiceFB implements CityService, PartEntityService<CityEntity>
     // Получение города по его ID, если город существует
     CityEntity cityEntityFromRequest = cityRepository.findById(idCity)
         .orElseThrow(() -> new NotFoundException(String.format(
-            "City with ID %s not found", idCity)));
+            "City with ID \"%s\" not found", idCity)));
 
     return CityConverter.toInfo(cityEntityFromRequest);
   }

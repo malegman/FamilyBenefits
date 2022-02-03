@@ -13,6 +13,7 @@ import com.example.familybenefits.dao.entity.InstitutionEntity;
 import com.example.familybenefits.dao.repository.InstitutionRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.service.s_interface.InstitutionService;
 import com.example.familybenefits.service.s_interface.PartEntityService;
@@ -39,7 +40,6 @@ public class InstitutionServiceFB implements InstitutionService, PartEntityServi
    * Интерфейс сервиса для моделей таблицы "city", целостность которых зависит от связанных таблиц
    */
   private final PartEntityService<CityEntity> cityPartEntityService;
-
   /**
    * Интерфейс сервиса для моделей таблицы "benefit", целостность которых зависит от связанных таблиц
    */
@@ -79,11 +79,9 @@ public class InstitutionServiceFB implements InstitutionService, PartEntityServi
 
     // Проверка существования города и пособий по их ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityPartEntityService::existsById, institutionAdd.getIdCity(),
-        "City with ID %s not found");
+        cityPartEntityService::existsById, institutionAdd.getIdCity(), R.NAME_OBJECT_CITY);
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        benefitPartEntityService::existsById, institutionAdd.getIdBenefitSet(),
-        "Benefit with ID %s not found");
+        benefitPartEntityService::existsById, institutionAdd.getIdBenefitSet(), R.NAME_OBJECT_BENEFIT);
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
     InstitutionEntity institutionEntityFromAdd = (InstitutionEntity) InstitutionConverter
@@ -92,8 +90,7 @@ public class InstitutionServiceFB implements InstitutionService, PartEntityServi
 
     // Проверка отсутствия учреждения по его названию
     dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
-        institutionRepository::existsByName, institutionEntityFromAdd.getName(),
-        "The institution %s already exists");
+        institutionRepository::existsByName, institutionEntityFromAdd.getName(), R.NAME_OBJECT_INSTITUTION);
 
     institutionRepository.saveAndFlush(institutionEntityFromAdd);
   }
@@ -108,16 +105,13 @@ public class InstitutionServiceFB implements InstitutionService, PartEntityServi
 
     // Проверка существования города и пособий по их ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityPartEntityService::existsById, institutionUpdate.getIdCity(),
-        "City with ID %s not found");
+        cityPartEntityService::existsById, institutionUpdate.getIdCity(), R.NAME_OBJECT_CITY);
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        benefitPartEntityService::existsById, institutionUpdate.getIdBenefitSet(),
-        "Benefit with ID %s not found");
+        benefitPartEntityService::existsById, institutionUpdate.getIdBenefitSet(), R.NAME_OBJECT_BENEFIT);
 
     // Проверка существования учреждения по его ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        institutionRepository::existsById, institutionUpdate.getId(),
-        "Institution with ID %s not found");
+        institutionRepository::existsById, institutionUpdate.getId(), R.NAME_OBJECT_INSTITUTION);
 
     // Сохранение полученной модели таблицы из запроса с подготовленными строковыми значениями для БД
     institutionRepository.saveAndFlush((InstitutionEntity) InstitutionConverter
@@ -135,8 +129,7 @@ public class InstitutionServiceFB implements InstitutionService, PartEntityServi
 
     // Проверка существования учреждения по его ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        institutionRepository::existsById, idInstitution,
-        "Institution with ID %s not found");
+        institutionRepository::existsById, idInstitution, R.NAME_OBJECT_INSTITUTION);
 
     institutionRepository.deleteById(idInstitution);
   }
@@ -153,7 +146,7 @@ public class InstitutionServiceFB implements InstitutionService, PartEntityServi
     // Получение учреждения по его ID, если учреждение существует
     InstitutionEntity institutionEntityFromRequest = institutionRepository.findById(idInstitution)
         .orElseThrow(() -> new NotFoundException(String.format(
-            "Institution with ID %s not found", idInstitution)));
+            "Institution with ID \"%s\" not found", idInstitution)));
 
     return InstitutionConverter.toInfo(institutionEntityFromRequest);
   }

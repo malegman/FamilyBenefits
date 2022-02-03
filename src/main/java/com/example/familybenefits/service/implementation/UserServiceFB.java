@@ -1,5 +1,6 @@
 package com.example.familybenefits.service.implementation;
 
+import com.example.familybenefits.resource.R;
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.user.UserAdd;
 import com.example.familybenefits.api_model.user.UserInfo;
@@ -26,11 +27,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.temporal.TemporalAccessor;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -58,12 +56,10 @@ public class UserServiceFB implements UserService {
    * Интерфейс сервиса для моделей таблицы "benefit", целостность которых зависит от связанных таблиц
    */
   private final PartEntityService<BenefitEntity> benefitPartEntityService;
-
   /**
    * Интерфейс сервиса для моделей таблицы "city", целостность которых зависит от связанных таблиц
    */
   private final PartEntityService<CityEntity> cityPartEntityService;
-
   /**
    * Интерфейс сервиса для моделей таблицы "criterion", целостность которых зависит от связанных таблиц
    */
@@ -73,12 +69,10 @@ public class UserServiceFB implements UserService {
    * Интерфейс сервиса, отвечающего за целостность базы данных
    */
   private final DBIntegrityService dbIntegrityService;
-
   /**
    * Интерфейс сервиса, отвечающего за данные пользователя
    */
   private final UserSecurityService userSecurityService;
-
   /**
    * Интерфейс сервиса для шифрования паролей
    */
@@ -137,22 +131,17 @@ public class UserServiceFB implements UserService {
 
     // Проверка существования города и критерий по их ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityPartEntityService::existsById, userAdd.getIdCity(),
-        "City with ID %s not found");
+        cityPartEntityService::existsById, userAdd.getIdCity(), R.NAME_OBJECT_CITY);
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionPartEntityService::existsById, userAdd.getIdCriterionSet(),
-        "Criterion with ID %s not found");
+        criterionPartEntityService::existsById, userAdd.getIdCriterionSet(), R.NAME_OBJECT_CRITERION);
 
     // Проверка паролей на эквивалентность и безопасность
     userSecurityService.checkPasswordElseThrow(
-        userAdd.getPassword(), userAdd.getRepeatPassword(),
-        "Input passwords are not equals",
-        "Input password is not safety");
+        userAdd.getPassword(), userAdd.getRepeatPassword());
 
     // Проверка строки email на соответствие формату email
     userSecurityService.checkEmailElseThrowInvalidEmail(
-        userAdd.getEmail(),
-        "Input value is not an email");
+        userAdd.getEmail());
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
     UserEntity userEntityFromAdd = (UserEntity) UserConverter
@@ -161,27 +150,22 @@ public class UserServiceFB implements UserService {
 
     // Проверка на существование пользователя или администратора по email
     dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
-        userRepository::existsByEmail, userEntityFromAdd.getEmail(),
-        "User or administrator with email %s already exists");
+        userRepository::existsByEmail, userEntityFromAdd.getEmail(), R.NAME_OBJECT_USER);
 
     // Преобразование дат рождения пользователя и рождения детей
     userEntityFromAdd.setDateBirth(strToDateElseThrow(
-        userAdd.getDateBirth(),
-        "User's birthday %s doesn't match the date format \"dd.mm.yyyy\""));
+        userAdd.getDateBirth()));
     userEntityFromAdd.setChildEntitySet(strBirthSetToChildEntity(
-        userAdd.getBirthDateChildren(),
-        "Child's birthday %s doesn't match the date format \"dd.mm.yyyy\""));
+        userAdd.getBirthDateChildren()));
 
     // Проверка дат рождения пользователя и детей на предшествие текущей даты
     checkDateBeforeNow(
-        userEntityFromAdd.getDateBirth(),
-        "User's birthday %s is after now");
+        userEntityFromAdd.getDateBirth());
     checkDateBeforeNow(
-        userEntityFromAdd.getChildEntitySet().stream()
-            .map(ChildEntity::getDateBirth).collect(Collectors.toSet()),
-        "Child's birthday %s is after now");
+        userEntityFromAdd.getChildEntitySet()
+            .stream().map(ChildEntity::getDateBirth).collect(Collectors.toSet()));
 
-    userEntityFromAdd.addRole("ROLE_USER");
+    userEntityFromAdd.addRole(R.ROLE_USER);
     userEntityFromAdd.setVerifiedEmail(false);
     userEntityFromAdd.encryptPassword(passwordEncoder::encode);
     userEntityFromAdd.setDateSelectCriterion(LocalDate.from(Instant.now()));
@@ -207,26 +191,22 @@ public class UserServiceFB implements UserService {
 
     // Проверка существования города и критерий по их ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityPartEntityService::existsById, userUpdate.getIdCity(),
-        "City with ID %s not found");
+        cityPartEntityService::existsById, userUpdate.getIdCity(), R.NAME_OBJECT_CITY);
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionPartEntityService::existsById, userUpdate.getIdCriterionSet(),
-        "Criterion with ID %s not found");
+        criterionPartEntityService::existsById, userUpdate.getIdCriterionSet(), R.NAME_OBJECT_CRITERION);
 
     // Проверка строки email на соответствие формату email
     userSecurityService.checkEmailElseThrowInvalidEmail(
-        userUpdate.getEmail(),
-        "Input value is not an email");
+        userUpdate.getEmail());
 
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromDB = userRepository.findById(userUpdate.getId())
         .orElseThrow(() -> new NotFoundException(String.format(
-            "User with ID %s not found", userUpdate.getId())));
+            "User with ID \"%s\" not found", userUpdate.getId())));
 
     // Проверка наличия роли "ROLE_USER" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromDB, "ROLE_USER",
-        "User with ID %s not found");
+        userEntityFromDB, R.ROLE_USER, R.NAME_OBJECT_USER);
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
     UserEntity userEntityFromUpdate = (UserEntity) UserConverter
@@ -241,20 +221,16 @@ public class UserServiceFB implements UserService {
 
     // Преобразование дат рождения пользователя и рождения детей
     userEntityFromUpdate.setDateBirth(strToDateElseThrow(
-        userUpdate.getDateBirth(),
-        "User's birthday %s doesn't match the date format \"dd.mm.yyyy\""));
+        userUpdate.getDateBirth()));
     userEntityFromUpdate.setChildEntitySet(strBirthSetToChildEntity(
-        userUpdate.getBirthDateChildren(),
-        "Child's birthday %s doesn't match the date format \"dd.mm.yyyy\""));
+        userUpdate.getBirthDateChildren()));
 
     // Проверка дат рождения пользователя и детей на предшествие текущей даты
     checkDateBeforeNow(
-        userEntityFromUpdate.getDateBirth(),
-        "User's birthday %s is after now");
+        userEntityFromUpdate.getDateBirth());
     checkDateBeforeNow(
         userEntityFromUpdate.getChildEntitySet().stream()
-            .map(ChildEntity::getDateBirth).collect(Collectors.toSet()),
-        "Child's birthday %s is after now");
+            .map(ChildEntity::getDateBirth).collect(Collectors.toSet()));
 
     userEntityFromDB.setName(userEntityFromUpdate.getName());
     userEntityFromDB.setDateSelectCriterion(LocalDate.from(Instant.now()));
@@ -274,16 +250,15 @@ public class UserServiceFB implements UserService {
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromRequest = userRepository.findById(idUser)
         .orElseThrow(() -> new NotFoundException(String.format(
-            "User with ID %s not found", idUser)));
+            "User with ID \"%s\" not found", idUser)));
 
     // Проверка наличия роли "ROLE_USER" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, "ROLE_USER",
-        "User with ID %s not found");
+        userEntityFromRequest, R.ROLE_USER, R.NAME_OBJECT_USER);
 
     // Если есть роль "ROLE_ADMIN", удаление роли "ROLE_USER", иначе удаление пользователя
-    if (userEntityFromRequest.hasRole("ROLE_ADMIN")) {
-      userEntityFromRequest.removeRole("ROLE_USER");
+    if (userEntityFromRequest.hasRole(R.ROLE_ADMIN)) {
+      userEntityFromRequest.removeRole(R.ROLE_USER);
       userRepository.saveAndFlush(userEntityFromRequest);
     } else {
       userRepository.deleteById(idUser);
@@ -302,12 +277,11 @@ public class UserServiceFB implements UserService {
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromRequest = userRepository.findById(idUser)
         .orElseThrow(() -> new NotFoundException(String.format(
-            "User with ID %s not found", idUser)));
+            "User with ID \"%s\" not found", idUser)));
 
     // Проверка наличия роли "ROLE_USER" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, "ROLE_USER",
-        "User with ID %s not found");
+        userEntityFromRequest, R.ROLE_USER, R.NAME_OBJECT_USER);
 
     return UserConverter.toInfo(userEntityFromRequest);
   }
@@ -348,25 +322,20 @@ public class UserServiceFB implements UserService {
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromRequest = userRepository.findById(idUser)
         .orElseThrow(() -> new NotFoundException(String.format(
-            "User with ID %s not found", idUser)));
+            "User with ID \"%s\" not found", idUser)));
 
     // Проверка наличия роли "ROLE_USER" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, "ROLE_USER",
-        "User with ID %s not found");
-    LocalDate localDateCriterion = userEntityFromRequest.getDateSelectCriterion();
+        userEntityFromRequest, R.ROLE_USER, R.NAME_OBJECT_USER);
 
+    LocalDate localDateCriterion = userEntityFromRequest.getDateSelectCriterion();
     // Проверка разницы дат между текущей датой и датой последней установки критериев
     // относительно дат рождений пользователя и его детей
-    checkHasBirthdayAfterElseThrow(
-        userEntityFromRequest.getDateBirth(),
-        localDateCriterion,
-        String.format("Need to update criteria. The user with ID %s had birthday", idUser));
-    checkHasBirthdayAfterElseThrow(
+    checkBirthdayBeforeElseThrow(
+        userEntityFromRequest.getDateBirth(), localDateCriterion);
+    checkBirthdayBeforeElseThrow(
         userEntityFromRequest.getChildEntitySet().stream()
-            .map(ChildEntity::getDateBirth).collect(Collectors.toSet()),
-        localDateCriterion,
-        "Need to update criteria. The user with ID %s had child's birthday");
+            .map(ChildEntity::getDateBirth).collect(Collectors.toSet()), localDateCriterion);
 
     // Если пособия пользователя не свежие, то
     // подбираются пособия, критерии которых включают в себя все критерии пользователя,
@@ -394,33 +363,32 @@ public class UserServiceFB implements UserService {
   /**
    * Преобразует строку формата "dd.mm.yyyy" в дату
    * @param userBirth дата в строковом виде
-   * @param messagePattern шаблон сообщения об ошибке
    * @return преобразованная строка в формат даты
    * @throws DateFormatException если полученная строка не соответствует формату "dd.mm.yyyy"
    */
-  private LocalDate strToDateElseThrow(String userBirth, String messagePattern) throws DateFormatException {
+  private LocalDate strToDateElseThrow(String userBirth) throws DateFormatException {
 
     try {
       return LocalDate.from((TemporalAccessor) SIMPLE_DATE_FORMAT.parse(userBirth));
     } catch (ParseException e) {
-      throw new DateFormatException(String.format(messagePattern, userBirth));
+      throw new DateFormatException(String.format(
+          "The string \"%s\" doesn't match the date format \"dd.mm.yyyy\"", userBirth));
     }
   }
 
   /**
    * Преобразует множество строк формата "dd.mm.yyyy" с датами рождения детей в модели таблицы "child"
    * @param strBirthSet множество строк формата "dd.mm.yyyy" с датами рождения детей
-   * @param messagePattern шаблон сообщения об ошибке
    * @return множество моделей таблицы "child"
    * @throws DateFormatException если одна из полученных строк не соответствует формату "dd.mm.yyyy"
    */
-  private Set<ChildEntity> strBirthSetToChildEntity(Set<String> strBirthSet, String messagePattern) throws DateFormatException {
+  private Set<ChildEntity> strBirthSetToChildEntity(Set<String> strBirthSet) throws DateFormatException {
 
     Set<LocalDate> dateBirthSet = new HashSet<>();
 
     // Преобразование строк формата "dd.mm.yyyy" в дату
     for (String strBirth : strBirthSet) {
-      dateBirthSet.add(strToDateElseThrow(strBirth, messagePattern));
+      dateBirthSet.add(strToDateElseThrow(strBirth));
     }
 
     // Преобразование дат рождения в модели детей.
@@ -437,55 +405,54 @@ public class UserServiceFB implements UserService {
 
   /**
    * Проверяет дату на предшествие текущей дате
-   * @param date проверяемая дата
-   * @param messagePattern шаблон сообщения об ошибке
+   * @param dateCheck проверяемая дата
    * @throws DateTimeException если проверяемая дата позже текущей даты
    */
-  private void checkDateBeforeNow(LocalDate date, String messagePattern) throws DateTimeException {
+  private void checkDateBeforeNow(LocalDate dateCheck) throws DateTimeException {
 
-    if (date.isAfter(LocalDate.now())) {
-      throw new DateTimeException(String.format(messagePattern, date));
+    LocalDate dateCurrent = LocalDate.now();
+    if (dateCheck.isAfter(dateCurrent)) {
+      throw new DateTimeException(String.format(
+          "The date \"%s\" is after current date \"%s\"", dateCheck, dateCurrent));
     }
   }
 
   /**
    * Проверяет множество дат на предшествие текущей дате
    * @param dateSet множество проверяемых дат
-   * @param messagePattern шаблон сообщения об ошибке
    * @throws DateTimeException если проверяемая дата позже текущей даты
    */
-  private void checkDateBeforeNow(Set<LocalDate> dateSet, String messagePattern) throws DateTimeException {
+  private void checkDateBeforeNow(Set<LocalDate> dateSet) throws DateTimeException {
 
     for (LocalDate date : dateSet) {
-      checkDateBeforeNow(date, messagePattern);
+      checkDateBeforeNow(date);
     }
   }
 
   /**
-   * Проверяет разницу между двумя датами относительно базовой даты
-   * @param dateBase дата, относительно которой сравниваются даты
-   * @param dateDiff1 первая дата для разницы
-   * @param message сообщение об ошибке
-   * @throws DateTimeException если даты разницы отличаются друг от друга относительно базовой даты на год и больше
+   * Проверяет, был ли день рождения после проверяемой даты
+   * @param dateBirth дата рождения
+   * @param dateCheck проверяемая дата
+   * @throws DateTimeException если день рождения был после проверяемой даты
    */
-  private void checkHasBirthdayAfterElseThrow(LocalDate dateBase, LocalDate dateDiff1, String message) throws DateTimeException {
+  private void checkBirthdayBeforeElseThrow(LocalDate dateBirth, LocalDate dateCheck) throws DateTimeException {
 
-    if (Period.between(dateDiff1, dateBase).getYears() != Period.between(LocalDate.now(), dateBase).getYears()) {
-      throw new DateTimeException(message);
+    if (dateBirth.plusYears(LocalDate.now().getYear() - dateBirth.getYear()).isAfter(dateCheck)) {
+      throw new DateTimeException(String.format(
+          "The day of birthday of date \"%s\" was after check date \"%s\"", dateBirth, dateCheck));
     }
   }
 
   /**
-   * Проверяет разницу между двумя датами относительно базовой даты
-   * @param dateBaseSet множество дат, относительно которых сравниваются даты
-   * @param dateDiff1 первая дата для разницы
-   * @param message сообщение об ошибке
-   * @throws DateTimeException если даты разницы отличаются друг от друга относительно базовой даты на год и больше
+   * Проверяет, был ли дни рождения после проверяемой даты
+   * @param dateBirthSet множество дат рождения
+   * @param dateCheck проверяемая дата
+   * @throws DateTimeException если один из дней рождения был после проверяемой даты
    */
-  private void checkHasBirthdayAfterElseThrow(Set<LocalDate> dateBaseSet, LocalDate dateDiff1, String message) throws DateTimeException {
+  private void checkBirthdayBeforeElseThrow(Set<LocalDate> dateBirthSet, LocalDate dateCheck) throws DateTimeException {
 
-    for (LocalDate dateBase : dateBaseSet) {
-      checkHasBirthdayAfterElseThrow(dateBase, dateDiff1, message);
+    for (LocalDate dateBase : dateBirthSet) {
+      checkBirthdayBeforeElseThrow(dateBase, dateCheck);
     }
   }
 }

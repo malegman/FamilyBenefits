@@ -1,5 +1,6 @@
 package com.example.familybenefits.service.implementation;
 
+import com.example.familybenefits.resource.R;
 import com.example.familybenefits.api_model.benefit.BenefitAdd;
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.benefit.BenefitInitData;
@@ -41,12 +42,10 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
    * Интерфейс сервиса для моделей таблицы "city", целостность которых зависит от связанных таблиц
    */
   private final PartEntityService<CityEntity> cityPartEntityService;
-
   /**
    * Интерфейс сервиса для моделей таблицы "institution", целостность которых зависит от связанных таблиц
    */
   private final PartEntityService<InstitutionEntity> institutionPartEntityService;
-
   /**
    * Интерфейс сервиса для моделей таблицы "criterion", целостность которых зависит от связанных таблиц
    */
@@ -89,14 +88,11 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
 
     // Проверка существования городов, критерий и учреждений по их ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityPartEntityService::existsById, benefitAdd.getIdCitySet(),
-        "City with ID %s not found");
+        cityPartEntityService::existsById, benefitAdd.getIdCitySet(), R.NAME_OBJECT_CITY);
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionPartEntityService::existsById, benefitAdd.getIdCriterionSet(),
-        "Criterion with ID %s not found");
+        criterionPartEntityService::existsById, benefitAdd.getIdCriterionSet(), R.NAME_OBJECT_CRITERION);
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        institutionPartEntityService::existsById, benefitAdd.getIdInstitutionSet(),
-        "Institution with ID %s not found");
+        institutionPartEntityService::existsById, benefitAdd.getIdInstitutionSet(), R.NAME_OBJECT_INSTITUTION);
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
     BenefitEntity benefitEntityFromAdd = (BenefitEntity) BenefitConverter
@@ -105,8 +101,7 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
 
     // Проверка отсутствия пособия по его названию
     dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
-        benefitRepository::existsByName, benefitEntityFromAdd.getName(),
-        "The benefit with name %s already exists");
+        benefitRepository::existsByName, benefitEntityFromAdd.getName(), R.NAME_OBJECT_BENEFIT);
 
     benefitRepository.saveAndFlush(benefitEntityFromAdd);
   }
@@ -121,19 +116,15 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
 
     // Проверка существования городов, критерий и учреждений по их ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityPartEntityService::existsById, benefitUpdate.getIdCitySet(),
-        "City with ID %s not found");
+        cityPartEntityService::existsById, benefitUpdate.getIdCitySet(), R.NAME_OBJECT_CITY);
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionPartEntityService::existsById, benefitUpdate.getIdCriterionSet(),
-        "Criterion with ID %s not found");
+        criterionPartEntityService::existsById, benefitUpdate.getIdCriterionSet(), R.NAME_OBJECT_CRITERION);
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        institutionPartEntityService::existsById, benefitUpdate.getIdInstitutionSet(),
-        "Institution with ID %s not found");
+        institutionPartEntityService::existsById, benefitUpdate.getIdInstitutionSet(), R.NAME_OBJECT_INSTITUTION);
 
     // Проверка существования пособия по его ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        benefitRepository::existsById, benefitUpdate.getId(),
-        "Benefit with ID %s not found");
+        benefitRepository::existsById, benefitUpdate.getId(), R.NAME_OBJECT_BENEFIT);
 
     // Сохранение полученной модели таблицы из запроса с подготовленными строковыми значениями для БД
     benefitRepository.saveAndFlush((BenefitEntity) BenefitConverter
@@ -151,8 +142,7 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
 
     // Проверка существование пособия по его ID
     dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        benefitRepository::existsById, idBenefit,
-        "Benefit with ID %s not found");
+        benefitRepository::existsById, idBenefit, R.NAME_OBJECT_BENEFIT);
 
     benefitRepository.deleteById(idBenefit);
   }
@@ -169,7 +159,7 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
     // Получение пособия по его ID, если пособие существует
     BenefitEntity benefitEntityFromRequest = benefitRepository.findById(idBenefit)
         .orElseThrow(() -> new NotFoundException(String.format(
-            "Benefit with ID %s not found", idBenefit)));
+            "Benefit with ID \"%s\" not found", idBenefit)));
 
     return BenefitConverter.toInfo(benefitEntityFromRequest);
   }
