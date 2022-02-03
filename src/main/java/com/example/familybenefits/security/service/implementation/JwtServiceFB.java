@@ -1,5 +1,6 @@
 package com.example.familybenefits.security.service.implementation;
 
+import com.example.familybenefits.resource.R;
 import com.example.familybenefits.exception.InvalidEmailException;
 import com.example.familybenefits.security.service.s_interface.JwtService;
 import com.example.familybenefits.security.service.s_interface.UserSecurityService;
@@ -16,16 +17,6 @@ import java.util.Date;
  */
 @Service
 public class JwtServiceFB implements JwtService {
-
-  /**
-   * Закрытый ключ, используемый для подписывания jwt
-   */
-  private static final String JWT_SECRET = "familyben";
-
-  /**
-   * Время жизни jwt в минутах
-   */
-  private static final int JWT_EXPIRATION_MIN = 15;
 
   /**
    * Интерфейс сервиса, отвечающего за данные пользователя
@@ -47,14 +38,14 @@ public class JwtServiceFB implements JwtService {
 
     // Проверка строки email на соответствие формату email
     userSecurityService.checkEmailElseThrowInvalidEmail(
-        email, "Input value is not an email");
+        email);
 
-    Date expiration = Date.from(LocalDateTime.now().plusMinutes(JWT_EXPIRATION_MIN).toInstant(ZoneOffset.UTC));
+    Date expiration = Date.from(LocalDateTime.now().plusMinutes(R.JWT_EXPIRATION_MIN).toInstant(ZoneOffset.UTC));
 
     return Jwts.builder()
         .setSubject(email)
         .setExpiration(expiration)
-        .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+        .signWith(SignatureAlgorithm.HS512, R.JWT_SECRET)
         .compact();
   }
 
@@ -66,7 +57,7 @@ public class JwtServiceFB implements JwtService {
   @Override
   public Jws<Claims> convertToJwt(String token) throws RuntimeException {
 
-    return Jwts.parser().setSigningKey(JWT_SECRET).parseClaimsJws(token);
+    return Jwts.parser().setSigningKey(R.JWT_SECRET).parseClaimsJws(token);
   }
 
   /**
@@ -82,8 +73,7 @@ public class JwtServiceFB implements JwtService {
 
     // Проверка строки email на соответствие формату email
     userSecurityService.checkEmailElseThrowInvalidEmail(
-        email,
-        String.format("Input value %s is not an email", email));
+        email);
 
     return email;
   }
