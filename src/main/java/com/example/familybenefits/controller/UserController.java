@@ -61,14 +61,14 @@ public class UserController {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException
-        | PasswordNotSafetyException
         | InvalidEmailException
+        | PasswordNotSafetyException
         | PasswordNotEqualsException
         | DateTimeException
         | DateFormatException e) {
       // Администратор или пользователь с указанным email существует.
-      // Пароль небезопасный.
       // Строка в поле "email" не является email.
+      // Пароль небезопасный.
       // Пароли не совпадают.
       // Даты позже текущей даты.
       // Даты не соответствуют формату "dd.mm.yyyy".
