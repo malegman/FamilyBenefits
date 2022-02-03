@@ -25,9 +25,3 @@ server:
     key-store: 'classpath:keystore.p12'
     key-store-password: 'familyben'
     key-alias: 'tomcat'
-
-jwt:
-  secret: 'familyben'
-  expirationMin: 15
-refresh:
-  expirationMs: 432000000
