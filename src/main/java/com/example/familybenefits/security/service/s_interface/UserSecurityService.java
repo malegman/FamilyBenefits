@@ -12,54 +12,51 @@ public interface UserSecurityService {
    * Проверяет пароль на эквивалентность с повторно введенным и на соответствие политике безопасности паролей.
    * @param password проверяемый пароль
    * @param repeatPassword повторно введенный пароль
-   * @param notEqMessage сообщение об ошибке о не эквивалентных паролях
-   * @param notSfMessage сообщение об ошибке о не безопасном пароле
    * @throws PasswordNotEqualsException если указанные пароли не эквивалентны
    * @throws PasswordNotSafetyException если пароль не соответствует политике безопасности
    */
-  void checkPasswordElseThrow(String password, String repeatPassword, String notEqMessage, String notSfMessage) throws PasswordNotEqualsException, PasswordNotSafetyException;
+  void checkPasswordElseThrow(String password, String repeatPassword) throws PasswordNotEqualsException, PasswordNotSafetyException;
 
   /**
    * Проверяет корректность email
    * @param email проверяемый email
-   * @param message сообщение об ошибке
    * @throws InvalidEmailException если указанный "email" не является email
    */
-  void checkEmailElseThrowInvalidEmail(String email, String message) throws InvalidEmailException;
+  void checkEmailElseThrowInvalidEmail(String email) throws InvalidEmailException;
 
   /**
    * Проверяет наличие указанной роли по её названию у указанной модели таблицы "user"
    * @param userEntity модель таблицы "user", роль которой необходимо проверить
    * @param nameRole название проверяемой роли
-   * @param messagePattern шаблон сообщения об ошибке
+   * @param nameTypeObject название проверяемого объекта
    * @throws UserRoleException если модель не имеет роль
    */
-  void checkHasRoleElseThrowUserRole(UserEntity userEntity, String nameRole, String messagePattern) throws UserRoleException;
+  void checkHasRoleElseThrowUserRole(UserEntity userEntity, String nameRole, String nameTypeObject) throws UserRoleException;
 
   /**
    * Проверяет наличие указанной роли по её названию у указанной модели таблицы "user"
    * @param userEntity модель таблицы "user", роль которой необходимо проверить
    * @param nameRole название проверяемой роли
-   * @param messagePattern шаблон сообщения об ошибке
+   * @param nameTypeObject название проверяемого объекта
    * @throws NotFoundException если модель не имеет роль и связано с отсутствием объекта в бд
    */
-  void checkHasRoleElseThrowNotFound(UserEntity userEntity, String nameRole, String messagePattern) throws NotFoundException;
+  void checkHasRoleElseThrowNotFound(UserEntity userEntity, String nameRole, String nameTypeObject) throws NotFoundException;
 
   /**
    * Проверяет отсутствие указанной роли по её названию у указанной модели таблицы "user"
    * @param userEntity модель таблицы "user", роль которой необходимо проверить
    * @param nameRole название проверяемой роли
-   * @param messagePattern шаблон сообщения об ошибке
+   * @param nameTypeObject название проверяемого объекта
    * @throws UserRoleException если модель имеет роль
    */
-  void checkNotHasRoleElseThrowUserRole(UserEntity userEntity, String nameRole, String messagePattern) throws UserRoleException;
+  void checkNotHasRoleElseThrowUserRole(UserEntity userEntity, String nameRole, String nameTypeObject) throws UserRoleException;
 
   /**
    * Проверяет отсутствие указанной роли по её названию у указанной модели таблицы "user"
    * @param userEntity модель таблицы "user", роль которой необходимо проверить
    * @param nameRole название проверяемой роли
-   * @param messagePattern шаблон сообщения об ошибке
+   * @param nameTypeObject название проверяемого объекта
    * @throws NotFoundException если модель имеет роль и связано с отсутствием объекта в бд
    */
-  void checkNotHasRoleElseThrowNotFound(UserEntity userEntity, String nameRole, String messagePattern) throws NotFoundException;
+  void checkNotHasRoleElseThrowNotFound(UserEntity userEntity, String nameRole, String nameTypeObject) throws NotFoundException;
 }

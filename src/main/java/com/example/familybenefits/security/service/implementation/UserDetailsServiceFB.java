@@ -31,7 +31,7 @@ public class UserDetailsServiceFB implements UserDetailsService {
 
   /**
    * Возвращает объект пользователя для авторизации по его имени
-   * @param username имя пользователя. В данной реализации - email
+   * @param username имя пользователя (его email)
    * @return Объект пользователя для авторизации
    * @throws UsernameNotFoundException если объект с указанным именем (email) не найден
    */
@@ -41,7 +41,7 @@ public class UserDetailsServiceFB implements UserDetailsService {
     // Получение пользователя по его email, если пользователь существует
     UserEntity userEntityFromRequest = userRepository.findByEmail(username)
         .orElseThrow(() -> new UsernameNotFoundException(String.format(
-            "User with username (email) %s not found", username)));
+            "User with username (email) \"%s\" not found", username)));
 
     return UserDetailsFB.fromUserEntity(userEntityFromRequest);
   }

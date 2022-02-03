@@ -23,37 +23,35 @@ public class UserSecurityServiceFB implements UserSecurityService {
    * Проверяет пароль на эквивалентность с повторно введенным и на соответствие политике безопасности паролей.
    * @param password проверяемый пароль
    * @param repeatPassword повторно введенный пароль
-   * @param notEqMessage сообщение об ошибке о не эквивалентных паролях
-   * @param notSfMessage сообщение об ошибке о не безопасном пароле
    * @throws PasswordNotEqualsException если указанные пароли не эквивалентны
    * @throws PasswordNotSafetyException если пароль не соответствует политике безопасности
    */
   @Override
-  public void checkPasswordElseThrow(String password, String repeatPassword, String notEqMessage, String notSfMessage) throws PasswordNotEqualsException, PasswordNotSafetyException {
+  public void checkPasswordElseThrow(String password, String repeatPassword) throws PasswordNotEqualsException, PasswordNotSafetyException {
 
     if (!password.equals(repeatPassword)) {
-      throw new PasswordNotEqualsException(notEqMessage);
+      throw new PasswordNotEqualsException("Input passwords are not equals");
     }
     
     if (!( PATTERN_PWD_LOWER.matcher(password).matches()
         && PATTERN_PWD_UPPER.matcher(password).matches()
         && PATTERN_PWD_SIGNS.matcher(password).matches()
         && PATTERN_PWD_NUMBER.matcher(password).matches())) {
-      throw new PasswordNotSafetyException(notEqMessage);
+      throw new PasswordNotSafetyException("Input password is not safety");
     }
   }
 
   /**
    * Проверяет корректность email
    * @param email проверяемый email
-   * @param message сообщение об ошибке
    * @throws InvalidEmailException если указанный "email" не является email
    */
   @Override
-  public void checkEmailElseThrowInvalidEmail(String email, String message) throws InvalidEmailException {
+  public void checkEmailElseThrowInvalidEmail(String email) throws InvalidEmailException {
 
     if (!PATTERN_EMAIL.matcher(email).matches()) {
-      throw new InvalidEmailException(message);
+      throw new InvalidEmailException(String.format(
+          "Input value \"%s\" is not an email", email));
     }
   }
 
@@ -61,15 +59,15 @@ public class UserSecurityServiceFB implements UserSecurityService {
    * Проверяет наличие указанной роли по её названию у указанной модели таблицы "user"
    * @param userEntity модель таблицы "user", роль которой необходимо проверить
    * @param nameRole название проверяемой роли
-   * @param messagePattern шаблон сообщения об ошибке
+   * @param nameTypeObject название проверяемого объекта
    * @throws UserRoleException если модель не имеет роль
    */
   @Override
-  public void checkHasRoleElseThrowUserRole(UserEntity userEntity, String nameRole, String messagePattern) throws UserRoleException {
+  public void checkHasRoleElseThrowUserRole(UserEntity userEntity, String nameRole, String nameTypeObject) throws UserRoleException {
 
     if (!userEntity.hasRole(nameRole)) {
       throw new UserRoleException(String.format(
-          messagePattern, userEntity.getId()));
+          "%s with ID \"%s\" has role \"%s\"", nameTypeObject, userEntity.getId(), nameRole));
     }
   }
 
@@ -77,15 +75,15 @@ public class UserSecurityServiceFB implements UserSecurityService {
    * Проверяет наличие указанной роли по её названию у указанной модели таблицы "user"
    * @param userEntity модель таблицы "user", роль которой необходимо проверить
    * @param nameRole название проверяемой роли
-   * @param messagePattern шаблон сообщения об ошибке
+   * @param nameTypeObject название проверяемого объекта
    * @throws NotFoundException если модель не имеет роль и связано с отсутствием объекта в бд
    */
   @Override
-  public void checkHasRoleElseThrowNotFound(UserEntity userEntity, String nameRole, String messagePattern) throws NotFoundException {
+  public void checkHasRoleElseThrowNotFound(UserEntity userEntity, String nameRole, String nameTypeObject) throws NotFoundException {
 
     if (!userEntity.hasRole(nameRole)) {
       throw new NotFoundException(String.format(
-          messagePattern, userEntity.getId()));
+          "%s with ID \"%s\" not found", nameTypeObject, userEntity.getId()));
     }
   }
 
@@ -93,15 +91,15 @@ public class UserSecurityServiceFB implements UserSecurityService {
    * Проверяет отсутствие указанной роли по её названию у указанной модели таблицы "user"
    * @param userEntity модель таблицы "user", роль которой необходимо проверить
    * @param nameRole название проверяемой роли
-   * @param messagePattern шаблон сообщения об ошибке
+   * @param nameTypeObject название проверяемого объекта
    * @throws UserRoleException если модель имеет роль
    */
   @Override
-  public void checkNotHasRoleElseThrowUserRole(UserEntity userEntity, String nameRole, String messagePattern) throws UserRoleException {
+  public void checkNotHasRoleElseThrowUserRole(UserEntity userEntity, String nameRole, String nameTypeObject) throws UserRoleException {
 
     if (userEntity.hasRole(nameRole)) {
       throw new UserRoleException(String.format(
-          messagePattern, userEntity.getId()));
+          "%s with ID \"%s\" hasn't got role \"%s\"", nameTypeObject, userEntity.getId(), nameRole));
     }
   }
 
@@ -109,15 +107,15 @@ public class UserSecurityServiceFB implements UserSecurityService {
    * Проверяет отсутствие указанной роли по её названию у указанной модели таблицы "user"
    * @param userEntity модель таблицы "user", роль которой необходимо проверить
    * @param nameRole название проверяемой роли
-   * @param messagePattern шаблон сообщения об ошибке
+   * @param nameTypeObject название проверяемого объекта
    * @throws NotFoundException если модель имеет роль и связано с отсутствием объекта в бд
    */
   @Override
-  public void checkNotHasRoleElseThrowNotFound(UserEntity userEntity, String nameRole, String messagePattern) throws NotFoundException {
+  public void checkNotHasRoleElseThrowNotFound(UserEntity userEntity, String nameRole, String nameTypeObject) throws NotFoundException {
 
     if (userEntity.hasRole(nameRole)) {
       throw new NotFoundException(String.format(
-          messagePattern, userEntity.getId()));
+          "%s with ID \"%s\" not found", nameTypeObject, userEntity.getId()));
     }
   }
 }
