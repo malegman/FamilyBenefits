@@ -1,11 +1,11 @@
 package com.example.familybenefits.security.service.implementation;
 
+import com.example.familybenefits.dao.entity.ObjectEntity;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -16,49 +16,59 @@ import java.util.function.Function;
 public class DBIntegrityServiceFB implements DBIntegrityService {
 
   /**
-   * Проверяет существование объекта по его ID
-   * @param existFunc функция, выполняющая проверку
-   * @param idObject ID проверяемого объекта
-   * @param nameTypeObject название проверяемого объекта
-   * @throws NotFoundException если объект с указанным ID не найден
+   * Проверяет существование в базе данных объекта по его ID
+   * @param existFunc функция проверки
+   * @param id ID проверяемого объекта
+   * @throws NotFoundException если объект не найден
    */
   @Override
-  public void checkExistenceByIdElseThrowNotFound(Function<BigInteger, Boolean> existFunc, BigInteger idObject, String nameTypeObject) throws NotFoundException {
+  public void checkExistenceById(Function<String, Boolean> existFunc, String id) throws NotFoundException {
 
-    if (!existFunc.apply(idObject)) {
+    if (!existFunc.apply(id)) {
       throw new NotFoundException(String.format(
-          "%s with ID \"%s\" not found", nameTypeObject, idObject));
+          "Entity with ID \"%s\" not found in repository %s", id, existFunc.getClass().getName()));
     }
   }
 
   /**
-   * Проверяет существование объекта по его ID
-   * @param existFunc функция, выполняющая проверку
-   * @param idObjectSet множество ID проверяемых объектов
-   * @param nameTypeObject название проверяемого объекта
-   * @throws NotFoundException если объект с указанным ID не найден
+   * Проверяет существование в базе данных объекта по его ID
+   * @param existFunc функция проверки
+   * @param entity проверяемый объект
+   * @param <E> Тип объекта
+   * @throws NotFoundException если объект не найден
    */
   @Override
-  public void checkExistenceByIdElseThrowNotFound(Function<BigInteger, Boolean> existFunc, Set<BigInteger> idObjectSet, String nameTypeObject) throws NotFoundException {
+  public <E extends ObjectEntity> void checkExistenceById(Function<String, Boolean> existFunc, E entity) throws NotFoundException {
 
-    for (BigInteger idObject : idObjectSet) {
-      checkExistenceByIdElseThrowNotFound(existFunc, idObject, nameTypeObject);
+    checkExistenceById(existFunc, entity.getId());
+  }
+
+  /**
+   * Проверяет существование в базе данных объекта из множества по ID
+   * @param existFunc функция проверки
+   * @param entitySet множество проверяемых объектов
+   * @param <E> Тип объекта в множестве
+   * @throws NotFoundException если объект из множества не найден
+   */
+  @Override
+  public <E extends ObjectEntity> void checkExistenceById(Function<String, Boolean> existFunc, Set<E> entitySet) throws NotFoundException {
+
+    for (E entity : entitySet) {
+      checkExistenceById(existFunc, entity.getId());
     }
   }
 
   /**
-   * Проверяет отсутствие объекта по его уникальному строковому параметру
-   * @param existFunc функция, выполняющая проверку
-   * @param uniqStrObject уникальный строковый параметр объекта
-   * @param nameTypeObject название проверяемого объекта
-   * @throws AlreadyExistsException если объект с указанным строковым параметром существует
+   * Проверяет отсутствие в базе данных объекта по его уникальному строковому полю
+   * @param uniqueStr уникальное строковое поле объекта
+   * @throws AlreadyExistsException если объект найден
    */
   @Override
-  public void checkAbsenceByUniqStrElseThrowAlreadyExists(Function<String, Boolean> existFunc, String uniqStrObject, String nameTypeObject) throws AlreadyExistsException {
+  public void checkAbsenceByUniqStr(Function<String, Boolean> existFunc, String uniqueStr) throws AlreadyExistsException {
 
-    if (existFunc.apply(uniqStrObject)) {
+    if (existFunc.apply(uniqueStr)) {
       throw new AlreadyExistsException(String.format(
-          "%s with unique field \"%s\" already exists", nameTypeObject, uniqStrObject));
+          "Benefit with name \"%s\" already exists", uniqueStr));
     }
   }
 

@@ -1,9 +1,9 @@
 package com.example.familybenefits.security.service.s_interface;
 
+import com.example.familybenefits.dao.entity.ObjectEntity;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 
-import java.math.BigInteger;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -13,31 +13,37 @@ import java.util.function.Function;
 public interface DBIntegrityService {
 
   /**
-   * Проверяет существование объекта по его ID
-   * @param existFunc функция, выполняющая проверку
-   * @param idObject ID проверяемого объекта
-   * @param nameTypeObject название проверяемого объекта
-   * @throws NotFoundException если объект с указанным ID не найден
+   * Проверяет существование в базе данных объекта по его ID
+   * @param existFunc функция проверки
+   * @param id ID проверяемого объекта
+   * @throws NotFoundException если объект не найден
    */
-  void checkExistenceByIdElseThrowNotFound(Function<BigInteger, Boolean> existFunc, BigInteger idObject, String nameTypeObject) throws NotFoundException;
+  void checkExistenceById(Function<String, Boolean> existFunc, String id) throws NotFoundException;
 
   /**
-   * Проверяет существование объекта по его ID
-   * @param existFunc функция, выполняющая проверку
-   * @param idObjectSet множество ID проверяемых объектов
-   * @param nameTypeObject название проверяемого объекта
-   * @throws NotFoundException если объект с указанным ID не найден
+   * Проверяет существование в базе данных объекта по его ID
+   * @param existFunc функция проверки
+   * @param entity проверяемый объект
+   * @param <E> Тип объекта
+   * @throws NotFoundException если объект не найден
    */
-  void checkExistenceByIdElseThrowNotFound(Function<BigInteger, Boolean> existFunc, Set<BigInteger> idObjectSet, String nameTypeObject) throws NotFoundException;
+  <E extends ObjectEntity> void checkExistenceById(Function<String, Boolean> existFunc, E entity) throws NotFoundException;
 
   /**
-   * Проверяет отсутствие объекта по его уникальному строковому параметру
-   * @param existFunc функция, выполняющая проверку
-   * @param uniqStrObject уникальный строковый параметр объекта
-   * @param nameTypeObject название проверяемого объекта
-   * @throws AlreadyExistsException если объект с указанным строковым параметром существует
+   * Проверяет существование в базе данных объекта из множества по ID
+   * @param existFunc функция проверки
+   * @param entitySet множество проверяемых объектов
+   * @param <E> Тип объекта в множестве
+   * @throws NotFoundException если объект из множества не найден
    */
-  void checkAbsenceByUniqStrElseThrowAlreadyExists(Function<String, Boolean> existFunc, String uniqStrObject, String nameTypeObject) throws AlreadyExistsException;
+  <E extends ObjectEntity> void checkExistenceById(Function<String, Boolean> existFunc, Set<E> entitySet) throws NotFoundException;
+
+  /**
+   * Проверяет отсутствие в базе данных объекта по его уникальному строковому полю
+   * @param uniqueStr уникальное строковое поле объекта
+   * @throws AlreadyExistsException если объект найден
+   */
+  void checkAbsenceByUniqStr(Function<String, Boolean> existFunc, String uniqueStr) throws AlreadyExistsException;
 
   /**
    * Подготавливает строку для вставки в SQL запрос, диалект PostgreSQL
