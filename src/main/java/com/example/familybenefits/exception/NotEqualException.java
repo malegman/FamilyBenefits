@@ -1,15 +1,15 @@
 package com.example.familybenefits.exception;
 
 /**
- * Исключение, связанное с не эквивалентностью паролей
+ * Исключение, связанное с не эквивалентностью объектов
  */
-public class PasswordNotEqualsException extends Exception {
+public class NotEqualException extends Exception {
 
   /**
    * Конструктор, создает исключение с описанием исключения
    * @param message описание исключения
    */
-  public PasswordNotEqualsException(String message) {
+  public NotEqualException(String message) {
     super(message);
   }
 }
