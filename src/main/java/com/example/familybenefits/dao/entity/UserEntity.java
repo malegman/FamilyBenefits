@@ -1,15 +1,11 @@
 package com.example.familybenefits.dao.entity;
 
-import com.example.familybenefits.security.service.s_interface.EntityPreparer;
 import lombok.*;
-import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
-import java.math.BigInteger;
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -24,7 +20,7 @@ import java.util.function.Function;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class UserEntity implements EntityPreparer {
+public class UserEntity extends ObjectEntity {
 
   /**
    * ID пользователя
@@ -32,7 +28,7 @@ public class UserEntity implements EntityPreparer {
   @NonNull
   @Id
   @Column(name = "id")
-  private BigInteger id;
+  private String id;
 
   /**
    * Имя пользователя
@@ -187,33 +183,5 @@ public class UserEntity implements EntityPreparer {
    */
   public void encryptPassword(Function<String, String> encryptFunc) {
     password = encryptFunc.apply(password);
-  }
-
-  /**
-   * Обрабатывает строковые поля объекта перед записью в базу данных
-   * @param prepareFunc функция обработки строки
-   * @return объект с обработанными полями
-   */
-  @Override
-  public EntityPreparer prepareForDB(Function<String, String> prepareFunc) {
-
-    name = prepareFunc.apply(name);
-    email = prepareFunc.apply(email);
-    password = prepareFunc.apply(password);
-
-    return this;
-  }
-
-  @Override
-  public boolean equals(@Nullable Object o) {
-    if (this == o) return true;
-    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    UserEntity userEntity = (UserEntity) o;
-    return Objects.equals(id, userEntity.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
   }
 }

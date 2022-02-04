@@ -1,9 +1,7 @@
 package com.example.familybenefits.dao.entity;
 
 import lombok.*;
-import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,7 +9,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * Модель записи таблицы "verify_email_code"
@@ -24,7 +21,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class VerifyEmailCodeEntity {
+public class VerifyEmailCodeEntity extends ObjectEntity {
 
   /**
    * ID пользователя
@@ -32,7 +29,7 @@ public class VerifyEmailCodeEntity {
   @NonNull
   @Id
   @Column(name = "id_user")
-  private BigInteger idUser;
+  private String idUser;
 
   /**
    * Код подтверждения почты
@@ -47,17 +44,4 @@ public class VerifyEmailCodeEntity {
   @NonNull
   @Column(name = "date_expiration")
   private Date dateExpiration;
-
-  @Override
-  public boolean equals(@Nullable Object o) {
-    if (this == o) return true;
-    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    VerifyEmailCodeEntity that = (VerifyEmailCodeEntity) o;
-    return Objects.equals(idUser, that.idUser);
-  }
-
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
-  }
 }

@@ -1,17 +1,13 @@
 package com.example.familybenefits.dao.entity;
 
 import lombok.*;
-import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.math.BigInteger;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * Модель записи таблицы "refresh_token"
@@ -24,7 +20,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class RefreshTokenEntity {
+public class RefreshTokenEntity extends ObjectEntity {
 
   /**
    * ID пользователя
@@ -32,7 +28,7 @@ public class RefreshTokenEntity {
   @NonNull
   @Id
   @Column(name = "id_user")
-  private BigInteger idUser;
+  private String idUser;
 
   /**
    * Токен обновления токена доступа
@@ -47,17 +43,4 @@ public class RefreshTokenEntity {
   @NonNull
   @Column(name = "date_expiration")
   private Date dateExpiration;
-
-  @Override
-  public boolean equals(@Nullable Object o) {
-    if (this == o) return true;
-    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    RefreshTokenEntity that = (RefreshTokenEntity) o;
-    return Objects.equals(idUser, that.idUser);
-  }
-
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
-  }
 }

@@ -1,16 +1,11 @@
 package com.example.familybenefits.dao.entity;
 
-import com.example.familybenefits.security.service.s_interface.EntityPreparer;
 import lombok.*;
-import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
-import java.math.BigInteger;
-import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Модель записи таблицы "institution"
@@ -23,7 +18,7 @@ import java.util.function.Function;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class InstitutionEntity implements EntityPreparer {
+public class InstitutionEntity extends ObjectEntity {
 
   /**
    * ID учреждения
@@ -31,7 +26,7 @@ public class InstitutionEntity implements EntityPreparer {
   @NonNull
   @Id
   @Column(name = "id")
-  private BigInteger id;
+  private String id;
 
   /**
    * Название учреждения
@@ -95,38 +90,7 @@ public class InstitutionEntity implements EntityPreparer {
    * Конструктор для создания модели по ID
    * @param id ID учреждения
    */
-  public InstitutionEntity(@NonNull BigInteger id) {
+  public InstitutionEntity(@NonNull String id) {
     this.id = id;
-  }
-
-  /**
-   * Обрабатывает строковые поля объекта перед записью в базу данных
-   * @param prepareFunc функция обработки строки
-   * @return объект с обработанными полями
-   */
-  @Override
-  public EntityPreparer prepareForDB(Function<String, String> prepareFunc) {
-
-    name = prepareFunc.apply(name);
-    info = prepareFunc.apply(info);
-    address = prepareFunc.apply(address);
-    phone = prepareFunc.apply(phone);
-    email = prepareFunc.apply(email);
-    schedule = prepareFunc.apply(schedule);
-
-    return this;
-  }
-
-  @Override
-  public boolean equals(@Nullable Object o) {
-    if (this == o) return true;
-    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    InstitutionEntity that = (InstitutionEntity) o;
-    return Objects.equals(id, that.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
   }
 }
