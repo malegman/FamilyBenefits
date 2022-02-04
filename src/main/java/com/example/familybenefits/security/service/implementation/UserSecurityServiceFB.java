@@ -23,14 +23,14 @@ public class UserSecurityServiceFB implements UserSecurityService {
    * Проверяет пароль на эквивалентность с повторно введенным и на соответствие политике безопасности паролей.
    * @param password проверяемый пароль
    * @param repeatPassword повторно введенный пароль
-   * @throws PasswordNotEqualsException если указанные пароли не эквивалентны
+   * @throws NotEqualException если указанные пароли не эквивалентны
    * @throws PasswordNotSafetyException если пароль не соответствует политике безопасности
    */
   @Override
-  public void checkPasswordElseThrow(String password, String repeatPassword) throws PasswordNotEqualsException, PasswordNotSafetyException {
+  public void checkPasswordElseThrow(String password, String repeatPassword) throws NotEqualException, PasswordNotSafetyException {
 
     if (!password.equals(repeatPassword)) {
-      throw new PasswordNotEqualsException("Input passwords are not equals");
+      throw new NotEqualException("Input passwords are not equals");
     }
     
     if (!( PATTERN_PWD_LOWER.matcher(password).matches()

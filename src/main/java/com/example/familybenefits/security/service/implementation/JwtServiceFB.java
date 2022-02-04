@@ -23,15 +23,20 @@ public class JwtServiceFB implements JwtService {
    */
   private final UserSecurityService userSecurityService;
 
+  /**
+   * Конструктор для инициализации интерфейса сервиса
+   * @param userSecurityService интерфейс сервиса, отвечающего за данные пользователя
+   */
   @Autowired
   public JwtServiceFB(UserSecurityService userSecurityService) {
     this.userSecurityService = userSecurityService;
   }
 
   /**
-   * Создает токен пользователя с использованием его email
+   * Создает токен jwt пользователя с использованием его email
    * @param email email пользователя
-   * @return сгенерированный jwt. null, если указан некорректный email
+   * @return сгенерированный jwt
+   * @throws InvalidEmailException если указанный "email" не является email
    */
   @Override
   public String generateToken(String email) throws InvalidEmailException {
@@ -51,7 +56,8 @@ public class JwtServiceFB implements JwtService {
 
   /**
    * Преобразует строковый токен в объект токена jwt
-   * @param token проверяемый токен
+   * @param token конвертируемый строковый токен
+   * @return токен в формате jwt
    * @throws RuntimeException если не удалось преобразовать токен
    */
   @Override
@@ -63,7 +69,7 @@ public class JwtServiceFB implements JwtService {
   /**
    * Получает email пользователя по токену формата jwt
    * @param jwt токен пользователя, jwt
-   * @return email пользователя. null, если не удалось извлечь email из jwt
+   * @return email пользователя
    * @throws InvalidEmailException если извлеченный объект из jwt не является email
    */
   @Override

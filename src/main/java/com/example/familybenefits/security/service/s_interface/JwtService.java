@@ -10,24 +10,25 @@ import io.jsonwebtoken.Jws;
 public interface JwtService {
 
   /**
-   * Создает токен пользователя с использованием его email
+   * Создает токен jwt пользователя с использованием его email
    * @param email email пользователя
-   * @return сгенерированный jwt. null, если указан некорректный email
+   * @return сгенерированный jwt
    * @throws InvalidEmailException если указанный "email" не является email
    */
   String generateToken(String email) throws InvalidEmailException;
 
   /**
-   * Проверяет токен на его действительность
-   * @param token проверяемый jwt
-   * @throws RuntimeException если токен недействительный
+   * Преобразует строковый токен в объект токена jwt
+   * @param token конвертируемый строковый токен
+   * @return объект токена jwt
+   * @throws RuntimeException если не удалось преобразовать токен
    */
   Jws<Claims> convertToJwt(String token) throws RuntimeException;
 
   /**
    * Получает email пользователя по токену формата jwt
    * @param jwt токен пользователя, jwt
-   * @return email пользователя. null, если не удалось извлечь email из jwt
+   * @return email пользователя
    * @throws InvalidEmailException если извлеченный объект из jwt не является email
    */
   String getEmailFromToken(Jws<Claims> jwt) throws InvalidEmailException;

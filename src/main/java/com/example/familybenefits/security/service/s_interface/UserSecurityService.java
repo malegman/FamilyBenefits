@@ -12,10 +12,10 @@ public interface UserSecurityService {
    * Проверяет пароль на эквивалентность с повторно введенным и на соответствие политике безопасности паролей.
    * @param password проверяемый пароль
    * @param repeatPassword повторно введенный пароль
-   * @throws PasswordNotEqualsException если указанные пароли не эквивалентны
+   * @throws NotEqualException если указанные пароли не эквивалентны
    * @throws PasswordNotSafetyException если пароль не соответствует политике безопасности
    */
-  void checkPasswordElseThrow(String password, String repeatPassword) throws PasswordNotEqualsException, PasswordNotSafetyException;
+  void checkPasswordElseThrow(String password, String repeatPassword) throws NotEqualException, PasswordNotSafetyException;
 
   /**
    * Проверяет корректность email
