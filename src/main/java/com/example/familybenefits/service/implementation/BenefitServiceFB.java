@@ -1,29 +1,30 @@
 package com.example.familybenefits.service.implementation;
 
-import com.example.familybenefits.resource.R;
 import com.example.familybenefits.api_model.benefit.BenefitAdd;
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.benefit.BenefitInitData;
 import com.example.familybenefits.api_model.benefit.BenefitUpdate;
-import com.example.familybenefits.convert.BenefitConverter;
-import com.example.familybenefits.convert.CityConverter;
-import com.example.familybenefits.convert.CriterionConverter;
-import com.example.familybenefits.convert.InstitutionConverter;
+import com.example.familybenefits.convert.BenefitDBConverter;
+import com.example.familybenefits.convert.CityDBConverter;
+import com.example.familybenefits.convert.CriterionDBConverter;
+import com.example.familybenefits.convert.InstitutionDBConverter;
 import com.example.familybenefits.dao.entity.BenefitEntity;
 import com.example.familybenefits.dao.entity.CityEntity;
 import com.example.familybenefits.dao.entity.CriterionEntity;
 import com.example.familybenefits.dao.entity.InstitutionEntity;
 import com.example.familybenefits.dao.repository.BenefitRepository;
+import com.example.familybenefits.dao.repository.CityRepository;
+import com.example.familybenefits.dao.repository.CriterionRepository;
+import com.example.familybenefits.dao.repository.InstitutionRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.service.s_interface.BenefitService;
-import com.example.familybenefits.service.s_interface.PartEntityService;
+import com.example.familybenefits.service.s_interface.EntityDBService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
  * Реализация сервиса, управляющего объектом "пособие"
  */
 @Service
-public class BenefitServiceFB implements BenefitService, PartEntityService<BenefitEntity> {
+public class BenefitServiceFB implements BenefitService, EntityDBService<BenefitEntity, BenefitRepository> {
 
   /**
    * Репозиторий, работающий с моделью таблицы "benefit"
@@ -39,17 +40,17 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
   private final BenefitRepository benefitRepository;
 
   /**
-   * Интерфейс сервиса для моделей таблицы "city", целостность которых зависит от связанных таблиц
+   * Интерфейс сервиса модели таблицы "city", целостность которой зависит от связанных таблиц
    */
-  private final PartEntityService<CityEntity> cityPartEntityService;
+  private final EntityDBService<CityEntity, CityRepository> cityDBService;
   /**
-   * Интерфейс сервиса для моделей таблицы "institution", целостность которых зависит от связанных таблиц
+   * Интерфейс сервиса модели таблицы "institution", целостность которых зависит от связанных таблиц
    */
-  private final PartEntityService<InstitutionEntity> institutionPartEntityService;
+  private final EntityDBService<InstitutionEntity, InstitutionRepository>institutionDBService;
   /**
-   * Интерфейс сервиса для моделей таблицы "criterion", целостность которых зависит от связанных таблиц
+   * Интерфейс сервиса модели таблицы "criterion", целостность которой зависит от связанных таблиц
    */
-  private final PartEntityService<CriterionEntity> criterionPartEntityService;
+  private final EntityDBService<CriterionEntity, CriterionRepository> criterionDBService;
 
   /**
    * Интерфейс сервиса, отвечающего за целостность базы данных
@@ -59,21 +60,21 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
   /**
    * Конструктор для инициализации интерфейсов репозиториев и сервисов
    * @param benefitRepository репозиторий, работающий с моделью таблицы "benefit"
-   * @param cityPartEntityService интерфейс сервиса для моделей таблицы "city", целостность которых зависит от связанных таблиц
-   * @param institutionPartEntityService интерфейс сервиса для моделей таблицы "institution", целостность которых зависит от связанных таблиц
-   * @param criterionPartEntityService интерфейс сервиса для моделей таблицы "criterion", целостность которых зависит от связанных таблиц
+   * @param cityDBService интерфейс сервиса модели таблицы "city", целостность которой зависит от связанных таблиц
+   * @param institutionDBService интерфейс сервиса модели таблицы "institution", целостность которой зависит от связанных таблиц
+   * @param criterionDBService интерфейс сервиса модели таблицы "criterion", целостность которой зависит от связанных таблиц
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    */
   @Autowired
   public BenefitServiceFB(BenefitRepository benefitRepository,
-                          @Lazy PartEntityService<CityEntity> cityPartEntityService,
-                          @Lazy PartEntityService<InstitutionEntity> institutionPartEntityService,
-                          PartEntityService<CriterionEntity> criterionPartEntityService,
+                          @Lazy EntityDBService<CityEntity, CityRepository> cityDBService,
+                          @Lazy EntityDBService<InstitutionEntity, InstitutionRepository> institutionDBService,
+                          EntityDBService<CriterionEntity, CriterionRepository> criterionDBService,
                           DBIntegrityService dbIntegrityService) {
     this.benefitRepository = benefitRepository;
-    this.cityPartEntityService = cityPartEntityService;
-    this.institutionPartEntityService = institutionPartEntityService;
-    this.criterionPartEntityService = criterionPartEntityService;
+    this.cityDBService = cityDBService;
+    this.institutionDBService = institutionDBService;
+    this.criterionDBService = criterionDBService;
     this.dbIntegrityService = dbIntegrityService;
   }
 
@@ -86,22 +87,21 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
   @Override
   public void add(BenefitAdd benefitAdd) throws AlreadyExistsException, NotFoundException {
 
-    // Проверка существования городов, критерий и учреждений по их ID
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityPartEntityService::existsById, benefitAdd.getIdCitySet(), R.NAME_OBJECT_CITY);
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionPartEntityService::existsById, benefitAdd.getIdCriterionSet(), R.NAME_OBJECT_CRITERION);
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        institutionPartEntityService::existsById, benefitAdd.getIdInstitutionSet(), R.NAME_OBJECT_INSTITUTION);
-
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    BenefitEntity benefitEntityFromAdd = (BenefitEntity) BenefitConverter
-        .fromAdd(benefitAdd)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString);
+    BenefitEntity benefitEntityFromAdd = BenefitDBConverter
+        .fromAdd(benefitAdd, dbIntegrityService::preparePostgreSQLString);
+
+    // Проверка существования городов, критерий и учреждений по их ID
+    dbIntegrityService.checkExistenceById(
+        cityDBService.getRepository()::existsById, benefitEntityFromAdd.getCityEntitySet());
+    dbIntegrityService.checkExistenceById(
+        criterionDBService.getRepository()::existsById, benefitEntityFromAdd.getCriterionEntitySet());
+    dbIntegrityService.checkExistenceById(
+        institutionDBService.getRepository()::existsById, benefitEntityFromAdd.getInstitutionEntitySet());
 
     // Проверка отсутствия пособия по его названию
-    dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
-        benefitRepository::existsByName, benefitEntityFromAdd.getName(), R.NAME_OBJECT_BENEFIT);
+    dbIntegrityService.checkAbsenceByUniqStr(
+        benefitRepository::existsByName, benefitEntityFromAdd.getName());
 
     benefitRepository.saveAndFlush(benefitEntityFromAdd);
   }
@@ -114,22 +114,23 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
   @Override
   public void update(BenefitUpdate benefitUpdate) throws NotFoundException {
 
+    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
+    BenefitEntity benefitEntityFromUpdate = BenefitDBConverter
+        .fromUpdate(benefitUpdate, dbIntegrityService::preparePostgreSQLString);
+
     // Проверка существования городов, критерий и учреждений по их ID
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityPartEntityService::existsById, benefitUpdate.getIdCitySet(), R.NAME_OBJECT_CITY);
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionPartEntityService::existsById, benefitUpdate.getIdCriterionSet(), R.NAME_OBJECT_CRITERION);
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        institutionPartEntityService::existsById, benefitUpdate.getIdInstitutionSet(), R.NAME_OBJECT_INSTITUTION);
+    dbIntegrityService.checkExistenceById(
+        cityDBService.getRepository()::existsById, benefitEntityFromUpdate.getCityEntitySet());
+    dbIntegrityService.checkExistenceById(
+        criterionDBService.getRepository()::existsById, benefitEntityFromUpdate.getCriterionEntitySet());
+    dbIntegrityService.checkExistenceById(
+        institutionDBService.getRepository()::existsById, benefitEntityFromUpdate.getInstitutionEntitySet());
 
     // Проверка существования пособия по его ID
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        benefitRepository::existsById, benefitUpdate.getId(), R.NAME_OBJECT_BENEFIT);
+    dbIntegrityService.checkExistenceById(
+        benefitRepository::existsById, benefitEntityFromUpdate);
 
-    // Сохранение полученной модели таблицы из запроса с подготовленными строковыми значениями для БД
-    benefitRepository.saveAndFlush((BenefitEntity) BenefitConverter
-        .fromUpdate(benefitUpdate)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString));
+    benefitRepository.saveAndFlush(benefitEntityFromUpdate);
   }
 
   /**
@@ -138,13 +139,15 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
    * @throws NotFoundException если пособие с указанным ID не найден
    */
   @Override
-  public void delete(BigInteger idBenefit) throws NotFoundException {
+  public void delete(String idBenefit) throws NotFoundException {
+
+    String prepareIdBenefit = dbIntegrityService.preparePostgreSQLString(idBenefit);
 
     // Проверка существование пособия по его ID
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        benefitRepository::existsById, idBenefit, R.NAME_OBJECT_BENEFIT);
+    dbIntegrityService.checkExistenceById(
+        benefitRepository::existsById, prepareIdBenefit);
 
-    benefitRepository.deleteById(idBenefit);
+    benefitRepository.deleteById(prepareIdBenefit);
   }
 
   /**
@@ -154,14 +157,16 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
    * @throws NotFoundException если пособие с указанным ID не найден
    */
   @Override
-  public BenefitInfo read(BigInteger idBenefit) throws NotFoundException {
+  public BenefitInfo read(String idBenefit) throws NotFoundException {
+
+    String prepareIdBenefit = dbIntegrityService.preparePostgreSQLString(idBenefit);
 
     // Получение пособия по его ID, если пособие существует
-    BenefitEntity benefitEntityFromRequest = benefitRepository.findById(idBenefit)
+    BenefitEntity benefitEntityFromRequest = benefitRepository.findById(prepareIdBenefit)
         .orElseThrow(() -> new NotFoundException(String.format(
             "Benefit with ID \"%s\" not found", idBenefit)));
 
-    return BenefitConverter.toInfo(benefitEntityFromRequest);
+    return BenefitDBConverter.toInfo(benefitEntityFromRequest);
   }
 
   /**
@@ -173,7 +178,7 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
 
     return findAllFull()
         .stream()
-        .map(BenefitConverter::toInfo)
+        .map(BenefitDBConverter::toInfo)
         .collect(Collectors.toSet());
   }
 
@@ -186,7 +191,7 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
 
     return findAllPartial()
         .stream()
-        .map(BenefitConverter::toInfo)
+        .map(BenefitDBConverter::toInfo)
         .collect(Collectors.toSet());
   }
 
@@ -200,33 +205,31 @@ public class BenefitServiceFB implements BenefitService, PartEntityService<Benef
 
     return BenefitInitData
         .builder()
-        .shortCitySet(cityPartEntityService
+        .shortCitySet(cityDBService
                           .findAllFull()
                           .stream()
-                          .map(CityConverter::toShortInfo)
+                          .map(CityDBConverter::toShortInfo)
                           .collect(Collectors.toSet()))
-        .criterionSet(criterionPartEntityService
+        .criterionSet(criterionDBService
                           .findAllFull()
                           .stream()
-                          .map(CriterionConverter::toInfo)
+                          .map(CriterionDBConverter::toInfo)
                           .collect(Collectors.toSet()))
-        .shortInstitutionSet(institutionPartEntityService
+        .shortInstitutionSet(institutionDBService
                                  .findAllFull()
                                  .stream()
-                                 .map(InstitutionConverter::toShortInfo)
+                                 .map(InstitutionDBConverter::toShortInfo)
                                  .collect(Collectors.toSet()))
         .build();
   }
 
   /**
-   * Проверяет существование модели таблицы "benefit" по ID
-   * @param id ID модели
-   * @return true, если модель существует
+   * Возвращает репозиторий сервиса
+   * @return репозиторий сервиса
    */
   @Override
-  public boolean existsById(BigInteger id) {
-
-    return benefitRepository.existsById(id);
+  public BenefitRepository getRepository() {
+    return benefitRepository;
   }
 
   /**

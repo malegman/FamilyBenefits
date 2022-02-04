@@ -1,34 +1,34 @@
 package com.example.familybenefits.service.implementation;
 
-import com.example.familybenefits.resource.R;
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.user.UserAdd;
 import com.example.familybenefits.api_model.user.UserInfo;
 import com.example.familybenefits.api_model.user.UserInitData;
 import com.example.familybenefits.api_model.user.UserUpdate;
-import com.example.familybenefits.convert.BenefitConverter;
-import com.example.familybenefits.convert.CityConverter;
-import com.example.familybenefits.convert.CriterionConverter;
-import com.example.familybenefits.convert.UserConverter;
+import com.example.familybenefits.convert.BenefitDBConverter;
+import com.example.familybenefits.convert.CityDBConverter;
+import com.example.familybenefits.convert.CriterionDBConverter;
+import com.example.familybenefits.convert.UserDBConverter;
 import com.example.familybenefits.dao.entity.*;
-import com.example.familybenefits.dao.repository.ChildRepository;
-import com.example.familybenefits.dao.repository.UserRepository;
+import com.example.familybenefits.dao.repository.*;
 import com.example.familybenefits.exception.*;
+import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.security.service.s_interface.UserSecurityService;
-import com.example.familybenefits.service.s_interface.PartEntityService;
+import com.example.familybenefits.service.s_interface.EntityDBService;
 import com.example.familybenefits.service.s_interface.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAccessor;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -53,17 +53,17 @@ public class UserServiceFB implements UserService {
   private final ChildRepository childRepository;
 
   /**
-   * Интерфейс сервиса для моделей таблицы "benefit", целостность которых зависит от связанных таблиц
+   * Интерфейс сервиса модели таблицы "benefit", целостность которой зависит от связанных таблиц
    */
-  private final PartEntityService<BenefitEntity> benefitPartEntityService;
+  private final EntityDBService<BenefitEntity, BenefitRepository> benefitDBService;
   /**
-   * Интерфейс сервиса для моделей таблицы "city", целостность которых зависит от связанных таблиц
+   * Интерфейс сервиса модели таблицы "city", целостность которой зависит от связанных таблиц
    */
-  private final PartEntityService<CityEntity> cityPartEntityService;
+  private final EntityDBService<CityEntity, CityRepository> cityDBService;
   /**
-   * Интерфейс сервиса для моделей таблицы "criterion", целостность которых зависит от связанных таблиц
+   * Интерфейс сервиса модели таблицы "criterion", целостность которой зависит от связанных таблиц
    */
-  private final PartEntityService<CriterionEntity> criterionPartEntityService;
+  private final EntityDBService<CriterionEntity, CriterionRepository> criterionDBService;
 
   /**
    * Интерфейс сервиса, отвечающего за целостность базы данных
@@ -82,9 +82,9 @@ public class UserServiceFB implements UserService {
    * Конструктор для инициализации интерфейсов репозиториев и сервисов
    * @param userRepository репозиторий, работающий с моделью таблицы "user"
    * @param childRepository репозиторий, работающий с моделью таблицы "child"
-   * @param benefitPartEntityService интерфейс сервиса для моделей таблицы "benefit", целостность которых зависит от связанных таблиц
-   * @param cityPartEntityService интерфейс сервиса для моделей таблицы "city", целостность которых зависит от связанных таблиц
-   * @param criterionPartEntityService интерфейс сервиса для моделей таблицы "criterion", целостность которых зависит от связанных таблиц
+   * @param benefitDBService интерфейс сервиса модели таблицы "benefit", целостность которой зависит от связанных таблиц
+   * @param cityDBService интерфейс сервиса модели таблицы "city", целостность которой зависит от связанных таблиц
+   * @param criterionDBService интерфейс сервиса модели таблицы "criterion", целостность которой зависит от связанных таблиц
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    * @param userSecurityService интерфейс сервиса, отвечающего за данные пользователя
    * @param passwordEncoder интерфейс сервиса для шифрования паролей
@@ -92,17 +92,17 @@ public class UserServiceFB implements UserService {
   @Autowired
   public UserServiceFB(UserRepository userRepository,
                        ChildRepository childRepository,
-                       PartEntityService<BenefitEntity> benefitPartEntityService,
-                       PartEntityService<CityEntity> cityPartEntityService,
-                       PartEntityService<CriterionEntity> criterionPartEntityService,
+                       EntityDBService<BenefitEntity, BenefitRepository> benefitDBService,
+                       EntityDBService<CityEntity, CityRepository> cityDBService,
+                       EntityDBService<CriterionEntity, CriterionRepository> criterionDBService,
                        DBIntegrityService dbIntegrityService,
                        UserSecurityService userSecurityService,
                        PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
     this.childRepository = childRepository;
-    this.benefitPartEntityService = benefitPartEntityService;
-    this.cityPartEntityService = cityPartEntityService;
-    this.criterionPartEntityService = criterionPartEntityService;
+    this.benefitDBService = benefitDBService;
+    this.cityDBService = cityDBService;
+    this.criterionDBService = criterionDBService;
     this.dbIntegrityService = dbIntegrityService;
     this.userSecurityService = userSecurityService;
     this.passwordEncoder = passwordEncoder;
@@ -114,7 +114,7 @@ public class UserServiceFB implements UserService {
    * @throws NotFoundException если город или критерии с указанными данными не найдены
    * @throws AlreadyExistsException если администратор или пользователь с указанным email уже существует
    * @throws PasswordNotSafetyException если пароль не соответствует политике безопасности
-   * @throws PasswordNotEqualsException если указанные пароли не эквивалентны
+   * @throws NotEqualException если указанные пароли не эквивалентны
    * @throws InvalidEmailException если указанный "email" не является email
    * @throws DateFormatException если даты рождения пользователя или детей не соответствуют формату "dd.mm.yyyy"
    * @throws DateTimeException если даты рождения пользователя или детей позже текущей даты
@@ -124,16 +124,10 @@ public class UserServiceFB implements UserService {
       NotFoundException,
       AlreadyExistsException,
       PasswordNotSafetyException,
-      PasswordNotEqualsException,
+      NotEqualException,
       InvalidEmailException,
       DateFormatException,
       DateTimeException {
-
-    // Проверка существования города и критерий по их ID
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityPartEntityService::existsById, userAdd.getIdCity(), R.NAME_OBJECT_CITY);
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionPartEntityService::existsById, userAdd.getIdCriterionSet(), R.NAME_OBJECT_CRITERION);
 
     // Проверка паролей на эквивалентность и безопасность
     userSecurityService.checkPasswordElseThrow(
@@ -144,26 +138,27 @@ public class UserServiceFB implements UserService {
         userAdd.getEmail());
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    UserEntity userEntityFromAdd = (UserEntity) UserConverter
-        .fromAdd(userAdd)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString);
+    UserEntity userEntityFromAdd = UserDBConverter
+        .fromAdd(userAdd, dbIntegrityService::preparePostgreSQLString);
+
+    // Проверка существования города и критерий по их ID
+    dbIntegrityService.checkExistenceById(
+        cityDBService.getRepository()::existsById, userEntityFromAdd.getCityEntity());
+    dbIntegrityService.checkExistenceById(
+        criterionDBService.getRepository()::existsById, userEntityFromAdd.getCriterionEntitySet());
 
     // Проверка на существование пользователя или администратора по email
-    dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
-        userRepository::existsByEmail, userEntityFromAdd.getEmail(), R.NAME_OBJECT_USER);
+    dbIntegrityService.checkAbsenceByUniqStr(
+        userRepository::existsByEmail, userEntityFromAdd.getEmail());
 
     // Преобразование дат рождения пользователя и рождения детей
-    userEntityFromAdd.setDateBirth(strToDateElseThrow(
-        userAdd.getDateBirth()));
-    userEntityFromAdd.setChildEntitySet(strBirthSetToChildEntity(
-        userAdd.getBirthDateChildren()));
+    userEntityFromAdd.setDateBirth(strToDate(userAdd.getDateBirth()));
+    userEntityFromAdd.setChildEntitySet(strBirthSetToChildEntity(userAdd.getBirthDateChildren()));
 
     // Проверка дат рождения пользователя и детей на предшествие текущей даты
-    checkDateBeforeNow(
-        userEntityFromAdd.getDateBirth());
-    checkDateBeforeNow(
-        userEntityFromAdd.getChildEntitySet()
-            .stream().map(ChildEntity::getDateBirth).collect(Collectors.toSet()));
+    checkDateBeforeNow(userEntityFromAdd.getDateBirth());
+    checkDateBeforeNow(userEntityFromAdd.getChildEntitySet()
+                           .stream().map(ChildEntity::getDateBirth).collect(Collectors.toSet()));
 
     userEntityFromAdd.addRole(R.ROLE_USER);
     userEntityFromAdd.setVerifiedEmail(false);
@@ -189,12 +184,6 @@ public class UserServiceFB implements UserService {
       DateFormatException,
       DateTimeException {
 
-    // Проверка существования города и критерий по их ID
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        cityPartEntityService::existsById, userUpdate.getIdCity(), R.NAME_OBJECT_CITY);
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionPartEntityService::existsById, userUpdate.getIdCriterionSet(), R.NAME_OBJECT_CRITERION);
-
     // Проверка строки email на соответствие формату email
     userSecurityService.checkEmailElseThrowInvalidEmail(
         userUpdate.getEmail());
@@ -204,14 +193,19 @@ public class UserServiceFB implements UserService {
         .orElseThrow(() -> new NotFoundException(String.format(
             "User with ID \"%s\" not found", userUpdate.getId())));
 
+    // Проверка существования города и критерий по их ID
+    dbIntegrityService.checkExistenceById(
+        cityDBService.getRepository()::existsById, userEntityFromDB.getCityEntity());
+    dbIntegrityService.checkExistenceById(
+        criterionDBService.getRepository()::existsById, userEntityFromDB.getCriterionEntitySet());
+
     // Проверка наличия роли "ROLE_USER" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromDB, R.ROLE_USER, R.NAME_OBJECT_USER);
+        userEntityFromDB, R.ROLE_USER, R.CLIENT_USER);
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    UserEntity userEntityFromUpdate = (UserEntity) UserConverter
-        .fromUpdate(userUpdate)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString);
+    UserEntity userEntityFromUpdate = UserDBConverter
+        .fromUpdate(userUpdate, dbIntegrityService::preparePostgreSQLString);
 
     // Изменение email и сброс его подтверждения, если новое email
     if (!userEntityFromUpdate.getEmail().equals(userEntityFromDB.getEmail())) {
@@ -220,9 +214,9 @@ public class UserServiceFB implements UserService {
     }
 
     // Преобразование дат рождения пользователя и рождения детей
-    userEntityFromUpdate.setDateBirth(strToDateElseThrow(
+    userEntityFromDB.setDateBirth(strToDate(
         userUpdate.getDateBirth()));
-    userEntityFromUpdate.setChildEntitySet(strBirthSetToChildEntity(
+    userEntityFromDB.setChildEntitySet(strBirthSetToChildEntity(
         userUpdate.getBirthDateChildren()));
 
     // Проверка дат рождения пользователя и детей на предшествие текущей даты
@@ -245,7 +239,7 @@ public class UserServiceFB implements UserService {
    * @throws NotFoundException если пользователь с указанным ID не найден
    */
   @Override
-  public void delete(BigInteger idUser) throws NotFoundException {
+  public void delete(String idUser) throws NotFoundException {
 
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromRequest = userRepository.findById(idUser)
@@ -254,7 +248,7 @@ public class UserServiceFB implements UserService {
 
     // Проверка наличия роли "ROLE_USER" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_USER, R.NAME_OBJECT_USER);
+        userEntityFromRequest, R.ROLE_USER, R.CLIENT_USER);
 
     // Если есть роль "ROLE_ADMIN", удаление роли "ROLE_USER", иначе удаление пользователя
     if (userEntityFromRequest.hasRole(R.ROLE_ADMIN)) {
@@ -272,7 +266,7 @@ public class UserServiceFB implements UserService {
    * @throws NotFoundException если пользователь с указанным ID не найден
    */
   @Override
-  public UserInfo read(BigInteger idUser) throws NotFoundException {
+  public UserInfo read(String idUser) throws NotFoundException {
 
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromRequest = userRepository.findById(idUser)
@@ -281,9 +275,9 @@ public class UserServiceFB implements UserService {
 
     // Проверка наличия роли "ROLE_USER" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_USER, R.NAME_OBJECT_USER);
+        userEntityFromRequest, R.ROLE_USER, R.CLIENT_USER);
 
-    return UserConverter.toInfo(userEntityFromRequest);
+    return UserDBConverter.toInfo(userEntityFromRequest);
   }
 
   /**
@@ -296,15 +290,15 @@ public class UserServiceFB implements UserService {
 
     return UserInitData
         .builder()
-        .shortCitySet(cityPartEntityService
+        .shortCitySet(cityDBService
                           .findAllFull()
                           .stream()
-                          .map(CityConverter::toShortInfo)
+                          .map(CityDBConverter::toShortInfo)
                           .collect(Collectors.toSet()))
-        .criterionSet(criterionPartEntityService
+        .criterionSet(criterionDBService
                           .findAllFull()
                           .stream()
-                          .map(CriterionConverter::toInfo)
+                          .map(CriterionDBConverter::toInfo)
                           .collect(Collectors.toSet()))
         .build();
   }
@@ -317,7 +311,7 @@ public class UserServiceFB implements UserService {
    * @throws DateTimeException если критерии пользователя устарели
    */
   @Override
-  public Set<BenefitInfo> getBenefits(BigInteger idUser) throws NotFoundException, DateTimeException {
+  public Set<BenefitInfo> getBenefits(String idUser) throws NotFoundException, DateTimeException {
 
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromRequest = userRepository.findById(idUser)
@@ -326,7 +320,7 @@ public class UserServiceFB implements UserService {
 
     // Проверка наличия роли "ROLE_USER" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_USER, R.NAME_OBJECT_USER);
+        userEntityFromRequest, R.ROLE_USER, R.CLIENT_USER);
 
     LocalDate localDateCriterion = userEntityFromRequest.getDateSelectCriterion();
     // Проверка разницы дат между текущей датой и датой последней установки критериев
@@ -344,7 +338,7 @@ public class UserServiceFB implements UserService {
       Set<CriterionEntity> userCriteria = userEntityFromRequest.getCriterionEntitySet();
 
       userEntityFromRequest.setBenefitEntitySet(
-          benefitPartEntityService
+          benefitDBService
               .findAllFull()
               .stream()
               .filter(benefitEntity -> benefitEntity.getCriterionEntitySet().containsAll(userCriteria))
@@ -356,7 +350,7 @@ public class UserServiceFB implements UserService {
 
     return userEntityFromRequest.getBenefitEntitySet()
         .stream()
-        .map(BenefitConverter::toInfo)
+        .map(BenefitDBConverter::toInfo)
         .collect(Collectors.toSet());
   }
 
@@ -366,7 +360,7 @@ public class UserServiceFB implements UserService {
    * @return преобразованная строка в формат даты
    * @throws DateFormatException если полученная строка не соответствует формату "dd.mm.yyyy"
    */
-  private LocalDate strToDateElseThrow(String userBirth) throws DateFormatException {
+  private LocalDate strToDate(String userBirth) throws DateFormatException {
 
     try {
       return LocalDate.from((TemporalAccessor) SIMPLE_DATE_FORMAT.parse(userBirth));
@@ -388,7 +382,7 @@ public class UserServiceFB implements UserService {
 
     // Преобразование строк формата "dd.mm.yyyy" в дату
     for (String strBirth : strBirthSet) {
-      dateBirthSet.add(strToDateElseThrow(strBirth));
+      dateBirthSet.add(strToDate(strBirth));
     }
 
     // Преобразование дат рождения в модели детей.

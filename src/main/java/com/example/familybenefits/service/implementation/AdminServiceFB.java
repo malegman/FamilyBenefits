@@ -1,21 +1,19 @@
 package com.example.familybenefits.service.implementation;
 
-import com.example.familybenefits.resource.R;
 import com.example.familybenefits.api_model.admin.AdminAdd;
 import com.example.familybenefits.api_model.admin.AdminInfo;
 import com.example.familybenefits.api_model.admin.AdminUpdate;
-import com.example.familybenefits.convert.AdminConverter;
+import com.example.familybenefits.convert.AdminDBConverter;
 import com.example.familybenefits.dao.entity.UserEntity;
 import com.example.familybenefits.dao.repository.UserRepository;
 import com.example.familybenefits.exception.*;
+import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.security.service.s_interface.UserSecurityService;
 import com.example.familybenefits.service.s_interface.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.math.BigInteger;
 
 /**
  * Реализация сервиса, управляющего объектом "администратор"
@@ -64,11 +62,11 @@ public class AdminServiceFB implements AdminService {
    * @param adminAdd adminAdd объект запроса на добавление администратора
    * @throws AlreadyExistsException если администратор или пользователь с указанным email уже существует
    * @throws PasswordNotSafetyException если пароль не соответствует политике безопасности
-   * @throws PasswordNotEqualsException если указанные пароли не эквивалентны
+   * @throws NotEqualException если указанные пароли не эквивалентны
    * @throws InvalidEmailException если указанный "email" не является email
    */
   @Override
-  public void add(AdminAdd adminAdd) throws AlreadyExistsException, PasswordNotSafetyException, PasswordNotEqualsException, InvalidEmailException {
+  public void add(AdminAdd adminAdd) throws AlreadyExistsException, PasswordNotSafetyException, NotEqualException, InvalidEmailException {
 
     // Проверка паролей на эквивалентность и безопасность
     userSecurityService.checkPasswordElseThrow(
@@ -79,13 +77,12 @@ public class AdminServiceFB implements AdminService {
         adminAdd.getEmail());
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    UserEntity userEntityFromAdd = (UserEntity) AdminConverter
-        .fromAdd(adminAdd)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString);
+    UserEntity userEntityFromAdd = AdminDBConverter
+        .fromAdd(adminAdd, dbIntegrityService::preparePostgreSQLString);
 
     // Проверка на существование пользователя или администратора по email
-    dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
-        userRepository::existsByEmail, userEntityFromAdd.getEmail(), R.NAME_OBJECT_USER);
+    dbIntegrityService.checkAbsenceByUniqStr(
+        userRepository::existsByEmail, userEntityFromAdd.getEmail());
 
     // Передача роли "ROLE_SUPER_ADMIN" новому администратору, если он первый администратор
     UserEntity userEntitySuperAdmin = userRepository.getSuperAdmin();
@@ -114,19 +111,18 @@ public class AdminServiceFB implements AdminService {
     userSecurityService.checkEmailElseThrowInvalidEmail(
         adminUpdate.getEmail());
 
+    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
+    UserEntity userEntityFromUpdate = AdminDBConverter
+        .fromUpdate(adminUpdate, dbIntegrityService::preparePostgreSQLString);
+
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromDB = userRepository.findById(adminUpdate.getId())
         .orElseThrow(() -> new NotFoundException(String.format(
-            "Administrator with ID \"%s\" not found", adminUpdate.getId())));
+            "Administrator with ID \"%s\" not found", userEntityFromUpdate.getId())));
 
     // Проверка наличия роли "ROLE_ADMIN" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromDB, R.ROLE_ADMIN, R.NAME_OBJECT_ADMIN);
-
-    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    UserEntity userEntityFromUpdate = (UserEntity) AdminConverter
-        .fromUpdate(adminUpdate)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString);
+        userEntityFromDB, R.ROLE_ADMIN, R.CLIENT_ADMIN);
 
     // Изменение email и сброс его подтверждения, если новое email
     if (!userEntityFromUpdate.getEmail().equals(userEntityFromDB.getEmail())) {
@@ -146,7 +142,7 @@ public class AdminServiceFB implements AdminService {
    * @throws UserRoleException если администратор имеет роль "ROLE_SUPER_ADMIN"
    */
   @Override
-  public void delete(BigInteger idAdmin) throws NotFoundException, UserRoleException {
+  public void delete(String idAdmin) throws NotFoundException, UserRoleException {
 
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromRequest = userRepository.findById(idAdmin)
@@ -155,11 +151,11 @@ public class AdminServiceFB implements AdminService {
 
     // Проверка наличия роли "ROLE_ADMIN" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_ADMIN, R.NAME_OBJECT_ADMIN);
+        userEntityFromRequest, R.ROLE_ADMIN, R.CLIENT_ADMIN);
 
     // Проверка отсутствия роли "ROLE_SUPER_ADMIN" у пользователя
     userSecurityService.checkNotHasRoleElseThrowUserRole(
-        userEntityFromRequest, R.ROLE_SUPER_ADMIN, R.NAME_OBJECT_ADMIN);
+        userEntityFromRequest, R.ROLE_SUPER_ADMIN, R.CLIENT_ADMIN);
 
     // Если есть роль "ROLE_USER", удаление роли "ROLE_ADMIN", иначе удаление пользователя
     if (userEntityFromRequest.hasRole(R.ROLE_USER)) {
@@ -177,7 +173,7 @@ public class AdminServiceFB implements AdminService {
    * @throws NotFoundException если администратор с данным ID не найдено
    */
   @Override
-  public AdminInfo read(BigInteger idAdmin) throws NotFoundException {
+  public AdminInfo read(String idAdmin) throws NotFoundException {
 
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromRequest = userRepository.findById(idAdmin)
@@ -186,9 +182,9 @@ public class AdminServiceFB implements AdminService {
 
     // Проверка наличия роли "ROLE_ADMIN" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_ADMIN, R.NAME_OBJECT_ADMIN);
+        userEntityFromRequest, R.ROLE_ADMIN, R.CLIENT_ADMIN);
 
-    return AdminConverter.toInfo(userEntityFromRequest);
+    return AdminDBConverter.toInfo(userEntityFromRequest);
   }
 
   /**
@@ -198,7 +194,7 @@ public class AdminServiceFB implements AdminService {
    * @throws UserRoleException если пользователь имеет роль "ROLE_ADMIN" или не имеет роль "ROLE_USER"
    */
   @Override
-  public void fromUser(BigInteger idUser) throws NotFoundException, UserRoleException {
+  public void fromUser(String idUser) throws NotFoundException, UserRoleException {
 
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromRequest = userRepository.findById(idUser)
@@ -207,11 +203,11 @@ public class AdminServiceFB implements AdminService {
 
     // Проверка наличия роли "ROLE_USER" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_USER, R.NAME_OBJECT_USER);
+        userEntityFromRequest, R.ROLE_USER, R.CLIENT_USER);
 
     // Проверка отсутствия роли "ROLE_ADMIN" у пользователя
     userSecurityService.checkNotHasRoleElseThrowUserRole(
-        userEntityFromRequest, R.ROLE_ADMIN, R.NAME_OBJECT_USER);
+        userEntityFromRequest, R.ROLE_ADMIN, R.CLIENT_USER);
 
     userEntityFromRequest.addRole(R.ROLE_ADMIN);
 
@@ -225,7 +221,7 @@ public class AdminServiceFB implements AdminService {
    * @throws UserRoleException если пользователь имеет роль "ROLE_USER" или не имеет роль "ROLE_ADMIN"
    */
   @Override
-  public void toUser(BigInteger idAdmin) throws NotFoundException, UserRoleException {
+  public void toUser(String idAdmin) throws NotFoundException, UserRoleException {
 
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromRequest = userRepository.findById(idAdmin)
@@ -234,11 +230,11 @@ public class AdminServiceFB implements AdminService {
 
     // Проверка наличия роли "ROLE_ADMIN" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_ADMIN, R.NAME_OBJECT_ADMIN);
+        userEntityFromRequest, R.ROLE_ADMIN, R.CLIENT_ADMIN);
 
     // Проверка отсутствия роли "ROLE_USER" у пользователя
     userSecurityService.checkNotHasRoleElseThrowUserRole(
-        userEntityFromRequest, R.ROLE_USER, R.NAME_OBJECT_ADMIN);
+        userEntityFromRequest, R.ROLE_USER, R.CLIENT_ADMIN);
 
     userEntityFromRequest.addRole(R.ROLE_USER);
 
@@ -252,7 +248,7 @@ public class AdminServiceFB implements AdminService {
    * @throws UserRoleException если администратор имеет роль "ROLE_SUPER_ADMIN"
    */
   @Override
-  public void toSuper(BigInteger idAdmin) throws NotFoundException, UserRoleException {
+  public void toSuper(String idAdmin) throws NotFoundException, UserRoleException {
 
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromRequest = userRepository.findById(idAdmin)
@@ -261,11 +257,11 @@ public class AdminServiceFB implements AdminService {
 
     // Проверка наличия роли "ROLE_ADMIN" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_ADMIN, R.NAME_OBJECT_ADMIN);
+        userEntityFromRequest, R.ROLE_ADMIN, R.CLIENT_ADMIN);
 
     // Проверка отсутствия роли "ROLE_SUPER_ADMIN" у пользователя
     userSecurityService.checkNotHasRoleElseThrowUserRole(
-        userEntityFromRequest, R.ROLE_SUPER_ADMIN, R.NAME_OBJECT_ADMIN);
+        userEntityFromRequest, R.ROLE_SUPER_ADMIN, R.CLIENT_ADMIN);
 
     // Передача роли "ROLE_SUPER_ADMIN"
     UserEntity userEntitySuperAdmin = userRepository.getSuperAdmin();

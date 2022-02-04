@@ -3,19 +3,17 @@ package com.example.familybenefits.service.implementation;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeAdd;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeUpdate;
-import com.example.familybenefits.convert.CriterionTypeConverter;
+import com.example.familybenefits.convert.CriterionTypeDBConverter;
 import com.example.familybenefits.dao.entity.CriterionTypeEntity;
 import com.example.familybenefits.dao.repository.CriterionTypeRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.service.s_interface.CriterionTypeService;
-import com.example.familybenefits.service.s_interface.PartEntityService;
+import com.example.familybenefits.service.s_interface.EntityDBService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigInteger;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,7 +21,7 @@ import java.util.stream.Collectors;
  * Реализация сервиса, управляющего объектом "тип критерия"
  */
 @Service
-public class CriterionTypeServiceFB implements CriterionTypeService, PartEntityService<CriterionTypeEntity> {
+public class CriterionTypeServiceFB implements CriterionTypeService, EntityDBService<CriterionTypeEntity, CriterionTypeRepository> {
 
   /**
    * Репозиторий, работающий с моделью таблицы "criterion_type"
@@ -55,15 +53,14 @@ public class CriterionTypeServiceFB implements CriterionTypeService, PartEntityS
   public void add(CriterionTypeAdd criterionTypeAdd) throws AlreadyExistsException {
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    CriterionTypeEntity criterionTypeEntity = (CriterionTypeEntity) CriterionTypeConverter
-        .fromAdd(criterionTypeAdd)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString);
+    CriterionTypeEntity criterionTypeEntityFromAdd = CriterionTypeDBConverter
+        .fromAdd(criterionTypeAdd, dbIntegrityService::preparePostgreSQLString);
 
     // Проверка отсутствия типа критерия по его названию
-    dbIntegrityService.checkAbsenceByUniqStrElseThrowAlreadyExists(
-        criterionTypeRepository::existsByName, criterionTypeEntity.getName(), R.NAME_OBJECT_CRITERION_TYPE);
+    dbIntegrityService.checkAbsenceByUniqStr(
+        criterionTypeRepository::existsByName, criterionTypeEntityFromAdd.getName());
 
-    criterionTypeRepository.saveAndFlush(criterionTypeEntity);
+    criterionTypeRepository.saveAndFlush(criterionTypeEntityFromAdd);
   }
 
   /**
@@ -74,14 +71,15 @@ public class CriterionTypeServiceFB implements CriterionTypeService, PartEntityS
   @Override
   public void update(CriterionTypeUpdate criterionTypeUpdate) throws NotFoundException {
 
-    // Проверка существования типа критерия по его ID
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionTypeRepository::existsById, criterionTypeUpdate.getId(), R.NAME_OBJECT_CRITERION_TYPE);
+    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
+    CriterionTypeEntity criterionTypeEntityFromUpdate = CriterionTypeDBConverter
+        .fromUpdate(criterionTypeUpdate, dbIntegrityService::preparePostgreSQLString);
 
-    // Сохранение полученной модели таблицы из запроса с подготовленными строковыми значениями для БД
-    criterionTypeRepository.saveAndFlush((CriterionTypeEntity) CriterionTypeConverter
-        .fromUpdate(criterionTypeUpdate)
-        .prepareForDB(dbIntegrityService::preparePostgreSQLString));
+    // Проверка существования типа критерия по его ID
+    dbIntegrityService.checkExistenceById(
+        criterionTypeRepository::existsById, criterionTypeEntityFromUpdate);
+
+    criterionTypeRepository.saveAndFlush(criterionTypeEntityFromUpdate);
   }
 
   /**
@@ -90,13 +88,15 @@ public class CriterionTypeServiceFB implements CriterionTypeService, PartEntityS
    * @throws NotFoundException если тип критерия с указанным ID не найден
    */
   @Override
-  public void delete(BigInteger idCriterionType) throws NotFoundException {
+  public void delete(String idCriterionType) throws NotFoundException {
+
+    String prepareIdCriterionType = dbIntegrityService.preparePostgreSQLString(idCriterionType);
 
     // Проверка существования типа критерия по его ID
-    dbIntegrityService.checkExistenceByIdElseThrowNotFound(
-        criterionTypeRepository::existsById, idCriterionType, R.NAME_OBJECT_CRITERION_TYPE);
+    dbIntegrityService.checkExistenceById(
+        criterionTypeRepository::existsById, prepareIdCriterionType);
 
-    criterionTypeRepository.deleteById(idCriterionType);
+    criterionTypeRepository.deleteById(prepareIdCriterionType);
   }
 
   /**
@@ -106,14 +106,16 @@ public class CriterionTypeServiceFB implements CriterionTypeService, PartEntityS
    * @throws NotFoundException если тип критерия с указанным ID не найден
    */
   @Override
-  public CriterionTypeInfo read(BigInteger idCriterionType) throws NotFoundException {
+  public CriterionTypeInfo read(String idCriterionType) throws NotFoundException {
+
+    String prepareIdCriterionType = dbIntegrityService.preparePostgreSQLString(idCriterionType);
 
     // Получение типа критерия по его ID, если тип критерия существует
-    CriterionTypeEntity criterionTypeEntityFromRequest = criterionTypeRepository.findById(idCriterionType)
+    CriterionTypeEntity criterionTypeEntityFromRequest = criterionTypeRepository.findById(prepareIdCriterionType)
         .orElseThrow(() -> new NotFoundException(String.format(
             "Criterion type with ID \"%s\" not found", idCriterionType)));
 
-    return CriterionTypeConverter.toInfo(criterionTypeEntityFromRequest);
+    return CriterionTypeDBConverter.toInfo(criterionTypeEntityFromRequest);
   }
 
   /**
@@ -125,7 +127,7 @@ public class CriterionTypeServiceFB implements CriterionTypeService, PartEntityS
 
     return findAllFull()
         .stream()
-        .map(CriterionTypeConverter::toInfo)
+        .map(CriterionTypeDBConverter::toInfo)
         .collect(Collectors.toSet());
   }
 
@@ -138,19 +140,17 @@ public class CriterionTypeServiceFB implements CriterionTypeService, PartEntityS
 
     return findAllPartial()
         .stream()
-        .map(CriterionTypeConverter::toInfo)
+        .map(CriterionTypeDBConverter::toInfo)
         .collect(Collectors.toSet());
   }
 
   /**
-   * Проверяет существование модели таблицы "criterion_type" по ID
-   * @param id ID модели
-   * @return true, если модель существует
+   * Возвращает репозиторий сервиса
+   * @return репозиторий сервиса
    */
   @Override
-  public boolean existsById(BigInteger id) {
-
-    return criterionTypeRepository.existsById(id);
+  public CriterionTypeRepository getRepository() {
+    return criterionTypeRepository;
   }
 
   /**
