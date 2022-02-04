@@ -6,33 +6,13 @@ package com.example.familybenefits.resource;
 public class R {
 
   /**
-   * Название типа объекта о пособии
+   * Название клиента с ролью пользователя
    */
-  public static final String NAME_OBJECT_BENEFIT = "Benefit";
+  public static final String CLIENT_USER = "User";
   /**
-   * Название типа объекта о городе
+   * Название клиента с ролью администратора
    */
-  public static final String NAME_OBJECT_CITY = "City";
-  /**
-   * Название типа объекта о критерии
-   */
-  public static final String NAME_OBJECT_CRITERION = "Criterion";
-  /**
-   * Название типа объекта о типе критерия
-   */
-  public static final String NAME_OBJECT_CRITERION_TYPE = "Criterion type";
-  /**
-   * Название типа объекта об учреждении
-   */
-  public static final String NAME_OBJECT_INSTITUTION = "Institution";
-  /**
-   * Название типа объекта о пользователе
-   */
-  public static final String NAME_OBJECT_USER = "User";
-  /**
-   * Название типа объекта об администраторе
-   */
-  public static final String NAME_OBJECT_ADMIN = "Administrator";
+  public static final String CLIENT_ADMIN = "Administrator";
 
   /**
    * Роль пользователя
