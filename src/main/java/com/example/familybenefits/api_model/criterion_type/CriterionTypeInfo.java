@@ -4,7 +4,6 @@ import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -20,7 +19,7 @@ public class CriterionTypeInfo {
    * ID типа критерия
    */
   @JsonProperty("id")
-  private BigInteger id;
+  private String id;
 
   /**
    * Название типа критерия

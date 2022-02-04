@@ -1,9 +1,11 @@
 package com.example.familybenefits.api_model.institution;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -40,7 +42,7 @@ public class InstitutionAdd {
   private String phone;
 
   /**
-   * Электронная почта учржедения
+   * Электронная почта учреждения
    */
   @JsonProperty("email")
   private String email;
@@ -55,11 +57,11 @@ public class InstitutionAdd {
    * ID города учреждения
    */
   @JsonProperty("idCity")
-  private BigInteger idCity;
+  private String idCity;
 
   /**
    * Множество ID пособий учреждения
    */
   @JsonProperty("idBenefitSet")
-  private Set<BigInteger> idBenefitSet;
+  private Set<String> idBenefitSet;
 }

@@ -1,6 +1,6 @@
 CREATE TABLE family_benefit.refresh_token (
 
-  id_user NUMERIC NOT NULL,
+  id_user TEXT NOT NULL,
   "token" TEXT NOT NULL,
   "date_expiration" TIMESTAMP NOT NULL,
 

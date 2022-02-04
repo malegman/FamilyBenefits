@@ -1,7 +1,6 @@
 CREATE TABLE family_benefit.user (
 
-  -- Диапазон ID [1 000 000 000; 9 999 999 999]
-  "id" NUMERIC NOT NULL DEFAULT (10000000000 - 1000000000) * random() + 1000000000,
+  "id" TEXT NOT NULL DEFAULT family_benefit.generate_id(20),
   "name" TEXT NOT NULL,
   "email" TEXT NOT NULL,
   "password" TEXT NOT NULL,
@@ -9,7 +8,7 @@ CREATE TABLE family_benefit.user (
   "date_birth" DATE NOT NULL,
   "date_select_criterion" DATE NOT NULL,
   "is_fresh_benefits" BOOLEAN NOT NULL,
-  "id_city" NUMERIC NULL,
+  "id_city" TEXT NULL,
 
   CONSTRAINT user_pk PRIMARY KEY ("id"),
   CONSTRAINT user_uniq_email UNIQUE ("email"),

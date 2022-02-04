@@ -3,12 +3,10 @@ package com.example.familybenefits.dao.repository;
 import com.example.familybenefits.dao.entity.CriterionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.math.BigInteger;
-
 /**
  * Репозиторий, работающий с моделью таблицы "criterion"
  */
-public interface CriterionRepository extends JpaRepository<CriterionEntity, BigInteger> {
+public interface CriterionRepository extends JpaRepository<CriterionEntity, String> {
 
   /**
    * Проверяет наличие критерия по его названию

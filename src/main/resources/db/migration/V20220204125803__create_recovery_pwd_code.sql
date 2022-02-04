@@ -1,6 +1,6 @@
 CREATE TABLE family_benefit.recovery_pwd_code (
 
-  "id_user" NUMERIC NOT NULL,
+  "id_user" TEXT NOT NULL,
   "code" NUMERIC NOT NULL,
   "date_expiration" TIMESTAMP NOT NULL,
   "for_user" BIT NOT NULL,

@@ -3,9 +3,11 @@ package com.example.familybenefits.api_model.benefit;
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.api_model.criterion.CriterionInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -21,7 +23,7 @@ public class BenefitInfo {
    * ID пособия
    */
   @JsonProperty("id")
-  private BigInteger id;
+  private String id;
 
   /**
    * Название пособия

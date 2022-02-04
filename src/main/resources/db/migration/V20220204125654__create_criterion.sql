@@ -1,10 +1,9 @@
 CREATE TABLE family_benefit.criterion (
 
-  -- Диапазон ID [1 000 000 000; 9 999 999 999]
-  "id" NUMERIC NOT NULL DEFAULT (10000000000 - 1000000000) * random() + 1000000000,
+  "id" TEXT NOT NULL DEFAULT family_benefit.generate_id(20),
   "name" TEXT NOT NULL,
   "info" TEXT NOT NULL,
-  "id_type" NUMERIC NOT NULL,
+  "id_type" TEXT NOT NULL,
 
   CONSTRAINT criterion_pk PRIMARY KEY ("id"),
   CONSTRAINT criterion_uniq_name UNIQUE ("name"),

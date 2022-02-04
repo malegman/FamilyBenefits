@@ -32,7 +32,7 @@ paths:
       summary: Вход в систему
       description:
         Вход в систему.
-        Для администратора. Для пользователя.
+        Для анонимного клиента.
       operationId: login
       requestBody:
         content:
@@ -255,7 +255,7 @@ paths:
       description:
         Восстановливает пароль.
         О запросившем клиенте.
-        Для администратора. Для пользователя.
+        Для анонимного клиента.
       operationId: recoveryPassword
       requestBody:
         content:
@@ -286,6 +286,7 @@ paths:
       summary: Добавляет нового пользователя. Регистрация гостя
       description:
         Добавляет нового пользователя. Регистрация гостя.
+        Для анонимного клиента.
       operationId: addUser
       requestBody:
         content:
@@ -368,8 +369,8 @@ paths:
           in: path
           description: ID пользователя
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '201':
@@ -402,8 +403,8 @@ paths:
           in: path
           description: ID пользователя
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '200':
@@ -439,8 +440,8 @@ paths:
           in: path
           description: ID пользователя
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '200':
@@ -571,8 +572,8 @@ paths:
           in: path
           description: ID администратора
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '201':
@@ -608,8 +609,8 @@ paths:
           in: path
           description: ID администратора
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '200':
@@ -645,8 +646,8 @@ paths:
           in: path
           description: ID пользователя
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '201':
@@ -682,8 +683,8 @@ paths:
           in: path
           description: ID администратора
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '201':
@@ -719,8 +720,8 @@ paths:
           in: path
           description: ID администратора
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '201':
@@ -821,8 +822,8 @@ paths:
           in: path
           description: ID города
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '201':
@@ -852,8 +853,8 @@ paths:
           in: path
           description: ID города
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '200':
@@ -1017,8 +1018,8 @@ paths:
           in: path
           description: ID пособия
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '201':
@@ -1048,8 +1049,8 @@ paths:
           in: path
           description: ID пособия
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '200':
@@ -1215,8 +1216,8 @@ paths:
           in: path
           description: ID учреждения
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '201':
@@ -1246,8 +1247,8 @@ paths:
           in: path
           description: ID учреждения
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '200':
@@ -1413,8 +1414,8 @@ paths:
           in: path
           description: ID критерия
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '201':
@@ -1444,8 +1445,8 @@ paths:
           in: path
           description: ID критерия
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '200':
@@ -1611,8 +1612,8 @@ paths:
           in: path
           description: ID типа критерия
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '201':
@@ -1642,8 +1643,8 @@ paths:
           in: path
           description: ID типа критерия
           schema:
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
           required: true
       responses:
         '200':
@@ -1722,8 +1723,8 @@ components:
       properties:
         id:
           description: ID пользователя
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Имя пользователя
           type: string
@@ -1742,12 +1743,12 @@ components:
           items:
             type: string
             format: date
-            example: 01-01-2022
+            example: 01.01.2022
         dateBirth:
           description: Дата рождения пользователя
           type: string
           format: date
-          example: 01-01-2022
+          example: 01.01.2022
         nameRoleSet:
           description: Множество названий ролей пользователя
           type: array
@@ -1788,30 +1789,30 @@ components:
             description: Дата рождения ребенка
             type: string
             format: date
-            example: 01-01-2022
+            example: 01.01.2022
         dateBirth:
           description: Дата рождения пользователя
           type: string
           format: date
-          example: 01-01-2022
+          example: 01.01.2022
         idCity:
           description: ID города пользователя
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         idCriterionSet:
           description: Множество ID критерий пользователя
           type: array
           items:
             description: ID критерия
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
     UserUpdate:
       description: Объект запроса для обновления пользователя
       properties:
         id:
           description: ID пользователя
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Имя пользователя
           type: string
@@ -1827,23 +1828,23 @@ components:
             description: Дата рождения ребенка
             type: string
             format: date
-            example: 01-01-2022
+            example: 01.01.2022
         dateBirth:
           description: Дата рождения пользователя
           type: string
           format: date
-          example: 01-01-2022
+          example: 01.01.2022
         idCity:
           description: ID города пользователя
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         idCriterionSet:
           description: Множество ID критерий пользователя
           type: array
           items:
             description: ID критерия
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
     UserInitData:
       description: Дополнительные данные для добавления или обновления пользователя.
         Содержат в себе множества кратких информаций о городах и полных инф. о критериях
@@ -1876,8 +1877,8 @@ components:
       properties:
         idUser:
           description: ID пользователя
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         nameUser:
           description: Имя пользователя
           type: string
@@ -1934,8 +1935,8 @@ components:
       properties:
         id:
           description: ID администратора
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Имя администратора
           type: string
@@ -1979,8 +1980,8 @@ components:
       properties:
         id:
           description: ID администратора
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Имя администратора
           type: string
@@ -1996,8 +1997,8 @@ components:
       properties:
         id:
           description: ID типа критерия
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Название типа критерия
           type: string
@@ -2027,8 +2028,8 @@ components:
       properties:
         id:
           description: ID типа критерия
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Название типа критерия
           type: string
@@ -2044,8 +2045,8 @@ components:
       properties:
         id:
           description: ID критерия
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Название критерия
           type: string
@@ -2074,15 +2075,15 @@ components:
           example: info
         idCriterionType:
           description: ID типа критерия критерия
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
     CriterionUpdate:
       description: Объект запроса для обновления критерия
       properties:
         id:
           description: ID критерия
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Название критерия
           type: string
@@ -2093,8 +2094,8 @@ components:
           example: info
         idCriterionType:
           description: ID типа критерия критерия
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
     CriterionInitData:
       description: Дополнительные данные для добавления или обновления критерия
         Содержат в себе множество кратких информаций о типах критериях
@@ -2111,8 +2112,8 @@ components:
       properties:
         id:
           description: ID города
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Название города
           type: string
@@ -2147,15 +2148,15 @@ components:
           type: array
           items:
             description: ID пособия
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
     CityUpdate:
       description: Объект запроса для обновления города
       properties:
         id:
           description: ID города
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Название города
           type: string
@@ -2169,8 +2170,8 @@ components:
           type: array
           items:
             description: ID пособия
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
     CityInitData:
       description: Дополнительные данные для добавления или обновления города
         Содержат в себе множество кратких информаций о пособиях
@@ -2187,8 +2188,8 @@ components:
       properties:
         id:
           description: ID учреждения
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Название учреждения
           type: string
@@ -2241,22 +2242,22 @@ components:
           example: График
         idCity:
           description: ID города учреждения
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         idBenefitSet:
           description: Множество ID пособий учреждения
           type: array
           items:
             description: ID пособия
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
     InstitutionUpdate:
       description: Объект запроса для обновления учреждения
       properties:
         id:
           description: ID учреждения
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Название учреждения
           type: string
@@ -2279,15 +2280,15 @@ components:
           example: График
         idCity:
           description: ID города учреждения
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         idBenefitSet:
           description: Множество ID пособий учреждения
           type: array
           items:
             description: ID пособия
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
     InstitutionInitData:
       description: Дополнительные данные для добавления или обновления учреждения
         Содержат в себе множество кратких информаций о городах и пособиях
@@ -2309,8 +2310,8 @@ components:
       properties:
         id:
           description: ID пособия
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Название пособия
           type: string
@@ -2358,29 +2359,29 @@ components:
           type: array
           items:
             description: ID города
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
         idInstitutionSet:
           description: Множество ID учреждений пособия
           type: array
           items:
             description: ID учреждения
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
         idCriterionSet:
           description: Множество ID критерий пособия
           type: array
           items:
             description: ID критерия
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
     BenefitUpdate:
       description: Объект запроса для обновления пособия
       properties:
         id:
           description: ID пособия
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         name:
           description: Название пособия
           type: string
@@ -2398,22 +2399,22 @@ components:
           type: array
           items:
             description: ID города
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
         idInstitutionSet:
           description: Множество ID учреждений пособия
           type: array
           items:
             description: ID учреждения
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
         idCriterionSet:
           description: Множество ID критерий пособия
           type: array
           items:
             description: ID критерия
-            type: integer
-            example: 1222333444
+            type: string
+            example: td56387fhj
     BenefitInitData:
       description: Дополнительные данные для добавления или обновления пособия
         Содержат в себе множества кратких информаций о городах, учреждениях и полных критериях
@@ -2440,8 +2441,8 @@ components:
       properties:
         idObject:
           description: ID объекта
-          type: integer
-          example: 1222333444
+          type: string
+          example: td56387fhj
         nameObject:
           description: Название объекта
           type: string

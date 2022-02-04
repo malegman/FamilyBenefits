@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -99,7 +98,7 @@ public class BenefitController {
    * @return код ответа, результат обработки запроса
    */
   @DeleteMapping(value = "/benefit/{id}")
-  public ResponseEntity<?> deleteCriterion(@PathVariable(name = "id")BigInteger idBenefit) {
+  public ResponseEntity<?> deleteCriterion(@PathVariable(name = "id") String idBenefit) {
 
     try {
       benefitService.delete(idBenefit);
@@ -119,7 +118,7 @@ public class BenefitController {
    * @return информация о пособии, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/benefit/{id}")
-  public ResponseEntity<BenefitInfo> getBenefit(@PathVariable(name = "id") BigInteger idBenefit) {
+  public ResponseEntity<BenefitInfo> getBenefit(@PathVariable(name = "id") String idBenefit) {
 
     try {
       BenefitInfo benefitInfo = benefitService.read(idBenefit);

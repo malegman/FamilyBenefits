@@ -1,7 +1,6 @@
 CREATE TABLE family_benefit.benefit (
 
-  -- Диапазон ID [1 000 000 000; 9 999 999 999]
-  "id" NUMERIC NOT NULL DEFAULT (10000000000 - 1000000000) * random() + 1000000000,
+  "id" TEXT NOT NULL DEFAULT family_benefit.generate_id(20),
   "name" TEXT NOT NULL,
   "info" TEXT NOT NULL,
   "documents" TEXT NULL,

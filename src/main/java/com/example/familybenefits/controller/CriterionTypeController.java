@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -93,7 +92,7 @@ public class CriterionTypeController {
    * @return код ответа, результат обработки запроса
    */
   @DeleteMapping(value = "/criteriontype/{id}")
-  public ResponseEntity<?> deleteCriterionType(@PathVariable(name = "id")BigInteger idCriterionType) {
+  public ResponseEntity<?> deleteCriterionType(@PathVariable(name = "id") String idCriterionType) {
 
     try {
       criterionTypeService.delete(idCriterionType);
@@ -113,7 +112,7 @@ public class CriterionTypeController {
    * @return информация о типе критерия, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/criteriontype/{id}")
-  public ResponseEntity<CriterionTypeInfo> getCriterionType(@PathVariable(name = "id")BigInteger idCriterionType) {
+  public ResponseEntity<CriterionTypeInfo> getCriterionType(@PathVariable(name = "id") String idCriterionType) {
 
     try {
       CriterionTypeInfo criterionTypeInfo = criterionTypeService.read(idCriterionType);

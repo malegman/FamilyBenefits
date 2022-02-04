@@ -3,8 +3,6 @@ package com.example.familybenefits.api_model.criterion;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.math.BigInteger;
-
 /**
  * Объект запроса для обновления критерия
  */
@@ -18,7 +16,7 @@ public class CriterionUpdate {
    * ID критерия
    */
   @JsonProperty("id")
-  private BigInteger id;
+  private String id;
 
   /**
    * Название критерия
@@ -36,5 +34,5 @@ public class CriterionUpdate {
    * ID типа критерия критерия
    */
   @JsonProperty("idCriterionType")
-  private BigInteger idCriterionType;
+  private String idCriterionType;
 }

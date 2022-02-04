@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -99,7 +98,7 @@ public class CityController {
    * @return код ответа, результат обработки запроса
    */
   @DeleteMapping(value = "/city/{id}")
-  public ResponseEntity<?> deleteCity(@PathVariable(name = "id") BigInteger idCity) {
+  public ResponseEntity<?> deleteCity(@PathVariable(name = "id") String idCity) {
 
     try {
       cityService.delete(idCity);
@@ -119,7 +118,7 @@ public class CityController {
    * @return информация о городе, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/city/{id}")
-  public ResponseEntity<CityInfo> getCity(@PathVariable(name = "id") BigInteger idCity) {
+  public ResponseEntity<CityInfo> getCity(@PathVariable(name = "id") String idCity) {
 
     try {
       CityInfo cityInfo = cityService.read(idCity);

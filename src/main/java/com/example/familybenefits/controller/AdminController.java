@@ -11,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
-
 /**
  * Контроллер запросов, связанных с администратором
  */
@@ -52,7 +50,7 @@ public class AdminController {
       adminService.add(adminAdd);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
-    } catch (AlreadyExistsException | PasswordNotSafetyException | InvalidEmailException | PasswordNotEqualsException e) {
+    } catch (AlreadyExistsException | PasswordNotSafetyException | InvalidEmailException | NotEqualException e) {
       // Администратор или пользователь с указанным email существует.
       // Пароль небезопасный.
       // Строка в поле "email" не является email.
@@ -99,7 +97,7 @@ public class AdminController {
    * @return код ответа, результат обработки запроса
    */
   @DeleteMapping(value = "/admin/{id}")
-  public ResponseEntity<?> deleteAdmin(@PathVariable(name = "id")BigInteger idAdmin) {
+  public ResponseEntity<?> deleteAdmin(@PathVariable(name = "id") String idAdmin) {
 
     try {
       adminService.delete(idAdmin);
@@ -124,7 +122,7 @@ public class AdminController {
    * @return информация об администраторе, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/admin/{id}")
-  public ResponseEntity<AdminInfo> getAdmin(@PathVariable(name = "id") BigInteger idAdmin) {
+  public ResponseEntity<AdminInfo> getAdmin(@PathVariable(name = "id") String idAdmin) {
 
     try {
       AdminInfo adminInfo = adminService.read(idAdmin);
@@ -144,7 +142,7 @@ public class AdminController {
    * @return код ответа, результат обработки запроса
    */
   @PostMapping(value = "/admin/fromuser/{id}")
-  public ResponseEntity<?> adminFromUser(@PathVariable(name = "id")BigInteger idUser) {
+  public ResponseEntity<?> adminFromUser(@PathVariable(name = "id") String idUser) {
 
     try {
       adminService.fromUser(idUser);
@@ -169,7 +167,7 @@ public class AdminController {
    * @return код ответа, результат обработки запроса
    */
   @PostMapping(value = "/admin/{id}/touser")
-  public ResponseEntity<?> adminToUser(@PathVariable(name = "id")BigInteger idAdmin) {
+  public ResponseEntity<?> adminToUser(@PathVariable(name = "id") String idAdmin) {
 
     try {
       adminService.toUser(idAdmin);
@@ -194,7 +192,7 @@ public class AdminController {
    * @return код ответа, результат обработки запроса
    */
   @PostMapping(value = "/admin/{id}/tosuper")
-  public ResponseEntity<?> adminToSuper(@PathVariable(name = "id")BigInteger idAdmin) {
+  public ResponseEntity<?> adminToSuper(@PathVariable(name = "id") String idAdmin) {
 
     try {
       adminService.toSuper(idAdmin);

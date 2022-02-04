@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -24,7 +23,7 @@ public class UserInfo {
    * ID пользователя
    */
   @JsonProperty("id")
-  private BigInteger id;
+  private String id;
 
   /**
    * Имя пользователя

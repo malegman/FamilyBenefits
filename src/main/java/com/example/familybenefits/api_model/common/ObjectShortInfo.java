@@ -1,9 +1,10 @@
 package com.example.familybenefits.api_model.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-
-import java.math.BigInteger;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Краткая информация об объекте
@@ -18,7 +19,7 @@ public class ObjectShortInfo {
    * ID объекта
    */
   @JsonProperty("idObject")
-  private BigInteger idObject;
+  private String idObject;
 
   /**
    * Название объекта

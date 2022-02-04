@@ -3,12 +3,10 @@ package com.example.familybenefits.dao.repository;
 import com.example.familybenefits.dao.entity.CityEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.math.BigInteger;
-
 /**
  * Репозиторий, работающий с моделью таблицы "city"
  */
-public interface CityRepository extends JpaRepository<CityEntity, BigInteger> {
+public interface CityRepository extends JpaRepository<CityEntity, String> {
 
   /**
    * Проверяет наличие города по его названию

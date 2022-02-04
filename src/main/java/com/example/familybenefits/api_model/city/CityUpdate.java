@@ -1,9 +1,11 @@
 package com.example.familybenefits.api_model.city;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -19,7 +21,7 @@ public class CityUpdate {
    * ID города
    */
   @JsonProperty("id")
-  private BigInteger id;
+  private String id;
 
   /**
    * Название города
@@ -37,5 +39,5 @@ public class CityUpdate {
    * Множество ID пособий города
    */
   @JsonProperty("idBenefitSet")
-  private Set<BigInteger> idBenefitSet;
+  private Set<String> idBenefitSet;
 }

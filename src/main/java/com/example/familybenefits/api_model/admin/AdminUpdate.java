@@ -3,8 +3,6 @@ package com.example.familybenefits.api_model.admin;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.math.BigInteger;
-
 /**
  * Объект запроса для обновления администратора
  */
@@ -18,7 +16,7 @@ public class AdminUpdate {
    * ID администратора
    */
   @JsonProperty("id")
-  private BigInteger id;
+  private String id;
 
   /**
    * Имя администратора

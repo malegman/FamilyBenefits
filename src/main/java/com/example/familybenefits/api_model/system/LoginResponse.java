@@ -1,9 +1,11 @@
 package com.example.familybenefits.api_model.system;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -19,7 +21,7 @@ public class LoginResponse {
    * ID пользователя
    */
   @JsonProperty("idUser")
-  private BigInteger idUser;
+  private String idUser;
 
   /**
    * Имя пользователя

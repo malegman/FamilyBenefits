@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -63,7 +62,7 @@ public class UserController {
     } catch (AlreadyExistsException
         | InvalidEmailException
         | PasswordNotSafetyException
-        | PasswordNotEqualsException
+        | NotEqualException
         | DateTimeException
         | DateFormatException e) {
       // Администратор или пользователь с указанным email существует.
@@ -118,7 +117,7 @@ public class UserController {
    * @return код ответа, результат обработки запроса
    */
   @DeleteMapping(value = "/user/{id}")
-  public ResponseEntity<?> deleteUser(@PathVariable(name = "id")BigInteger idUser) {
+  public ResponseEntity<?> deleteUser(@PathVariable(name = "id") String idUser) {
 
     try {
       userService.delete(idUser);
@@ -138,7 +137,7 @@ public class UserController {
    * @return информация о пользователе, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/user/{id}")
-  public ResponseEntity<UserInfo> getUser(@PathVariable(name = "id") BigInteger idUser) {
+  public ResponseEntity<UserInfo> getUser(@PathVariable(name = "id") String idUser) {
 
     try {
       UserInfo userInfo = userService.read(idUser);
@@ -157,7 +156,7 @@ public class UserController {
    * @return множество предложенных пособий пользователя и код ответа
    */
   @GetMapping(value = "/user/{id}/benefits")
-  public ResponseEntity<Set<BenefitInfo>> getUserBenefits(@PathVariable(name = "id")BigInteger idUser) {
+  public ResponseEntity<Set<BenefitInfo>> getUserBenefits(@PathVariable(name = "id") String idUser) {
 
     try {
       Set<BenefitInfo> benefitInfoSet = userService.getBenefits(idUser);
