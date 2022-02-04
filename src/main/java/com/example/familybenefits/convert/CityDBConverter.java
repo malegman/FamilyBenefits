@@ -7,19 +7,21 @@ import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.dao.entity.BenefitEntity;
 import com.example.familybenefits.dao.entity.CityEntity;
 
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Класс преобразования модели таблицы "city" в другие объекты и получения из других объектов
+ * Класс преобразования модели таблицы "city" в другие объекты и получения из других объектов, обрабатывая строковые поля для БД.
  */
-public class CityConverter {
+public class CityDBConverter {
 
   /**
-   * Преобразует объект запроса на добавление города в модель таблицы "city"
+   * Преобразует объект запроса на добавление города в модель таблицы "city", обрабатывая строковые поля для БД
    * @param cityAdd объект запроса на добавление города
+   * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "city"
    */
-  static public CityEntity fromAdd(CityAdd cityAdd) {
+  static public CityEntity fromAdd(CityAdd cityAdd, Function<String, String> prepareDBFunc) {
 
     if (cityAdd == null) {
       return new CityEntity();
@@ -27,21 +29,22 @@ public class CityConverter {
 
     return CityEntity
         .builder()
-        .name(cityAdd.getName())
-        .info(cityAdd.getInfo())
+        .name(prepareDBFunc.apply(cityAdd.getName()))
+        .info(prepareDBFunc.apply(cityAdd.getInfo()))
         .benefitEntitySet(cityAdd.getIdBenefitSet()
                               .stream()
-                              .map(BenefitEntity::new)
+                              .map(id -> new BenefitEntity(prepareDBFunc.apply(id)))
                               .collect(Collectors.toSet()))
         .build();
   }
 
   /**
-   * Преобразует объект запроса на обновление города в модель таблицы "city"
+   * Преобразует объект запроса на обновление города в модель таблицы "city", обрабатывая строковые поля для БД
    * @param cityUpdate объект запроса на обновление города
+   * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "city"
    */
-  static public CityEntity fromUpdate(CityUpdate cityUpdate) {
+  static public CityEntity fromUpdate(CityUpdate cityUpdate, Function<String, String> prepareDBFunc) {
 
     if (cityUpdate == null) {
       return new CityEntity();
@@ -49,12 +52,12 @@ public class CityConverter {
 
     return CityEntity
         .builder()
-        .id(cityUpdate.getId())
-        .name(cityUpdate.getName())
-        .info(cityUpdate.getInfo())
+        .id(prepareDBFunc.apply(cityUpdate.getId()))
+        .name(prepareDBFunc.apply(cityUpdate.getName()))
+        .info(prepareDBFunc.apply(cityUpdate.getInfo()))
         .benefitEntitySet(cityUpdate.getIdBenefitSet()
                               .stream()
-                              .map(BenefitEntity::new)
+                              .map(id -> new BenefitEntity(prepareDBFunc.apply(id)))
                               .collect(Collectors.toSet()))
         .build();
   }
@@ -77,11 +80,11 @@ public class CityConverter {
         .info(cityEntity.getInfo())
         .shortBenefitSet(cityEntity.getBenefitEntitySet()
                               .stream()
-                              .map(BenefitConverter::toShortInfo)
+                              .map(BenefitDBConverter::toShortInfo)
                               .collect(Collectors.toSet()))
         .shortInstitutionSet(cityEntity.getInstitutionEntitySet()
                               .stream()
-                              .map(InstitutionConverter::toShortInfo)
+                              .map(InstitutionDBConverter::toShortInfo)
                               .collect(Collectors.toSet()))
         .build();
   }

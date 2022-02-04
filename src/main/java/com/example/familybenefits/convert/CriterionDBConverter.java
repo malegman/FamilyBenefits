@@ -7,19 +7,21 @@ import com.example.familybenefits.api_model.criterion.CriterionUpdate;
 import com.example.familybenefits.dao.entity.CriterionEntity;
 import com.example.familybenefits.dao.entity.CriterionTypeEntity;
 
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Класс преобразования модели таблицы "criterion" в другие объекты и получения из других объектов
+ * Класс преобразования модели таблицы "criterion" в другие объекты и получения из других объектов, обрабатывая строковые поля для БД.
  */
-public class CriterionConverter {
+public class CriterionDBConverter {
 
   /**
-   * Преобразует объект запроса на добавление критерия в модель таблицы "criterion"
+   * Преобразует объект запроса на добавление критерия в модель таблицы "criterion", обрабатывая строковые поля для БД
    * @param criterionAdd объект запроса на добавление критерия
+   * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "criterion_type"
    */
-  static public CriterionEntity fromAdd(CriterionAdd criterionAdd) {
+  static public CriterionEntity fromAdd(CriterionAdd criterionAdd, Function<String, String> prepareDBFunc) {
 
     if (criterionAdd == null) {
       return new CriterionEntity();
@@ -27,18 +29,19 @@ public class CriterionConverter {
 
     return CriterionEntity
         .builder()
-        .name(criterionAdd.getName())
-        .info(criterionAdd.getInfo())
-        .criterionTypeEntity(new CriterionTypeEntity(criterionAdd.getIdCriterionType()))
+        .name(prepareDBFunc.apply(criterionAdd.getName()))
+        .info(prepareDBFunc.apply(criterionAdd.getInfo()))
+        .criterionTypeEntity(new CriterionTypeEntity(prepareDBFunc.apply(criterionAdd.getIdCriterionType())))
         .build();
   }
 
   /**
-   * Преобразует объект запроса на обновление критерия в модель таблицы "criterion"
+   * Преобразует объект запроса на обновление критерия в модель таблицы "criterion", обрабатывая строковые поля для БД
    * @param criterionUpdate объект запроса на обновление критерия
+   * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "criterion_type"
    */
-  static public CriterionEntity fromUpdate(CriterionUpdate criterionUpdate) {
+  static public CriterionEntity fromUpdate(CriterionUpdate criterionUpdate, Function<String, String> prepareDBFunc) {
 
     if (criterionUpdate == null) {
       return new CriterionEntity();
@@ -46,10 +49,10 @@ public class CriterionConverter {
 
     return CriterionEntity
         .builder()
-        .id(criterionUpdate.getId())
-        .name(criterionUpdate.getName())
-        .info(criterionUpdate.getInfo())
-        .criterionTypeEntity(new CriterionTypeEntity(criterionUpdate.getIdCriterionType()))
+        .id(prepareDBFunc.apply(criterionUpdate.getId()))
+        .name(prepareDBFunc.apply(criterionUpdate.getName()))
+        .info(prepareDBFunc.apply(criterionUpdate.getInfo()))
+        .criterionTypeEntity(new CriterionTypeEntity(prepareDBFunc.apply(criterionUpdate.getIdCriterionType())))
         .build();
   }
 
@@ -69,10 +72,10 @@ public class CriterionConverter {
         .id(criterionEntity.getId())
         .name(criterionEntity.getName())
         .info(criterionEntity.getInfo())
-        .shortCriterionType(CriterionTypeConverter.toShortInfo(criterionEntity.getCriterionTypeEntity()))
+        .shortCriterionType(CriterionTypeDBConverter.toShortInfo(criterionEntity.getCriterionTypeEntity()))
         .shortBenefitSet(criterionEntity.getBenefitEntitySet()
                              .stream()
-                             .map(BenefitConverter::toShortInfo)
+                             .map(BenefitDBConverter::toShortInfo)
                              .collect(Collectors.toSet()))
         .build();
   }

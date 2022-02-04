@@ -8,21 +8,23 @@ import com.example.familybenefits.dao.entity.CriterionEntity;
 import com.example.familybenefits.dao.entity.RoleEntity;
 import com.example.familybenefits.dao.entity.UserEntity;
 
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Класс преобразования модели таблицы "user" в другие объекты и получения из других объектов.
+ * Класс преобразования модели таблицы "user" в другие объекты и получения из других объектов, обрабатывая строковые поля для БД.
  * В рамках объекта "пользователь"
  */
-public class UserConverter {
+public class UserDBConverter {
 
   /**
-   * Преобразует объект запроса на добавление пользователя в модель таблицы "user".
+   * Преобразует объект запроса на добавление пользователя в модель таблицы "user", обрабатывая строковые поля для БД.
    * В преобразовании не участвуют поля с датами рождениями детей и датой рождения пользователя
    * @param userAdd объект запроса на добавление пользователя
+   * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "user"
    */
-  static public UserEntity fromAdd(UserAdd userAdd) {
+  static public UserEntity fromAdd(UserAdd userAdd, Function<String, String> prepareDBFunc) {
 
     if (userAdd == null) {
       return new UserEntity();
@@ -30,24 +32,25 @@ public class UserConverter {
 
     return UserEntity
         .builder()
-        .name(userAdd.getName())
-        .email(userAdd.getEmail())
-        .password(userAdd.getPassword())
-        .cityEntity(new CityEntity(userAdd.getIdCity()))
+        .name(prepareDBFunc.apply(userAdd.getName()))
+        .email(prepareDBFunc.apply(userAdd.getEmail()))
+        .password(prepareDBFunc.apply(userAdd.getPassword()))
+        .cityEntity(new CityEntity(prepareDBFunc.apply(userAdd.getIdCity())))
         .criterionEntitySet(userAdd.getIdCriterionSet()
                                 .stream()
-                                .map(CriterionEntity::new)
+                                .map(id -> new CriterionEntity(prepareDBFunc.apply(id)))
                                 .collect(Collectors.toSet()))
         .build();
   }
 
   /**
-   * Преобразует объект запроса на обновление пользователя в модель таблицы "user".
+   * Преобразует объект запроса на обновление пользователя в модель таблицы "user", обрабатывая строковые поля для БД.
    * В преобразовании не участвуют поля с датами рождениями детей и датой рождения пользователя
    * @param userUpdate объект запроса на обновление пользователя
+   * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "user"
    */
-  static public UserEntity fromUpdate(UserUpdate userUpdate) {
+  static public UserEntity fromUpdate(UserUpdate userUpdate, Function<String, String> prepareDBFunc) {
 
     if (userUpdate == null) {
       return new UserEntity();
@@ -55,13 +58,13 @@ public class UserConverter {
 
     return UserEntity
         .builder()
-        .id(userUpdate.getId())
-        .name(userUpdate.getName())
-        .email(userUpdate.getEmail())
-        .cityEntity(new CityEntity(userUpdate.getIdCity()))
+        .id(prepareDBFunc.apply(userUpdate.getId()))
+        .name(prepareDBFunc.apply(userUpdate.getName()))
+        .email(prepareDBFunc.apply(userUpdate.getEmail()))
+        .cityEntity(new CityEntity(prepareDBFunc.apply(userUpdate.getIdCity())))
         .criterionEntitySet(userUpdate.getIdCriterionSet()
                                 .stream()
-                                .map(CriterionEntity::new)
+                                .map(id -> new CriterionEntity(prepareDBFunc.apply(id)))
                                 .collect(Collectors.toSet()))
         .build();
   }
@@ -89,10 +92,10 @@ public class UserConverter {
                          .stream()
                          .map(RoleEntity::getName)
                          .collect(Collectors.toSet()))
-        .shortCity(CityConverter.toShortInfo(userEntity.getCityEntity()))
+        .shortCity(CityDBConverter.toShortInfo(userEntity.getCityEntity()))
         .criterionSet(userEntity.getCriterionEntitySet()
                           .stream()
-                          .map(CriterionConverter::toInfo)
+                          .map(CriterionDBConverter::toInfo)
                           .collect(Collectors.toSet()))
         .build();
   }

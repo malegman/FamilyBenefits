@@ -6,20 +6,22 @@ import com.example.familybenefits.api_model.admin.AdminUpdate;
 import com.example.familybenefits.dao.entity.RoleEntity;
 import com.example.familybenefits.dao.entity.UserEntity;
 
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Класс преобразования модели таблицы "user" в другие объекты и получения из других объектов.
+ * Класс преобразования модели таблицы "user" в другие объекты и получения из других объектов, обрабатывая строковые поля для БД.
  * В рамках объекта "администратор"
  */
-public class AdminConverter {
+public class AdminDBConverter {
 
   /**
-   * Преобразует объект запроса на добавление администратора в модель таблицы "user"
+   * Преобразует объект запроса на добавление администратора в модель таблицы "user", обрабатывая строковые поля для БД
    * @param adminAdd объект запроса на добавление администратора
+   * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "user"
    */
-  static public UserEntity fromAdd(AdminAdd adminAdd) {
+  static public UserEntity fromAdd(AdminAdd adminAdd, Function<String, String> prepareDBFunc) {
 
     if (adminAdd == null) {
       return new UserEntity();
@@ -27,18 +29,19 @@ public class AdminConverter {
 
     return UserEntity
         .builder()
-        .name(adminAdd.getName())
-        .email(adminAdd.getEmail())
-        .password(adminAdd.getPassword())
+        .name(prepareDBFunc.apply(adminAdd.getName()))
+        .email(prepareDBFunc.apply(adminAdd.getEmail()))
+        .password(prepareDBFunc.apply(adminAdd.getPassword()))
         .build();
   }
 
   /**
-   * Преобразует объект запроса на обновление администратора в модель таблицы "user"
+   * Преобразует объект запроса на обновление администратора в модель таблицы "user", обрабатывая строковые поля для БД
    * @param adminUpdate объект запроса на обновление администратора
+   * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "user"
    */
-  static public UserEntity fromUpdate(AdminUpdate adminUpdate) {
+  static public UserEntity fromUpdate(AdminUpdate adminUpdate, Function<String, String> prepareDBFunc) {
 
     if (adminUpdate == null) {
       return new UserEntity();
@@ -46,9 +49,9 @@ public class AdminConverter {
 
     return UserEntity
         .builder()
-        .id(adminUpdate.getId())
-        .name(adminUpdate.getName())
-        .email(adminUpdate.getEmail())
+        .id(prepareDBFunc.apply(adminUpdate.getId()))
+        .name(prepareDBFunc.apply(adminUpdate.getName()))
+        .email(prepareDBFunc.apply(adminUpdate.getEmail()))
         .build();
   }
 
