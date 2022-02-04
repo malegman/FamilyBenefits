@@ -7,7 +7,6 @@ import com.example.familybenefits.api_model.city.CityUpdate;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -35,7 +34,7 @@ public interface CityService {
    * @param idCity ID города
    * @throws NotFoundException если город с указанным ID не найден
    */
-  void delete(BigInteger idCity) throws NotFoundException;
+  void delete(String idCity) throws NotFoundException;
 
   /**
    * Возвращает информацию о городе по его ID
@@ -43,7 +42,7 @@ public interface CityService {
    * @return информация о городе
    * @throws NotFoundException если город с указанным ID не найден
    */
-  CityInfo read(BigInteger idCity) throws NotFoundException;
+  CityInfo read(String idCity) throws NotFoundException;
 
   /**
    * Возвращает множество городов, в которых есть учреждения и пособия

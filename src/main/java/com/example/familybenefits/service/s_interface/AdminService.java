@@ -5,8 +5,6 @@ import com.example.familybenefits.api_model.admin.AdminInfo;
 import com.example.familybenefits.api_model.admin.AdminUpdate;
 import com.example.familybenefits.exception.*;
 
-import java.math.BigInteger;
-
 /**
  * Интерфейс сервиса, управляющего объектом "администратор"
  */
@@ -17,10 +15,10 @@ public interface AdminService {
    * @param adminAdd объект запроса на добавление администратора
    * @throws AlreadyExistsException если администратор или пользователь с указанным email уже существует
    * @throws PasswordNotSafetyException если пароль не соответствует политике безопасности
-   * @throws PasswordNotEqualsException если указанные пароли не эквивалентны
+   * @throws NotEqualException если указанные пароли не эквивалентны
    * @throws InvalidEmailException если указанный "email" не является email
    */
-  void add(AdminAdd adminAdd) throws AlreadyExistsException, PasswordNotSafetyException, PasswordNotEqualsException, InvalidEmailException;
+  void add(AdminAdd adminAdd) throws AlreadyExistsException, PasswordNotSafetyException, NotEqualException, InvalidEmailException;
 
   /**
    * Обновляет администратора по запросу на обновление
@@ -36,7 +34,7 @@ public interface AdminService {
    * @throws NotFoundException если администратор с указанным ID не найден
    * @throws UserRoleException если администратор имеет роль "ROLE_SUPER_ADMIN"
    */
-  void delete(BigInteger idAdmin) throws NotFoundException, UserRoleException;
+  void delete(String idAdmin) throws NotFoundException, UserRoleException;
 
   /**
    * Возвращает администратора об учреждении по его ID
@@ -44,7 +42,7 @@ public interface AdminService {
    * @return информация об администраторе
    * @throws NotFoundException если администратор с данным ID не найден
    */
-  AdminInfo read(BigInteger idAdmin) throws NotFoundException;
+  AdminInfo read(String idAdmin) throws NotFoundException;
 
   /**
    * Добавляет роль "ROLE_ADMIN" пользователю
@@ -52,7 +50,7 @@ public interface AdminService {
    * @throws NotFoundException если пользователь с данным ID не найден
    * @throws UserRoleException если пользователь имеет роль "ROLE_ADMIN" или не имеет роль "ROLE_USER"
    */
-  void fromUser(BigInteger idUser) throws NotFoundException, UserRoleException;
+  void fromUser(String idUser) throws NotFoundException, UserRoleException;
 
   /**
    * Добавляет роль "ROLE_USER" администратору
@@ -60,7 +58,7 @@ public interface AdminService {
    * @throws NotFoundException если администратор с данным ID не найден
    * @throws UserRoleException если пользователь имеет роль "ROLE_USER" или не имеет роль "ROLE_ADMIN"
    */
-  void toUser(BigInteger idAdmin) throws NotFoundException, UserRoleException;
+  void toUser(String idAdmin) throws NotFoundException, UserRoleException;
 
   /**
    * Передает роль "ROLE_SUPER_ADMIN" указанному администратору, удаляя данную роль у текущего администратора
@@ -68,5 +66,5 @@ public interface AdminService {
    * @throws NotFoundException если администратор с данным ID не найден
    * @throws UserRoleException если администратор имеет роль "ROLE_SUPER_ADMIN"
    */
-  void toSuper(BigInteger idAdmin) throws NotFoundException, UserRoleException;
+  void toSuper(String idAdmin) throws NotFoundException, UserRoleException;
 }

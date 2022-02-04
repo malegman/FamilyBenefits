@@ -7,7 +7,6 @@ import com.example.familybenefits.api_model.benefit.BenefitUpdate;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -35,7 +34,7 @@ public interface BenefitService {
    * @param idBenefit ID пособия
    * @throws NotFoundException если пособие с указанным ID не найден
    */
-  void delete(BigInteger idBenefit) throws NotFoundException;
+  void delete(String idBenefit) throws NotFoundException;
 
   /**
    * Возвращает информацию о пособии по его ID
@@ -43,7 +42,7 @@ public interface BenefitService {
    * @return информация о пособии
    * @throws NotFoundException если пособие с указанным ID не найден
    */
-  BenefitInfo read(BigInteger idBenefit) throws NotFoundException;
+  BenefitInfo read(String idBenefit) throws NotFoundException;
 
   /**
    * Возвращает множество пособий, в которых есть города, учреждения и критерии

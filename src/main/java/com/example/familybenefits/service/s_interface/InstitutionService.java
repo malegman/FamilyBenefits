@@ -7,7 +7,6 @@ import com.example.familybenefits.api_model.institution.InstitutionUpdate;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -35,7 +34,7 @@ public interface InstitutionService {
    * @param idInstitution ID учреждения
    * @throws NotFoundException если учреждение с указанным ID не найдено
    */
-  void delete(BigInteger idInstitution) throws NotFoundException;
+  void delete(String idInstitution) throws NotFoundException;
 
   /**
    * Возвращает информацию об учреждении по его ID
@@ -43,7 +42,7 @@ public interface InstitutionService {
    * @return информация об учреждении
    * @throws NotFoundException если учреждение с указанным ID не найдено
    */
-  InstitutionInfo read(BigInteger idInstitution) throws NotFoundException;
+  InstitutionInfo read(String idInstitution) throws NotFoundException;
 
   /**
    * Возвращает множество учреждений, в которых есть пособия

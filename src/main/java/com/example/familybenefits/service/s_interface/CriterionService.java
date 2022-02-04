@@ -7,7 +7,6 @@ import com.example.familybenefits.api_model.criterion.CriterionUpdate;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -35,7 +34,7 @@ public interface CriterionService {
    * @param idCriterion ID критерия
    * @throws NotFoundException если критерий с указанным ID не найден
    */
-  void delete(BigInteger idCriterion) throws NotFoundException;
+  void delete(String idCriterion) throws NotFoundException;
 
   /**
    * Возвращает информацию о критерии по его ID
@@ -43,7 +42,7 @@ public interface CriterionService {
    * @return информация о критерии
    * @throws NotFoundException если критерий с указанным ID не найден
    */
-  CriterionInfo read(BigInteger idCriterion) throws NotFoundException;
+  CriterionInfo read(String idCriterion) throws NotFoundException;
 
   /**
    * Возвращает множество критерий, в которых есть пособия

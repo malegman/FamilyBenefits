@@ -7,7 +7,6 @@ import com.example.familybenefits.api_model.user.UserInitData;
 import com.example.familybenefits.api_model.user.UserUpdate;
 import com.example.familybenefits.exception.*;
 
-import java.math.BigInteger;
 import java.util.Set;
 
 /**
@@ -21,7 +20,7 @@ public interface UserService {
    * @throws NotFoundException если город или критерии с указанными данными не найдены
    * @throws AlreadyExistsException если администратор или пользователь с указанным email уже существует
    * @throws PasswordNotSafetyException если пароль не соответствует политике безопасности
-   * @throws PasswordNotEqualsException если указанные пароли не эквивалентны
+   * @throws NotEqualException если указанные пароли не эквивалентны
    * @throws InvalidEmailException если указанный "email" не является email
    * @throws DateFormatException если даты рождения пользователя или детей не соответствуют формату "dd.mm.yyyy"
    * @throws DateTimeException если даты рождения пользователя или детей позже текущей даты
@@ -30,7 +29,7 @@ public interface UserService {
       NotFoundException,
       AlreadyExistsException,
       PasswordNotSafetyException,
-      PasswordNotEqualsException,
+      NotEqualException,
       InvalidEmailException,
       DateFormatException,
       DateTimeException;
@@ -54,7 +53,7 @@ public interface UserService {
    * @param idUser ID пользователя
    * @throws NotFoundException если пользователь с указанным ID не найден
    */
-  void delete(BigInteger idUser) throws NotFoundException;
+  void delete(String idUser) throws NotFoundException;
 
   /**
    * Возвращает пользователя об учреждении по его ID
@@ -62,7 +61,7 @@ public interface UserService {
    * @return информация о пользователе
    * @throws NotFoundException если пользователь с указанным ID не найден
    */
-  UserInfo read(BigInteger idUser) throws NotFoundException;
+  UserInfo read(String idUser) throws NotFoundException;
 
   /**
    * Возвращает множество подобранных пособий для пользователя
@@ -71,7 +70,7 @@ public interface UserService {
    * @throws NotFoundException если пользователь с указанным ID не найден
    * @throws DateTimeException если критерии пользователя устарели
    */
-  Set<BenefitInfo> getBenefits(BigInteger idUser) throws NotFoundException, DateTimeException;
+  Set<BenefitInfo> getBenefits(String idUser) throws NotFoundException, DateTimeException;
 
   /**
    * Возвращает дополнительные данные для пользователя.
