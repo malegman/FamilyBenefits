@@ -24,7 +24,30 @@ tags:
     description: Получение и изменение критерия
   - name: criterion type
     description: Получение и изменение типа критерия
+
+
 paths:
+  /pre-login:
+    post:
+      tags:
+        - system
+      summary: Отправляет на указанную почту код для входа в систему
+      description:
+        Отправляет на указанную почту код для входа в систему.
+        Для анонимного клиента.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreLoginRequest'
+      responses:
+        '200':
+          description: Вход в систему выполнен
+          content: { }
+        '404':
+          description: Пользователь с указанным email не найден
+          content: { }
+      security: [ ]
   /login:
     post:
       tags:
@@ -33,7 +56,6 @@ paths:
       description:
         Вход в систему.
         Для анонимного клиента.
-      operationId: login
       requestBody:
         content:
           application/json:
@@ -44,11 +66,11 @@ paths:
         '200':
           description: Вход в систему выполнен
           headers:
-            Set-Cookie:
+            Authorization:
               schema:
-                description: Токен обновления токена доступа
+                description: Токен доступа в формате jwt
                 type: string
-                example: refreshToken=1222333444; httpOnly;
+                example: jwt=d6tefy0.fh3653.26r3fyg
           content:
             application/json:
               schema:
@@ -67,7 +89,6 @@ paths:
         О запросившем клиенте.
         Для администратора. Для пользователя.
         Необходима авторизация.
-      operationId: logout
       responses:
         '200':
           description: Выход из системы выполнен
@@ -82,322 +103,48 @@ paths:
           description: Пользователь с указанными данными не найден
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /refresh:
-    post:
-      tags:
-        - system
-      summary: Обновляет токены сессии
-      description:
-        Обновляет токены доступа и обновления.
-        О запросившем клиенте.
-        Для администратора. Для пользователя.
-        Необходима авторизация.
-      operationId: refresh
-      responses:
-        '201':
-          description: Токены обновлены
-          headers:
-            Set-Cookie:
-              schema:
-                type: string
-                example: refreshToken=1222333444; httpOnly;
-          content:
-            application/json:
-              schema:
-                type: string
-                example: jwt=d6tefy0.fh3653.26r3fyg
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-  /changepwd:
-    put:
-      tags:
-        - system
-      summary: Изменяет пароль
-      description:
-        Изменяет пароль.
-        О запросившем клиенте.
-        Для администратора. Для пользователя.
-        Необходима авторизация.
-      operationId: changePassword
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ChangePassword'
-        required: true
-      responses:
-        '201':
-          description: Пароль изменен
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-  /verifemail:
-    post:
-      tags:
-        - system
-      summary: Принимает запрос на подтверждение почты
-      description:
-        Принимает запрос на подтверждение почты. Отправляет на почту код подтверждения.
-        О запросившем клиенте.
-        Для администратора. Для пользователя.
-        Необходима авторизация.
-      operationId: verifyEmailRequest
-      responses:
-        '200':
-          description: Письмо с кодом подтверждения отправлено на email
-          content: { }
-        '400':
-          description: Почта уже подтверждена
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-    put:
-      tags:
-        - system
-      summary: Подтверждает почту
-      description:
-        Подтверждает почту.
-        О запросившем клиенте.
-        Для администратора. Для пользователя.
-        Необходима авторизация.
-      operationId: verifyEmail
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: Код подтверждения почты
-              type: integer
-              example: 1222333
-        required: true
-      responses:
-        '201':
-          description: Email подтвержден
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-  /recoverpwd:
-    post:
-      tags:
-        - system
-      summary: Принимает запрос на восстановление пароля
-      description:
-        Принимает запрос на восстановление пароля. Отправляет на почту код восстановления.
-        Для администратора. Для пользователя.
-      operationId: recoveryPasswordRequest
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: Подтвержденный email пользователя
-              type: string
-              example: example@email.com
-        required: true
-      responses:
-        '200':
-          description: Письмо с кодом восстановления отправлено на указанный email
-          content: { }
-        '400':
-          description: Невозможно восстановить пароль. Email не подтвержден
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
-          content: { }
-      security: [ ]
-    put:
-      tags:
-        - system
-      summary: Восстановливает пароль
-      description:
-        Восстановливает пароль.
-        О запросившем клиенте.
-        Для анонимного клиента.
-      operationId: recoveryPassword
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RecoveryPassword'
-        required: true
-      responses:
-        '201':
-          description: Пароль изменен
-          content: { }
-        '400':
-          description: Невозможно восстановить пароль. Email не подтвержден
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
-          content: { }
-      security: [ ]
 
 
-  /user:
+  /users:
     post:
       tags:
         - user
-      summary: Добавляет нового пользователя. Регистрация гостя
+      summary: Создает пользователя. Регистрация гостя
       description:
-        Добавляет нового пользователя. Регистрация гостя.
+        Создает пользователя. Регистрация гостя.
         Для анонимного клиента.
-      operationId: addUser
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserAdd'
+              $ref: '#/components/schemas/UserSave'
         required: true
       responses:
         '201':
-          description: Пользователь зарегистрирован
+          description: Пользователь создан
           content: { }
         '400':
           description:
             Варианты -
             1) администратор или пользователь с данным email уже существует;
-            2) не безопасный пароль;
-            3) указанные пароли не эквивалентны;
-            4) указанный "email" не является email;
-            5) даты рождения пользователя или детей не соответствуют формату "dd.mm.yyyy";
-            6) даты рождения пользователя или детей позже текущей даты.
+            2) указанный "email" не является email;
+            3) даты рождения пользователя или детей не соответствуют формату "dd.mm.yyyy";
+            4) даты рождения пользователя или детей позже текущей даты.
         '404':
           description: Город или критерии с указанными ID не найдены
           content: { }
       security: [ ]
-    put:
-      tags:
-        - user
-      summary: Обновляет данные пользователя
-      description:
-        Обновляет данные пользователя.
-        О запросившем клиенте.
-        Для пользователя.
-        Необходима авторизация.
-      operationId: updateUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserUpdate'
-        required: true
-      responses:
-        '201':
-          description: Пользователь обновлен
-          content: { }
-        '400':
-          description:
-            Варианты -
-            1) указанный "email" не является email;
-            2) даты рождения пользователя или детей не соответствуют формату "dd.mm.yyyy";
-            3) даты рождения пользователя или детей позже текущей даты.
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description:
-            Варианты -
-            1) пользователь с указанными данными не найден;
-            2) город с указанным ID не найден.
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-  /user/{id}:
-    delete:
-      tags:
-        - user
-      summary: Удаляет пользователя по ID
-      description:
-        Удаляет пользователя по ID. Если пользователь имеет роль админа, то удаляются роль пользователя и пользовательские данные.
-        О запросившем клиенте.
-        Для пользователя.
-        Необходима авторизация.
-      operationId: deleteUser
-      parameters:
-        - name: id
-          in: path
-          description: ID пользователя
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '201':
-          description: Пользователь удален
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
+  /users/{id}:
     get:
       tags:
         - user
-      summary: Возвращает информацию о пользователе
+      summary: Возвращает информацию о пользователе по ID
       description:
         Возвращает информацию о пользователе по ID.
         О запросившем клиенте.
         Для пользователя.
         Необходима авторизация.
-      operationId: getUser
       parameters:
         - name: id
           in: path
@@ -420,21 +167,67 @@ paths:
           description: Нет доступа
           content: { }
         '404':
-          description: Пользователь с указанными данными не найден
+          description: Пользователь с указанным ID не найден
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /user/{id}/benefits:
-    get:
+    put:
       tags:
         - user
-      summary: Возвращает множество предложенных пособий пользователя
+      summary: Обновляет пользователя по ID
       description:
-        Возвращает множество предложенных пособий.
+        Обновляет данные пользователя.
+        О запросившем клиенте.
         Для пользователя.
         Необходима авторизация.
-      operationId: getUserBenefits
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSave'
+        required: true
+      responses:
+        '201':
+          description: Пользователь обновлен
+          content: { }
+        '400':
+          description:
+            Варианты -
+            1) указанный "email" не является email;
+            2) даты рождения пользователя или детей не соответствуют формату "dd.mm.yyyy";
+            3) даты рождения пользователя или детей позже текущей даты.
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description:
+            Варианты -
+            1) пользователь с указанным ID не найден;
+            2) город или критерии с указанными ID не найдены.
+          content: { }
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - user
+      summary: Удаляет пользователя по ID
+      description:
+        Удаляет пользователя по ID. Если пользователь имеет роль админа, то удаляются роль пользователя и пользовательские данные.
+        О запросившем клиенте.
+        Для пользователя.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -444,16 +237,8 @@ paths:
             example: td56387fhj
           required: true
       responses:
-        '200':
-          description: Множество предложенных пособий получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BenefitInfo'
-        '400':
-          description: Критерии пользователя устарели
+        '201':
+          description: Пользователь удален
           content: { }
         '401':
           description: Клиент не авторизован или токен не действительный
@@ -462,18 +247,17 @@ paths:
           description: Нет доступа
           content: { }
         '404':
-          description: Не найден пользователь с указанными данными
+          description: Пользователь с указанным ID не найден
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /user/initdata:
+  /users/initdata:
     get:
       tags:
         - user
       summary: Возвращает дополнительные данные для пользователя
       description:
-        Возвращает дополнительные данные для добавления или обновления пользователя.
+        Возвращает дополнительные данные для создания или обновления пользователя.
         Данные содержат в себе множества кратких информаций о городах и полных критериях.
       responses:
         '200':
@@ -485,33 +269,30 @@ paths:
       security: [ ]
 
 
-  /admin:
+  /admins:
     post:
       tags:
         - admin
-      summary: Добавляет нового администратора
+      summary: Создает администратора
       description:
-        Добавляет нового администратора.
+        Создает администратора.
         Для супер администратора.
         Необходима авторизация.
-      operationId: addAdmin
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AdminAdd'
+              $ref: '#/components/schemas/AdminSave'
         required: true
       responses:
         '201':
-          description: Администратор добавлен
+          description: Администратор создан
           content: { }
         '400':
           description:
             Варианты -
             1) администратор или пользователь с данным email уже существует;
-            2) не безопасный пароль;
-            3) указанные пароли не эквивалентны;
-            4) указанный "email" не является email.
+            2) указанный "email" не является email.
           content: { }
         '401':
           description: Клиент не авторизован или токен не действительный
@@ -520,80 +301,8 @@ paths:
           description: Нет доступа
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
-    put:
-      tags:
-        - admin
-      summary: Обновляет данные администратора
-      description:
-        Обновляет данные администратора.
-        О запросившем клиенте.
-        Для администратора.
-        Необходима авторизация.
-      operationId: updateAdmin
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AdminUpdate'
-        required: true
-      responses:
-        '201':
-          description: Администратор обновлен
-          content: { }
-        '400':
-          description: Указанный "email" не является email
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Администратор с указанными данными не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-  /admin/{id}:
-    delete:
-      tags:
-        - admin
-      summary: Удаляет администратора по ID
-      description:
-        Удаляет администратора по ID.
-        Для супер администратора.
-        Необходима авторизация.
-      operationId: deleteAdmin
-      parameters:
-        - name: id
-          in: path
-          description: ID администратора
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '201':
-          description: Администратор удален
-          content: { }
-        '400':
-          description: Невозможно удалить администратора с ролью супер администратора
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Администратор с указанными данными не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
+  /admins/{id}:
     get:
       tags:
         - admin
@@ -603,7 +312,6 @@ paths:
         О запросившем клиенте.
         Для администратора.
         Необходима авторизация.
-      operationId: getAdmin
       parameters:
         - name: id
           in: path
@@ -626,12 +334,86 @@ paths:
           description: Нет доступа
           content: { }
         '404':
-          description: Администратор с указанными данными не найден
+          description: Администратор с указанным ID не найден
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /admin/fromuser/{id}:
+    put:
+      tags:
+        - admin
+      summary: Обновляет администратора по ID
+      description:
+        Обновляет данные администратора по ID.
+        О запросившем клиенте.
+        Для администратора.
+        Необходима авторизация.
+      parameters:
+        - name: id
+          in: path
+          description: ID администратора
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSave'
+        required: true
+      responses:
+        '201':
+          description: Администратор обновлен
+          content: { }
+        '400':
+          description: Указанный "email" не является email
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Администратор с указанным ID не найден
+          content: { }
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - admin
+      summary: Удаляет администратора по ID
+      description:
+        Удаляет администратора по ID.
+        Для супер администратора.
+        Необходима авторизация.
+      parameters:
+        - name: id
+          in: path
+          description: ID администратора
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '201':
+          description: Администратор удален
+          content: { }
+        '400':
+          description: Невозможно удалить администратора с ролью супер администратора
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Администратор с указанным ID не найден
+          content: { }
+      security:
+        - bearerAuth: [ ]
+  /admins/fromuser/{id}:
     post:
       tags:
         - admin
@@ -640,7 +422,6 @@ paths:
         Добавляет роль администратора пользователю.
         Для супер администратора.
         Необходима авторизация.
-      operationId: adminFromUser
       parameters:
         - name: id
           in: path
@@ -666,9 +447,8 @@ paths:
           description: Пользователь с данным ID не найден
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /admin/{id}/touser:
+  /admins/{id}/touser:
     post:
       tags:
         - admin
@@ -677,7 +457,6 @@ paths:
         Добавляет роль пользователя администратору.
         Для супер администратора.
         Необходима авторизация.
-      operationId: adminToUser
       parameters:
         - name: id
           in: path
@@ -703,9 +482,8 @@ paths:
           description: Администратор с данным ID не найден
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /admin/{id}/tosuper:
+  /admins/{id}/tosuper:
     post:
       tags:
         - admin
@@ -714,7 +492,6 @@ paths:
         Передает роль супер администратора другому администратору.
         Для супер администратора.
         Необходима авторизация.
-      operationId: adminToSuper
       parameters:
         - name: id
           in: path
@@ -740,25 +517,23 @@ paths:
           description: Администратор с данным ID не найден
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
 
 
-  /city:
+  /cities:
     post:
       tags:
         - city
-      summary: Добавляет новый город
+      summary: Создает город
       description:
-        Добавляет новый город.
+        Создает город.
         Для администратора.
         Необходима авторизация.
-      operationId: addCity
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CityAdd'
+              $ref: '#/components/schemas/CitySave'
         required: true
       responses:
         '201':
@@ -774,80 +549,30 @@ paths:
           description: Нет доступа
           content: { }
       security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-    put:
-      tags:
-        - city
-      summary: Обновляет город
-      description:
-        Обновляет город.
-        Для администратора.
-        Необходима авторизация.
-      operationId: updateCity
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CityUpdate'
-        required: true
-      responses:
-        '201':
-          description: Город обновлен
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Город с указанными данными не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-  /city/{id}:
-    delete:
-      tags:
-        - city
-      summary: Удаляет город
-      description:
-        Удаляет город.
-        Для администратора.
-        Необходима авторизация.
-      operationId: deleteCity
-      parameters:
-        - name: id
-          in: path
-          description: ID города
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '201':
-          description: Город удален
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Город с указанными данными не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
     get:
       tags:
         - city
-      summary: Возвращает информацию о городе
+      summary: Возвращает множество городов, в которых есть учреждения и пособия
       description:
-        Возвращает информацию о городе.
-      operationId: getCity
+        Возвращает множество городов, в которых есть учреждения и пособия.
+      responses:
+        '200':
+          description: Множество городов получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+      security: [ ]
+  /cities/{id}:
+    get:
+      tags:
+        - city
+      summary: Возвращает информацию о городе по ID
+      description:
+        Возвращает информацию о городе по ID.
       parameters:
         - name: id
           in: path
@@ -867,25 +592,75 @@ paths:
           description: Город с указанным ID не найден
           content: { }
       security: [ ]
-  /city/all:
-    get:
+    put:
       tags:
         - city
-      summary: Возвращает множество городов, в которых есть учреждения и пособия
+      summary: Обновляет город по ID
       description:
-        Возвращает множество городов, в которых есть учреждения и пособия.
-      operationId: getCities
+        Обновляет город по ID.
+        Для администратора.
+        Необходима авторизация.
+      parameters:
+        - name: id
+          in: path
+          description: ID города
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CitySave'
+        required: true
       responses:
-        '200':
-          description: Множество городов получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CityInfo'
-      security: [ ]
-  /city/allpartial:
+        '201':
+          description: Город обновлен
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Город с указанным ID не найден
+          content: { }
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - city
+      summary: Удаляет город по ID
+      description:
+        Удаляет город по ID.
+        Для администратора.
+        Необходима авторизация.
+      parameters:
+        - name: id
+          in: path
+          description: ID города
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '201':
+          description: Город удален
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Город с указанным ID не найден
+          content: { }
+      security:
+        - bearerAuth: [ ]
+  /cities/partial:
     get:
       tags:
         - city
@@ -894,7 +669,6 @@ paths:
         Возвращает множество городов, в которых нет учреждений или пособий.
         Для администратора.
         Необходима авторизация.
-      operationId: getPartialCities
       responses:
         '200':
           description: Множество городов получено
@@ -903,7 +677,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CityInfo'
+                  $ref: '#/components/schemas/ObjectShortInfo'
         '401':
           description: Клиент не авторизован или токен не действительный
           content: { }
@@ -911,142 +685,43 @@ paths:
           description: Нет доступа
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /city/initdata:
+  /cities/findByName:
     get:
       tags:
         - city
-      summary: Возвращает дополнительные данные для города
+      summary: Возвращает информацию о городе по названию
       description:
-        Возвращает дополнительные данные для добавления или обновления города.
-        Данные содержат в себе множество кратких информаций о пособиях.
-      operationId: getCityInitData
+        Возвращает информацию о городе по названию.
+      parameters:
+        - name: name
+          in: query
+          description: Название города
+          schema:
+            type: string
+            example: name
+          required: true
       responses:
         '200':
-          description: Дополнительные данные пользователя получены
+          description: Данные о городе получены
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CityInitData'
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-
-
-  /benefit:
-    post:
-      tags:
-        - benefit
-      summary: Добавляет новое пособие
-      description:
-        Добавляет новое пособие.
-        Для администратора.
-        Необходима авторизация.
-      operationId: addBenefit
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BenefitAdd'
-        required: true
-      responses:
-        '201':
-          description: Пособие добавлено
-          content: { }
-        '400':
-          description: Пособие с указанными данными уже существует
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-    put:
-      tags:
-        - benefit
-      summary: Обновляет пособие
-      description:
-        Обновляет пособие.
-        Для администратора.
-        Необходима авторизация.
-      operationId: updateBenefit
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BenefitUpdate'
-        required: true
-      responses:
-        '201':
-          description: Пособие обновлено
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
+                $ref: '#/components/schemas/CityInfo'
         '404':
-          description: Пособие с указанными данными не найдено
+          description: Город с указанным названием не найден
           content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-  /benefit/{id}:
-    delete:
-      tags:
-        - benefit
-      summary: Удаляет пособие
-      description:
-        Удаляет пособие.
-        Для администратора.
-        Необходима авторизация.
-      operationId: deleteBenefit
-      parameters:
-        - name: id
-          in: path
-          description: ID пособия
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '201':
-          description: Пособие удалено
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пособие с указанными данными не найдено
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
+      security: [ ]
+  /cities/findByIdBenefit:
     get:
       tags:
-        - benefit
-      summary: Возвращает информацию о пособии
+        - city
+      summary: Возвращает множество городов по ID пособия
       description:
-        Возвращает информацию о пособии.
-      operationId: getBenefit
+        Возвращает множество городов по ID пособия.
       parameters:
-        - name: id
-          in: path
+        - name: idBenefit
+          in: query
           description: ID пособия
           schema:
             type: string
@@ -1054,109 +729,37 @@ paths:
           required: true
       responses:
         '200':
-          description: Данные о пособии получены
+          description: Данные о городах получены
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BenefitInfo'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
         '404':
           description: Пособие с указанным ID не найдено
           content: { }
       security: [ ]
-  /benefit/all:
-    get:
-      tags:
-        - benefit
-      summary: Возвращает множество пособий, в которых есть города, учреждения и критерии
-      description:
-        Возвращает множество пособий, в которых есть города, учреждения и критерии.
-      operationId: getBenefits
-      responses:
-        '200':
-          description: Множество пособий получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BenefitInfo'
-      security: [ ]
-  /benefit/allpartial:
-    get:
-      tags:
-        - benefit
-      summary: Возвращает множество пособий, в которых нет городов, учреждений или критерий
-      description:
-        Возвращает множество пособий, в которых нет городов, учреждений или критерий.
-        Для администратора.
-        Необходима авторизация.
-      operationId: getPartialBenefits
-      responses:
-        '200':
-          description: Множество пособий получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BenefitInfo'
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-  /benefit/initdata:
-    get:
-      tags:
-        - benefit
-      summary: Возвращает дополнительные данные для пособия
-      description:
-        Возвращает дополнительные данные для добавления или обновления пособия.
-        Данные содержат в себе множества кратких информаций о городах, полных критериях и учреждениях
-        Для администратора.
-        Необходима авторизация.
-      operationId: getBenefitInitData
-      responses:
-        '200':
-          description: Дополнительные данные пособия получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BenefitInitData'
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
 
 
-  /institution:
+  /institutions:
     post:
       tags:
         - institution
-      summary: Добавляет новое учреждение
+      summary: Создает учреждение
       description:
-        Добавляет новое учреждение.
+        Создает учреждение.
         Для администратора.
         Необходима авторизация.
-      operationId: addInsitution
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InstitutionAdd'
+              $ref: '#/components/schemas/InstitutionSave'
         required: true
       responses:
         '201':
-          description: Учреждение добавлено
+          description: Учреждение создано
           content: { }
         '401':
           description: Клиент не авторизован или токен не действительный
@@ -1168,80 +771,30 @@ paths:
           description: Нет доступа
           content: { }
       security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-    put:
-      tags:
-        - institution
-      summary: Обновляет данные учреждения
-      description:
-        Обновляет данные учреждения.
-        Для администратора.
-        Необходима авторизация.
-      operationId: updateInstitution
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/InstitutionUpdate'
-        required: true
-      responses:
-        '201':
-          description: Учреждение обновлено
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Учреждение с указанными данными не найдено
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-  /institution/{id}:
-    delete:
-      tags:
-        - institution
-      summary: Удаляет учреждение
-      description:
-        Удаляет учреждение.
-        Для администратора.
-        Необходима авторизация.
-      operationId: deleteInstitution
-      parameters:
-        - name: id
-          in: path
-          description: ID учреждения
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '201':
-          description: Учреждение удалено
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Учреждение с указанными данными не найдено
-          content: { }
-      security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
     get:
       tags:
         - institution
-      summary: Возвращает информацию об учреждении
+      summary: Возвращает множество учреждений, в которых есть пособия
       description:
-        Возвращает информацию об учреждении.
-      operationId: getInstitution
+        Возвращает множество учреждений, в которых есть пособия.
+      responses:
+        '200':
+          description: Множество учреждений получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+      security: [ ]
+  /institutions/{id}:
+    get:
+      tags:
+        - institution
+      summary: Возвращает информацию об учреждении по ID
+      description:
+        Возвращает информацию об учреждении по ID.
       parameters:
         - name: id
           in: path
@@ -1261,25 +814,75 @@ paths:
           description: Учреждение с указанным ID не найдено
           content: { }
       security: [ ]
-  /institution/all:
-    get:
+    put:
       tags:
         - institution
-      summary: Возвращает множество учреждений, в которых есть пособия
+      summary: Обновляет учреждение по ID
       description:
-        Возвращает множество учреждений, в которых есть пособия.
-      operationId: getInstitutions
+        Обновляет учреждение по ID.
+        Для администратора.
+        Необходима авторизация.
+      parameters:
+        - name: id
+          in: path
+          description: ID учреждения
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstitutionSave'
+        required: true
       responses:
-        '200':
-          description: Множество учреждений получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/InstitutionInfo'
-      security: [ ]
-  /institution/allpartial:
+        '201':
+          description: Учреждение обновлено
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Учреждение с указанным ID не найдено
+          content: { }
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - institution
+      summary: Удаляет учреждение по ID
+      description:
+        Удаляет учреждение по ID.
+        Для администратора.
+        Необходима авторизация.
+      parameters:
+        - name: id
+          in: path
+          description: ID учреждения
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '201':
+          description: Учреждение удалено
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Учреждение с указанным ID не найдено
+          content: { }
+      security:
+        - bearerAuth: [ ]
+  /institutions/partial:
     get:
       tags:
         - institution
@@ -1288,7 +891,6 @@ paths:
         Возвращает множество учреждений, в которых нет пособий
         Для администратора.
         Необходима авторизация.
-      operationId: getPartialInstitutions
       responses:
         '200':
           description: Множество учреждений получено
@@ -1297,7 +899,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InstitutionInfo'
+                  $ref: '#/components/schemas/ObjectShortInfo'
         '401':
           description: Клиент не авторизован или токен не действительный
           content: { }
@@ -1305,9 +907,8 @@ paths:
           description: Нет доступа
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /institution/initdata:
+  /institutions/initdata:
     get:
       tags:
         - institution
@@ -1332,25 +933,396 @@ paths:
           description: Нет доступа
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
+  /institutions/findByIdCity:
+    get:
+      tags:
+        - institution
+      summary: Возвращает множество учреждений по ID города
+      description:
+        Возвращает множество учреждений по ID города.
+      parameters:
+        - name: idCity
+          in: query
+          description: ID города
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '200':
+          description: Данные об учреждениях получены
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Город с указанным ID не найдено
+          content: { }
+      security: [ ]
+  /institutions/findByIdBenefit:
+    get:
+      tags:
+        - institution
+      summary: Возвращает множество учреждений по ID пособия
+      description:
+        Возвращает множество учреждений по ID пособия.
+      parameters:
+        - name: idBenefit
+          in: query
+          description: ID пособия
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '200':
+          description: Данные об учреждениях получены
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Пособие с указанным ID не найдено
+          content: { }
+      security: [ ]
 
 
-  /criterion:
+  /benefits:
     post:
       tags:
-        - criterion
-      summary: Добавляет новый критерий
+        - benefit
+      summary: Создает пособие
       description:
-        Добавляет новый критерий.
+        Создает пособие.
         Для администратора.
         Необходима авторизация.
-      operationId: addCriterion
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CriterionAdd'
+              $ref: '#/components/schemas/BenefitSave'
+        required: true
+      responses:
+        '201':
+          description: Пособие создано
+          content: { }
+        '400':
+          description: Пособие с указанными данными уже существует
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+      security:
+        - bearerAuth: [ ]
+    get:
+      tags:
+        - benefit
+      summary: Возвращает множество пособий, в которых есть города, учреждения и критерии
+      description:
+        Возвращает множество пособий, в которых есть города, учреждения и критерии.
+      responses:
+        '200':
+          description: Множество пособий получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+      security: [ ]
+  /benefits/{id}:
+    get:
+      tags:
+        - benefit
+      summary: Возвращает информацию о пособии по ID
+      description:
+        Возвращает информацию о пособии по ID.
+      parameters:
+        - name: id
+          in: path
+          description: ID пособия
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '200':
+          description: Данные о пособии получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BenefitInfo'
+        '404':
+          description: Пособие с указанным ID не найдено
+          content: { }
+      security: [ ]
+    put:
+      tags:
+        - benefit
+      summary: Обновляет пособие по ID
+      description:
+        Обновляет пособие по ID.
+        Для администратора.
+        Необходима авторизация.
+      parameters:
+        - name: id
+          in: path
+          description: ID пособия
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BenefitUpdate'
+        required: true
+      responses:
+        '201':
+          description: Пособие обновлено
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Пособие с указанными данными не найдено
+          content: { }
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - benefit
+      summary: Удаляет пособие по ID
+      description:
+        Удаляет пособие по ID.
+        Для администратора.
+        Необходима авторизация.
+      parameters:
+        - name: id
+          in: path
+          description: ID пособия
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '201':
+          description: Пособие удалено
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Пособие с указанным ID не найдено
+          content: { }
+      security:
+        - bearerAuth: [ ]
+  /benefits/partial:
+    get:
+      tags:
+        - benefit
+      summary: Возвращает множество пособий, в которых нет городов, учреждений или критерий
+      description:
+        Возвращает множество пособий, в которых нет городов, учреждений или критерий.
+        Для администратора.
+        Необходима авторизация.
+      responses:
+        '200':
+          description: Множество пособий получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+      security:
+        - bearerAuth: [ ]
+  /benefits/initdata:
+    get:
+      tags:
+        - benefit
+      summary: Возвращает дополнительные данные для пособия
+      description:
+        Возвращает дополнительные данные для добавления или обновления пособия.
+        Данные содержат в себе множества кратких информаций о городах и полных критериях
+        Для администратора.
+        Необходима авторизация.
+      responses:
+        '200':
+          description: Дополнительные данные пособия получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BenefitInitData'
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+      security:
+        - bearerAuth: [ ]
+  /benefits/findByIdUser:
+    get:
+      tags:
+        - benefit
+      summary: Возвращает множество предложенных пособий пользователя
+      description:
+        Возвращает множество предложенных пособий.
+        Для пользователя.
+        Необходима авторизация.
+      parameters:
+        - name: idUser
+          in: query
+          description: ID пользователя
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '200':
+          description: Множество предложенных пособий получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+        '400':
+          description: Критерии пользователя устарели
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Не найден пользователь с указанным ID
+          content: { }
+      security:
+        - bearerAuth: [ ]
+  /benefits/findByIdCity:
+    get:
+      tags:
+        - benefit
+      summary: Возвращает множество пособий по ID города
+      description:
+        Возвращает множество пособий по ID города.
+      parameters:
+        - name: idCity
+          in: query
+          description: ID города
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '200':
+          description: Множество пособий получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Не найден город с указанным ID
+          content: { }
+      security: [ ]
+  /benefits/findByIdInstitution:
+    get:
+      tags:
+        - benefit
+      summary: Возвращает множество пособий по ID учреждения
+      description:
+        Возвращает множество пособий по ID учреждения.
+      parameters:
+        - name: idInstitution
+          in: query
+          description: ID учреждения
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '200':
+          description: Множество пособий получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Не найдено учреждение с указанным ID
+          content: { }
+      security: [ ]
+  /benefits/findByIdCriterion:
+    get:
+      tags:
+        - benefit
+      summary: Возвращает множество пособий по ID критерия
+      description:
+        Возвращает множество пособий по ID критерия.
+      parameters:
+        - name: idCriterion
+          in: query
+          description: ID критерия
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '200':
+          description: Множество пособий получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Не найден критерий с указанным ID
+          content: { }
+      security: [ ]
+
+
+  /criteria:
+    post:
+      tags:
+        - criterion
+      summary: Создает критерий
+      description:
+        Создает критерий.
+        Для администратора.
+        Необходима авторизация.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CriterionSave'
         required: true
       responses:
         '201':
@@ -1366,80 +1338,30 @@ paths:
           description: Нет доступа
           content: { }
       security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-    put:
-      tags:
-        - criterion
-      summary: Обновляет данные критерия
-      description:
-        Обновляет данные критерия.
-        Для администратора.
-        Необходима авторизация.
-      operationId: updateCriterion
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CriterionUpdate'
-        required: true
-      responses:
-        '201':
-          description: Критерий обновлен
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Не найден критерий с указанными данными
-          content: { }
-      security:
-        - cookieAuth: [ ]
-        - bearerAuth: [ ]
-  /criterion/{id}:
-    delete:
-      tags:
-        - criterion
-      summary: Удаляет критерий
-      description:
-        Удаляет критерий.
-        Для администратора.
-        Необходима авторизация.
-      operationId: deleteCriterion
-      parameters:
-        - name: id
-          in: path
-          description: ID критерия
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '201':
-          description: Критерий удален
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Критерий с указанными данными не найден
-          content: { }
-      security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
     get:
       tags:
         - criterion
-      summary: Возвращает информацию о критерии
+      summary: Возвращает множество критерий, в которых есть пособия
       description:
-        Возвращает информацию о критерии.
-      operationId: getCriterion
+        Возвращает множество критерий, в которых есть пособия
+      responses:
+        '200':
+          description: Множество всех критерий получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+      security: [ ]
+  /criteria/{id}:
+    get:
+      tags:
+        - criterion
+      summary: Возвращает информацию о критерии по ID
+      description:
+        Возвращает информацию о критерии по ID.
       parameters:
         - name: id
           in: path
@@ -1459,25 +1381,75 @@ paths:
           description: Критерий с указанным ID не найден
           content: { }
       security: [ ]
-  /criterion/all:
-    get:
+    put:
       tags:
         - criterion
-      summary: Возвращает множество критерий, в которых есть пособия
+      summary: Обновляет критерий по ID
       description:
-        Возвращает множество критерий, в которых есть пособия
-      operationId: getCriteria
+        Обновляет критерий по ID.
+        Для администратора.
+        Необходима авторизация.
+      parameters:
+        - name: id
+          in: path
+          description: ID критерия
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CriterionSave'
+        required: true
       responses:
-        '200':
-          description: Множество всех критерий получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CriterionInfo'
-      security: [ ]
-  /criterion/allpartial:
+        '201':
+          description: Критерий обновлен
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Не найден критерий с указанным ID
+          content: { }
+      security:
+        - bearerAuth: [ ]
+    delete:
+      tags:
+        - criterion
+      summary: Удаляет критерий по ID
+      description:
+        Удаляет критерий по ID.
+        Для администратора.
+        Необходима авторизация.
+      parameters:
+        - name: id
+          in: path
+          description: ID критерия
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '201':
+          description: Критерий удален
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Критерий с указанными данным ID не найден
+          content: { }
+      security:
+        - bearerAuth: [ ]
+  /criteria/partial:
     get:
       tags:
         - criterion
@@ -1486,7 +1458,6 @@ paths:
         Возвращает множество критерий, в которых нет пособий.
         Для администратора.
         Необходима авторизация.
-      operationId: getPartialCriteria
       responses:
         '200':
           description: Множество всех критерий получено
@@ -1495,7 +1466,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CriterionInfo'
+                  $ref: '#/components/schemas/ObjectShortInfo'
         '401':
           description: Клиент не авторизован или токен не действительный
           content: { }
@@ -1503,9 +1474,8 @@ paths:
           description: Нет доступа
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /criterion/initdata:
+  /criteria/initdata:
     get:
       tags:
         - criterion
@@ -1515,7 +1485,6 @@ paths:
         Данные содержат в себе множетсво кратких информаций о типах критерий.
         Для администратора.
         Необходима авторизация.
-      operationId: getCriterionInitData
       responses:
         '200':
           description: Дополнительные данные критерия получены
@@ -1530,29 +1499,120 @@ paths:
           description: Нет доступа
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
+  /criteria/findByIdUser:
+    get:
+      tags:
+        - criterion
+      summary: Возвращает множество критерий пользователя
+      description:
+        Возвращает множество критерий пользователя.
+        Для пользователя.
+        Необходима авторизация.
+      parameters:
+        - name: idUser
+          in: query
+          description: ID пользователя
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '200':
+          description: Множество критерий получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+        '404':
+          description: Не найден пользователь с указанным ID
+          content: { }
+      security:
+        - bearerAuth: [ ]
+  /criteria/findByIdBenefit:
+    get:
+      tags:
+        - criterion
+      summary: Возвращает множество критерий по ID пособия
+      description:
+        Возвращает множество критерий по ID пособия.
+      parameters:
+        - name: idBenefit
+          in: query
+          description: ID пособия
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '200':
+          description: Множество критерий получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Не найдено пособие с указанным ID
+          content: { }
+      security: [ ]
+  /criteria/findByIdCriterionType:
+    get:
+      tags:
+        - criterion
+      summary: Возвращает множество критерий по ID типа критерия
+      description:
+        Возвращает множество критерий по ID типа критерия.
+      parameters:
+        - name: idCriterionType
+          in: query
+          description: ID типа критерия
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '200':
+          description: Множество критерий получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Не найден тип критерия с указанным ID
+          content: { }
+      security: [ ]
 
 
-  /criteriontype:
+  /criterion-types:
     post:
       tags:
         - criterion type
-      summary: Добавляет новый тип критерия
+      summary: Создает тип критерия
       description:
-        Добавляет новый тип критерия.
+        Создает тип критерия.
         Для администратора.
         Необходима авторизация.
-      operationId: addCriterionType
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CriterionTypeAdd'
+              $ref: '#/components/schemas/CriterionTypeSave'
         required: true
       responses:
         '201':
-          description: Тип критерия добавлен
+          description: Тип критерия создан
           content: { }
         '400':
           description: Тип критерия с указанными данными уже существует
@@ -1564,22 +1624,71 @@ paths:
           description: Нет доступа
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
+    get:
+      tags:
+        - criterion type
+      summary: Возвращает множество типов критерия, в которых есть критерии
+      description:
+        Возвращает множество типов критерия, в которых есть критерии
+      operationId: getCriterionTypes
+      responses:
+        '200':
+          description: Множество типов критерия получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+      security: [ ]
+  /criterion-types/{id}:
+    get:
+      tags:
+        - criterion type
+      summary: Возвращает информацию о типе критерия
+      description:
+        Возвращает информацию о типе критерия.
+      parameters:
+        - name: id
+          in: path
+          description: ID типа критерия
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
+      responses:
+        '200':
+          description: Данные о типе критерия получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CriterionTypeInfo'
+        '404':
+          description: Тип критерия с указанным ID не найден
+          content: { }
+      security: [ ]
     put:
       tags:
         - criterion type
-      summary: Обновляет данные типа критерия
+      summary: Обновляет тип критерия по ID
       description:
-        Обновляет данные типа критерия.
+        Обновляет тип критерия по ID.
         Для администратора.
         Необходима авторизация.
-      operationId: updateCriterionType
+      parameters:
+        - name: id
+          in: path
+          description: ID типа критерия
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CriterionTypeUpdate'
+              $ref: '#/components/schemas/CriterionTypeSave'
         required: true
       responses:
         '201':
@@ -1592,21 +1701,18 @@ paths:
           description: Нет доступа
           content: { }
         '404':
-          description: Не найден тип критерия с указанными данными
+          description: Не найден тип критерия с указанным ID
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
-  /criteriontype/{id}:
     delete:
       tags:
         - criterion type
-      summary: Удаляет тип критерия
+      summary: Удаляет тип критерия по ID
       description:
-        Удаляет тип критерия.
+        Удаляет тип критерия по ID.
         Для администратора.
         Необходима авторизация.
-      operationId: deleteCriterionType
       parameters:
         - name: id
           in: path
@@ -1629,53 +1735,8 @@ paths:
           description: Тип критерия с указанным ID не найден
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
-    get:
-      tags:
-        - criterion type
-      summary: Возвращает информацию о типе критерия
-      description:
-        Возвращает информацию о типе критерия.
-      operationId: getCriterionType
-      parameters:
-        - name: id
-          in: path
-          description: ID типа критерия
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '200':
-          description: Данные о типе критерия получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CriterionTypeInfo'
-        '404':
-          description: Тип критерия с указанным ID не найден
-          content: { }
-      security: [ ]
-  /criteriontype/all:
-    get:
-      tags:
-        - criterion type
-      summary: Возвращает множество типов критерия, в которых есть критерии
-      description:
-        Возвращает множество типов критерия, в которых есть критерии
-      operationId: getCriterionTypes
-      responses:
-        '200':
-          description: Множество типов критерия получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CriterionTypeInfo'
-      security: [ ]
-  /criteriontype/allpartial:
+  /criterion-types/partial:
     get:
       tags:
         - criterion type
@@ -1684,7 +1745,6 @@ paths:
         Возвращает множество типов критерия, в которых нет критерий.
         Для администратора.
         Необходима авторизация.
-      operationId: getPartialCriterionTypes
       responses:
         '200':
           description: Множество типов критерия получено
@@ -1693,7 +1753,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CriterionTypeInfo'
+                  $ref: '#/components/schemas/ObjectShortInfo'
         '401':
           description: Клиент не авторизован или токен не действительный
           content: { }
@@ -1701,17 +1761,38 @@ paths:
           description: Нет доступа
           content: { }
       security:
-        - cookieAuth: [ ]
         - bearerAuth: [ ]
+  /criterion-types/findByName:
+    get:
+      tags:
+        - criterion type
+      summary: Возвращает информацию о типе критерия по названию
+      description:
+        Возвращает информацию о типе критерия по названию.
+      parameters:
+        - name: name
+          in: query
+          description: Название типа критерия
+          schema:
+            type: string
+            example: name
+          required: true
+      responses:
+        '200':
+          description: Данные о типе критерия получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CityInfo'
+        '404':
+          description: Тип критерия с указанным названием не найден
+          content: { }
+      security: [ ]
 
 
 components:
 
   securitySchemes:
-    cookieAuth:
-      type: apiKey
-      in: cookie
-      name: refreshToken
     bearerAuth:
       type: http
       scheme: bearer
@@ -1733,10 +1814,6 @@ components:
           description: Электронная почта пользователя
           type: string
           example: exmaple@mail.com
-        isVerifiedEmail:
-          description: Статус почты, true, если подтверждена
-          type: boolean
-          example: false
         birthDateChildren:
           description: Множество дат рождений детей пользователя
           type: array
@@ -1756,63 +1833,13 @@ components:
             description: Название роли
             type: string
             example: name
-        shortCity:
-          $ref: '#/components/schemas/ObjectShortInfo'
-        criterionSet:
-          description: Множество информаций о критериях пользователя
-          type: array
-          items:
-            $ref: '#/components/schemas/CriterionInfo'
-    UserAdd:
-      description: Объект запроса для добавления пользователя
-      properties:
-        name:
-          description: Имя пользователя
+        nameCity:
+          description: Название города пользователя
           type: string
           example: name
-        email:
-          description: Электронная почта пользователя
-          type: string
-          example: exmaple@mail.com
-        password:
-          description: Пароль пользователя
-          type: string
-          example: password
-        repeatPassword:
-          description: Повторно введенный пароль пользователя
-          type: string
-          example: password
-        birthDateChildren:
-          description: Множество дат рождений детей пользователя
-          type: array
-          items:
-            description: Дата рождения ребенка
-            type: string
-            format: date
-            example: 01.01.2022
-        dateBirth:
-          description: Дата рождения пользователя
-          type: string
-          format: date
-          example: 01.01.2022
-        idCity:
-          description: ID города пользователя
-          type: string
-          example: td56387fhj
-        idCriterionSet:
-          description: Множество ID критерий пользователя
-          type: array
-          items:
-            description: ID критерия
-            type: string
-            example: td56387fhj
-    UserUpdate:
-      description: Объект запроса для обновления пользователя
+    UserSave:
+      description: Объект запроса для сохранения пользователя, создания или обновления
       properties:
-        id:
-          description: ID пользователя
-          type: string
-          example: td56387fhj
         name:
           description: Имя пользователя
           type: string
@@ -1846,7 +1873,7 @@ components:
             type: string
             example: td56387fhj
     UserInitData:
-      description: Дополнительные данные для добавления или обновления пользователя.
+      description: Дополнительные данные для создания или обновления пользователя.
         Содержат в себе множества кратких информаций о городах и полных инф. о критериях
       properties:
         shortCitySet:
@@ -1861,6 +1888,13 @@ components:
             $ref: '#/components/schemas/CriterionInfo'
 
 
+    PreLoginRequest:
+      description: Объект запроса пользователя для получения кода для входа в систему
+      properties:
+        email:
+          description: Электронная почта пользователя
+          type: string
+          example: example@mail.com
     LoginRequest:
       description: Объект запроса пользователя для входа в систему
       properties:
@@ -1868,10 +1902,10 @@ components:
           description: Электронная почта пользователя
           type: string
           example: example@mail.com
-        password:
-          description: Пароль пользователя
-          type: string
-          example: password
+        loginCode:
+          description: Код пользователя для входа в систему
+          type: integer
+          example: 111222
     LoginResponse:
       description: Объект ответа на вход в систему
       properties:
@@ -1890,44 +1924,6 @@ components:
             description: Роль пользователя
             type: string
             example: role
-        jwt:
-          description: Токен доступа в формате jwt
-          type: string
-          example: jwt=d6tefy0.fh3653.26r3fyg
-    ChangePassword:
-      description: Объект запроса для изменения пароля пользователя
-      properties:
-        oldPassword:
-          description: Старый пароль пользователя
-          type: string
-          example: oldPassword
-        newPassword:
-          description: Новый пароль пользователя
-          type: string
-          example: newPassword
-        repeatPassword:
-          description: Повторно введенный новый пароль пользователя
-          type: string
-          example: newPassword
-    RecoveryPassword:
-      description: Объект запроса на восстановление пароля
-      properties:
-        email:
-          description: Электронная почта пользователя
-          type: string
-          example: example@mail.com
-        recoveryPwdCode:
-          description: Код пользователя, необходимый для восстановления пароля
-          type: integer
-          example: 1222333
-        newPassword:
-          description: Новый пароль пользователя
-          type: string
-          example: newPassword
-        repeatPassword:
-          description: Повторно введенный новый пароль пользователя
-          type: string
-          example: newPassword
 
 
     AdminInfo:
@@ -1945,10 +1941,6 @@ components:
           description: Электронная почта администратора
           type: string
           example: exmaple@mail.com
-        isVerifiedEmail:
-          description: Статус почты, true, если подтверждена
-          type: boolean
-          example: false
         nameRoleSet:
           description: Множество названий ролей администратора
           type: array
@@ -1956,32 +1948,9 @@ components:
             description: Название роли
             type: string
             example: name
-    AdminAdd:
-      description: Объект запроса для добавления администратора
+    AdminSave:
+      description: Объект запроса для сохранения администратора, создания или обновления
       properties:
-        name:
-          description: Имя администратора
-          type: string
-          example: name
-        email:
-          description: Электронная почта администратора
-          type: string
-          example: exmaple@mail.com
-        password:
-          description: Пароль администратора
-          type: string
-          example: password
-        repeatPassword:
-          description: Повторно введенный пароль администратора
-          type: string
-          example: password
-    AdminUpdate:
-      description: Объект запроса для обновления администратора
-      properties:
-        id:
-          description: ID администратора
-          type: string
-          example: td56387fhj
         name:
           description: Имя администратора
           type: string
@@ -2007,29 +1976,9 @@ components:
           description: Информация типа критерия
           type: string
           example: info
-        shortCriterionSet:
-          description: Множество кратких информаций о кртитериях типа критерия
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectShortInfo'
-    CriterionTypeAdd:
-      description: Объект запроса для добавления типа критерия
+    CriterionTypeSave:
+      description: Объект запроса для сохранения типа критерия, создания или обновления
       properties:
-        name:
-          description: Название типа критерия
-          type: string
-          example: name
-        info:
-          description: Информация типа критерия
-          type: string
-          example: info
-    CriterionTypeUpdate:
-      description: Объект запроса для обновления типа критерия
-      properties:
-        id:
-          description: ID типа критерия
-          type: string
-          example: td56387fhj
         name:
           description: Название типа критерия
           type: string
@@ -2055,35 +2004,13 @@ components:
           description: Информация критерия
           type: string
           example: info
-        shortCriterionType:
-          $ref: '#/components/schemas/ObjectShortInfo'
-        shortBenefitSet:
-          description: Множество кратких информаций о пособиях критерия
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectShortInfo'
-    CriterionAdd:
-      description: Объект запроса для добавления критерия
-      properties:
-        name:
-          description: Название критерия
+        nameCriterionType:
+          description: Название типа критерия данного критерия
           type: string
           example: name
-        info:
-          description: Информация критерия
-          type: string
-          example: info
-        idCriterionType:
-          description: ID типа критерия критерия
-          type: string
-          example: td56387fhj
-    CriterionUpdate:
-      description: Объект запроса для обновления критерия
+    CriterionSave:
+      description: Объект запроса для сохранения критерия, создания или обновления
       properties:
-        id:
-          description: ID критерия
-          type: string
-          example: td56387fhj
         name:
           description: Название критерия
           type: string
@@ -2097,7 +2024,7 @@ components:
           type: string
           example: td56387fhj
     CriterionInitData:
-      description: Дополнительные данные для добавления или обновления критерия
+      description: Дополнительные данные для создания или обновления критерия
         Содержат в себе множество кратких информаций о типах критериях
       properties:
         shortCriterionTypeSet:
@@ -2122,18 +2049,8 @@ components:
           description: Информация города
           type: string
           example: info
-        shortBenefitSet:
-          description: Множество кратких информаций о пособиях города
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectShortInfo'
-        shortInstitutionSet:
-          description: Множество кратких информаций об учреждениях города
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectShortInfo'
-    CityAdd:
-      description: Объект запроса для добавления города
+    CitySave:
+      description: Объект запроса для сохранения города, создания или обновления
       properties:
         name:
           description: Название города
@@ -2143,44 +2060,6 @@ components:
           description: Информация города
           type: string
           example: info
-        idBenefitSet:
-          description: Множество ID пособий города
-          type: array
-          items:
-            description: ID пособия
-            type: string
-            example: td56387fhj
-    CityUpdate:
-      description: Объект запроса для обновления города
-      properties:
-        id:
-          description: ID города
-          type: string
-          example: td56387fhj
-        name:
-          description: Название города
-          type: string
-          example: name
-        info:
-          description: Информация города
-          type: string
-          example: info
-        idBenefitSet:
-          description: Множество ID пособий города
-          type: array
-          items:
-            description: ID пособия
-            type: string
-            example: td56387fhj
-    CityInitData:
-      description: Дополнительные данные для добавления или обновления города
-        Содержат в себе множество кратких информаций о пособиях
-      properties:
-        shortBenefitSet:
-          description: Множество кратких информаций о пособиях
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectShortInfo'
 
 
     InstitutionInfo:
@@ -2210,54 +2089,13 @@ components:
           description: График работы учреждения
           type: string
           example: График
-        shortCity:
-          $ref: '#/components/schemas/ObjectShortInfo'
-        shortBenefitSet:
-          description: Множество кратких информаций о пособиях учреждения
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectShortInfo'
-    InstitutionAdd:
-      description: Объект запроса для добавления учреждения
-      properties:
-        name:
-          description: Название учреждения
+        nameCity:
+          description: Название города учреждения
           type: string
           example: name
-        address:
-          description: Адрес учреждения
-          type: string
-          example: address
-        phone:
-          description: Телефон учреждения
-          type: string
-          example: 8-888-888-88-88
-        email:
-          description: Электронная почта учржедения
-          type: string
-          example: example@mail.com
-        schedule:
-          description: График работы учреждения
-          type: string
-          example: График
-        idCity:
-          description: ID города учреждения
-          type: string
-          example: td56387fhj
-        idBenefitSet:
-          description: Множество ID пособий учреждения
-          type: array
-          items:
-            description: ID пособия
-            type: string
-            example: td56387fhj
-    InstitutionUpdate:
-      description: Объект запроса для обновления учреждения
+    InstitutionSave:
+      description: Объект запроса для сохранения учреждения, создания или обновления
       properties:
-        id:
-          description: ID учреждения
-          type: string
-          example: td56387fhj
         name:
           description: Название учреждения
           type: string
@@ -2290,7 +2128,7 @@ components:
             type: string
             example: td56387fhj
     InstitutionInitData:
-      description: Дополнительные данные для добавления или обновления учреждения
+      description: Дополнительные данные для создания или обновления учреждения
         Содержат в себе множество кратких информаций о городах и пособиях
       properties:
         shortCitySet:
@@ -2324,64 +2162,9 @@ components:
           description: Документы для получения пособия
           type: string
           example: documents
-        shortCitySet:
-          description: Множество кратких информаций о городах пособия
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectShortInfo'
-        shortInstitutionSet:
-          description: Множество кратких информаций об учреждениях пособия
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectShortInfo'
-        criterionSet:
-          description: Множество информаций о критериях пособия
-          type: array
-          items:
-            $ref: '#/components/schemas/CriterionInfo'
-    BenefitAdd:
-      description: Объект запроса для добавления пособия
+    BenefitSave:
+      description: Объект запроса для сохранения пособия, создания или обновления
       properties:
-        name:
-          description: Название пособия
-          type: string
-          example: name
-        info:
-          description: Информация пособия
-          type: string
-          example: info
-        documents:
-          description: Документы для получения пособия
-          type: string
-          example: documents
-        idCitySet:
-          description: Множество ID городов пособия
-          type: array
-          items:
-            description: ID города
-            type: string
-            example: td56387fhj
-        idInstitutionSet:
-          description: Множество ID учреждений пособия
-          type: array
-          items:
-            description: ID учреждения
-            type: string
-            example: td56387fhj
-        idCriterionSet:
-          description: Множество ID критерий пособия
-          type: array
-          items:
-            description: ID критерия
-            type: string
-            example: td56387fhj
-    BenefitUpdate:
-      description: Объект запроса для обновления пособия
-      properties:
-        id:
-          description: ID пособия
-          type: string
-          example: td56387fhj
         name:
           description: Название пособия
           type: string
@@ -2416,16 +2199,11 @@ components:
             type: string
             example: td56387fhj
     BenefitInitData:
-      description: Дополнительные данные для добавления или обновления пособия
-        Содержат в себе множества кратких информаций о городах, учреждениях и полных критериях
+      description: Дополнительные данные для создания или обновления пособия
+        Содержат в себе множества кратких информаций о городах и полных критериях
       properties:
         shortCitySet:
           description: Множество кратких информаций о городах
-          type: array
-          items:
-            $ref: '#/components/schemas/ObjectShortInfo'
-        shortInstitutionSet:
-          description: Множество кратких информаций об учреждениях
           type: array
           items:
             $ref: '#/components/schemas/ObjectShortInfo'
