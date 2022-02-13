@@ -1,8 +1,8 @@
 package com.example.familybenefits.service.s_interface;
 
-import com.example.familybenefits.api_model.criterion_type.CriterionTypeAdd;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
+import com.example.familybenefits.api_model.criterion_type.CriterionTypeSave;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
-import com.example.familybenefits.api_model.criterion_type.CriterionTypeUpdate;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 
@@ -14,25 +14,17 @@ import java.util.Set;
 public interface CriterionTypeService {
 
   /**
-   * Добавляет новый тип критерия
-   * @param criterionTypeAdd объект запроса для добавления типа критерия
+   * Возвращает множество типов критерия, в которых есть критерии
+   * @return множество кратких информаций о типах критерий
+   */
+  Set<ObjectShortInfo> readAll();
+
+  /**
+   * Создает тип критерия по запросу на сохранение
+   * @param criterionTypeSave объект запроса для сохранения типа критерия
    * @throws AlreadyExistsException если тип критерия с указанным названием уже существует
    */
-  void add(CriterionTypeAdd criterionTypeAdd) throws AlreadyExistsException;
-
-  /**
-   * Обновляет данные типа критерия
-   * @param criterionTypeUpdate объект запроса для обновления типа критерия
-   * @throws NotFoundException если тип критерия с указанными данными не найден
-   */
-  void update(CriterionTypeUpdate criterionTypeUpdate) throws NotFoundException;
-
-  /**
-   * Удаляет тип критерия по его ID
-   * @param idCriterionType ID типа критерия
-   * @throws NotFoundException если тип критерия с указанным ID не найден
-   */
-  void delete(String idCriterionType) throws NotFoundException;
+  void create(CriterionTypeSave criterionTypeSave) throws AlreadyExistsException;
 
   /**
    * Возвращает информацию о типе критерия по его ID
@@ -43,14 +35,23 @@ public interface CriterionTypeService {
   CriterionTypeInfo read(String idCriterionType) throws NotFoundException;
 
   /**
-   * Возвращает множество типов критерия, в которых есть критерии
-   * @return множество информаций о типах критерий
+   * Обновляет тип критерия по запросу на сохранение
+   * @param idCriterionType ID типа критерия
+   * @param criterionTypeSave объект запроса для сохранения типа критерия
+   * @throws NotFoundException если тип критерия с указанными данными не найден
    */
-  Set<CriterionTypeInfo> getAll();
+  void update(String idCriterionType, CriterionTypeSave criterionTypeSave) throws NotFoundException;
+
+  /**
+   * Удаляет тип критерия по его ID
+   * @param idCriterionType ID типа критерия
+   * @throws NotFoundException если тип критерия с указанным ID не найден
+   */
+  void delete(String idCriterionType) throws NotFoundException;
 
   /**
    * Возвращает множество типов критерия, в которых нет критерий
-   * @return множество информаций о типах критерий
+   * @return множество кратких информаций о типах критерий
    */
-  Set<CriterionTypeInfo> getAllPartial();
+  Set<ObjectShortInfo> readAllPartial();
 }

@@ -1,8 +1,8 @@
 package com.example.familybenefits.service.implementation;
 
-import com.example.familybenefits.api_model.criterion_type.CriterionTypeAdd;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
+import com.example.familybenefits.api_model.criterion_type.CriterionTypeSave;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
-import com.example.familybenefits.api_model.criterion_type.CriterionTypeUpdate;
 import com.example.familybenefits.convert.CriterionTypeDBConverter;
 import com.example.familybenefits.dao.entity.CriterionTypeEntity;
 import com.example.familybenefits.dao.repository.CriterionTypeRepository;
@@ -45,58 +45,35 @@ public class CriterionTypeServiceFB implements CriterionTypeService, EntityDBSer
   }
 
   /**
-   * Добавляет новый тип критерия
-   * @param criterionTypeAdd объект запроса для добавления типа критерия
+   * Возвращает множество типов критерия, в которых есть критерии
+   * @return множество кратких информаций о типах критерий
+   */
+  @Override
+  public Set<ObjectShortInfo> readAll() {
+
+    return findAllFull()
+        .stream()
+        .map(CriterionTypeDBConverter::toShortInfo)
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Создает тип критерия по запросу на сохранение
+   * @param criterionTypeSave объект запроса для сохранения типа критерия
    * @throws AlreadyExistsException если тип критерия с указанным названием уже существует
    */
   @Override
-  public void add(CriterionTypeAdd criterionTypeAdd) throws AlreadyExistsException {
+  public void create(CriterionTypeSave criterionTypeSave) throws AlreadyExistsException {
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    CriterionTypeEntity criterionTypeEntityFromAdd = CriterionTypeDBConverter
-        .fromAdd(criterionTypeAdd, dbIntegrityService::preparePostgreSQLString);
+    CriterionTypeEntity criterionTypeEntityFromSave = CriterionTypeDBConverter
+        .fromSave(criterionTypeSave, dbIntegrityService::preparePostgreSQLString);
 
     // Проверка отсутствия типа критерия по его названию
     dbIntegrityService.checkAbsenceByUniqStr(
-        criterionTypeRepository::existsByName, criterionTypeEntityFromAdd.getName());
+        criterionTypeRepository::existsByName, criterionTypeEntityFromSave.getName());
 
-    criterionTypeRepository.saveAndFlush(criterionTypeEntityFromAdd);
-  }
-
-  /**
-   * Обновляет данные типа критерия
-   * @param criterionTypeUpdate объект запроса для обновления типа критерия
-   * @throws NotFoundException если тип критерия с указанными данными не найден
-   */
-  @Override
-  public void update(CriterionTypeUpdate criterionTypeUpdate) throws NotFoundException {
-
-    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    CriterionTypeEntity criterionTypeEntityFromUpdate = CriterionTypeDBConverter
-        .fromUpdate(criterionTypeUpdate, dbIntegrityService::preparePostgreSQLString);
-
-    // Проверка существования типа критерия по его ID
-    dbIntegrityService.checkExistenceById(
-        criterionTypeRepository::existsById, criterionTypeEntityFromUpdate);
-
-    criterionTypeRepository.saveAndFlush(criterionTypeEntityFromUpdate);
-  }
-
-  /**
-   * Удаляет тип критерия по его ID
-   * @param idCriterionType ID типа критерия
-   * @throws NotFoundException если тип критерия с указанным ID не найден
-   */
-  @Override
-  public void delete(String idCriterionType) throws NotFoundException {
-
-    String prepareIdCriterionType = dbIntegrityService.preparePostgreSQLString(idCriterionType);
-
-    // Проверка существования типа критерия по его ID
-    dbIntegrityService.checkExistenceById(
-        criterionTypeRepository::existsById, prepareIdCriterionType);
-
-    criterionTypeRepository.deleteById(prepareIdCriterionType);
+    criterionTypeRepository.saveAndFlush(criterionTypeEntityFromSave);
   }
 
   /**
@@ -119,28 +96,52 @@ public class CriterionTypeServiceFB implements CriterionTypeService, EntityDBSer
   }
 
   /**
-   * Возвращает множество типов критерия, в которых есть критерии
-   * @return множество информаций о типах критерий
+   * Обновляет тип критерия по запросу на сохранение
+   * @param idCriterionType ID типа критерия
+   * @param criterionTypeSave объект запроса для сохранения типа критерия
+   * @throws NotFoundException если тип критерия с указанными данными не найден
    */
   @Override
-  public Set<CriterionTypeInfo> getAll() {
+  public void update(String idCriterionType, CriterionTypeSave criterionTypeSave) throws NotFoundException {
 
-    return findAllFull()
-        .stream()
-        .map(CriterionTypeDBConverter::toInfo)
-        .collect(Collectors.toSet());
+    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
+    CriterionTypeEntity criterionTypeEntityFromSave = CriterionTypeDBConverter
+        .fromSave(criterionTypeSave, dbIntegrityService::preparePostgreSQLString);
+
+    // Проверка существования типа критерия по его ID
+    dbIntegrityService.checkExistenceById(
+        criterionTypeRepository::existsById, criterionTypeEntityFromSave);
+
+    criterionTypeRepository.saveAndFlush(criterionTypeEntityFromSave);
+  }
+
+  /**
+   * Удаляет тип критерия по его ID
+   * @param idCriterionType ID типа критерия
+   * @throws NotFoundException если тип критерия с указанным ID не найден
+   */
+  @Override
+  public void delete(String idCriterionType) throws NotFoundException {
+
+    String prepareIdCriterionType = dbIntegrityService.preparePostgreSQLString(idCriterionType);
+
+    // Проверка существования типа критерия по его ID
+    dbIntegrityService.checkExistenceById(
+        criterionTypeRepository::existsById, prepareIdCriterionType);
+
+    criterionTypeRepository.deleteById(prepareIdCriterionType);
   }
 
   /**
    * Возвращает множество типов критерия, в которых нет критерий
-   * @return множество информаций о типах критерий
+   * @return множество кратких информаций о типах критерий
    */
   @Override
-  public Set<CriterionTypeInfo> getAllPartial() {
+  public Set<ObjectShortInfo> readAllPartial() {
 
     return findAllPartial()
         .stream()
-        .map(CriterionTypeDBConverter::toInfo)
+        .map(CriterionTypeDBConverter::toShortInfo)
         .collect(Collectors.toSet());
   }
 
