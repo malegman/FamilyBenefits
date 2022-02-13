@@ -1,7 +1,5 @@
 package com.example.familybenefits.api_model.user;
 
-import com.example.familybenefits.api_model.common.ObjectShortInfo;
-import com.example.familybenefits.api_model.criterion.CriterionInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,12 +36,6 @@ public class UserInfo {
   private String email;
 
   /**
-   * Статус почты, true, если подтверждена
-   */
-  @JsonProperty("isVerifiedEmail")
-  private boolean isVerifiedEmail;
-
-  /**
    * Множество дат рождений детей пользователя
    */
   @JsonProperty("birthDateChildren")
@@ -62,14 +54,8 @@ public class UserInfo {
   private Set<String> nameRoleSet;
 
   /**
-   * Краткая информация о городе пользователя
+   * Название города пользователя
    */
-  @JsonProperty("shortCity")
-  private ObjectShortInfo shortCity;
-
-  /**
-   * Множество информаций о критериях пользователя
-   */
-  @JsonProperty("criterionSet")
-  private Set<CriterionInfo> criterionSet;
+  @JsonProperty("nameCity")
+  private String nameCity;
 }
