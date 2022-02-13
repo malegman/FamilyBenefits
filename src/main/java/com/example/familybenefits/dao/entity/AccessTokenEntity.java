@@ -10,17 +10,17 @@ import javax.persistence.Table;
 import java.util.Date;
 
 /**
- * Модель записи таблицы "refresh_token"
+ * Модель записи таблицы "access_token"
  */
 @Entity
-@Table(name = "refresh_token", schema = "family_benefit")
+@Table(name = "access_token", schema = "family_benefit")
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class RefreshTokenEntity extends ObjectEntity {
+public class AccessTokenEntity extends ObjectEntity {
 
   /**
    * ID пользователя
@@ -31,16 +31,9 @@ public class RefreshTokenEntity extends ObjectEntity {
   private String idUser;
 
   /**
-   * Токен обновления токена доступа
+   * Токен доступа
    */
   @NonNull
   @Column(name = "token")
   private String token;
-
-  /**
-   * Время истечения срока токена
-   */
-  @NonNull
-  @Column(name = "date_expiration")
-  private Date dateExpiration;
 }
