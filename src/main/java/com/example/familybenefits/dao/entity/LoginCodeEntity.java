@@ -11,17 +11,17 @@ import java.math.BigInteger;
 import java.util.Date;
 
 /**
- * Модель записи таблицы "verify_email_code"
+ * Модель записи таблицы "login_code"
  */
 @Entity
-@Table(name = "verify_email_code", schema = "family_benefit")
+@Table(name = "login_code", schema = "family_benefit")
 @Getter
 @Setter
 @ToString
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class VerifyEmailCodeEntity extends ObjectEntity {
+public class LoginCodeEntity extends ObjectEntity {
 
   /**
    * ID пользователя
@@ -32,7 +32,7 @@ public class VerifyEmailCodeEntity extends ObjectEntity {
   private String idUser;
 
   /**
-   * Код подтверждения почты
+   * Код для входа в систему
    */
   @NonNull
   @Column(name = "code")
