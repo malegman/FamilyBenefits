@@ -1,9 +1,9 @@
 package com.example.familybenefits.service.implementation;
 
-import com.example.familybenefits.api_model.institution.InstitutionAdd;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
+import com.example.familybenefits.api_model.institution.InstitutionSave;
 import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.api_model.institution.InstitutionInitData;
-import com.example.familybenefits.api_model.institution.InstitutionUpdate;
 import com.example.familybenefits.convert.BenefitDBConverter;
 import com.example.familybenefits.convert.CityDBConverter;
 import com.example.familybenefits.convert.InstitutionDBConverter;
@@ -69,71 +69,53 @@ public class InstitutionServiceFB implements InstitutionService, EntityDBService
   }
 
   /**
-   * Добавляет учреждение по запросу на добавление
-   * @param institutionAdd объект запроса на добавление учреждения
-   * @throws AlreadyExistsException если учреждение с таким названием уже существует
-   * @throws NotFoundException если город учреждения с указанным ID не найден
+   * Возвращает множество учреждений, в которых есть пособия.
+   * Фильтр по городу и пособию.
+   * В качестве параметра может быть указан null, если данный параметр не участвует в фильтрации
+   * @param idCity ID города
+   * @param idBenefit ID пособия
+   * @return множество кратких информаций об учреждениях
    */
   @Override
-  public void add(InstitutionAdd institutionAdd) throws AlreadyExistsException, NotFoundException {
+  public Set<ObjectShortInfo> readAllFilter(String idCity, String idBenefit) {
+
+    return findAllFull()
+        .stream()
+        .filter(institutionEntity ->
+                    (idCity == null || idCity.equals(institutionEntity.getCityEntity().getId())
+                    ) && (idBenefit == null || institutionEntity.getBenefitEntitySet()
+                        .stream()
+                        .map(BenefitEntity::getId)
+                        .collect(Collectors.toSet())
+                        .contains(idBenefit)))
+        .map(InstitutionDBConverter::toShortInfo)
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Создает учреждение по запросу на сохранение
+   * @param institutionSave объект запроса на сохранение учреждения
+   * @throws AlreadyExistsException если учреждение с таким названием уже существует
+   * @throws NotFoundException если город или пособия с указанными ID не найдены
+   */
+  @Override
+  public void create(InstitutionSave institutionSave) throws AlreadyExistsException, NotFoundException {
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    InstitutionEntity institutionEntityFromAdd = InstitutionDBConverter
-        .fromAdd(institutionAdd, dbIntegrityService::preparePostgreSQLString);
+    InstitutionEntity institutionEntityFromSave = InstitutionDBConverter
+        .fromSave(institutionSave, dbIntegrityService::preparePostgreSQLString);
 
     // Проверка существования города и пособий по их ID
     dbIntegrityService.checkExistenceById(
-        cityDBService.getRepository()::existsById, institutionEntityFromAdd.getCityEntity());
+        cityDBService.getRepository()::existsById, institutionEntityFromSave.getCityEntity());
     dbIntegrityService.checkExistenceById(
-        benefitDBService.getRepository()::existsById, institutionEntityFromAdd.getBenefitEntitySet());
+        benefitDBService.getRepository()::existsById, institutionEntityFromSave.getBenefitEntitySet());
 
     // Проверка отсутствия учреждения по его названию
     dbIntegrityService.checkAbsenceByUniqStr(
-        institutionRepository::existsByName, institutionEntityFromAdd.getName());
+        institutionRepository::existsByName, institutionEntityFromSave.getName());
 
-    institutionRepository.saveAndFlush(institutionEntityFromAdd);
-  }
-
-  /**
-   * Обновляет учреждение по запросу на обновление
-   * @param institutionUpdate объект запроса на обновление учреждения
-   * @throws NotFoundException если учреждение с указанными данными не найдено
-   */
-  @Override
-  public void update(InstitutionUpdate institutionUpdate) throws NotFoundException {
-
-    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    InstitutionEntity institutionEntityFromUpdate = InstitutionDBConverter
-        .fromUpdate(institutionUpdate, dbIntegrityService::preparePostgreSQLString);
-
-    // Проверка существования города и пособий по их ID
-    dbIntegrityService.checkExistenceById(
-        cityDBService.getRepository()::existsById, institutionEntityFromUpdate.getCityEntity());
-    dbIntegrityService.checkExistenceById(
-        benefitDBService.getRepository()::existsById, institutionEntityFromUpdate.getBenefitEntitySet());
-
-    // Проверка существования учреждения по его ID
-    dbIntegrityService.checkExistenceById(
-        institutionRepository::existsById, institutionEntityFromUpdate);
-
-    institutionRepository.saveAndFlush(institutionEntityFromUpdate);
-  }
-
-  /**
-   * Удаляет учреждение по его ID
-   * @param idInstitution ID учреждения
-   * @throws NotFoundException если учреждение с указанными данными не найдено
-   */
-  @Override
-  public void delete(String idInstitution) throws NotFoundException {
-
-    String prepareIdInstitution = dbIntegrityService.preparePostgreSQLString(idInstitution);
-
-    // Проверка существования учреждения по его ID
-    dbIntegrityService.checkExistenceById(
-        institutionRepository::existsById, prepareIdInstitution);
-
-    institutionRepository.deleteById(prepareIdInstitution);
+    institutionRepository.saveAndFlush(institutionEntityFromSave);
   }
 
   /**
@@ -156,28 +138,58 @@ public class InstitutionServiceFB implements InstitutionService, EntityDBService
   }
 
   /**
-   * Возвращает множество учреждений, в которых есть пособия
-   * @return множество информаций об учреждениях
+   * Обновляет учреждение по запросу на сохранение
+   * @param idInstitution ID учреждения
+   * @param institutionSave объект запроса на сохранение учреждения
+   * @throws NotFoundException если учреждение, город или пособия с указанными ID не найдены
    */
   @Override
-  public Set<InstitutionInfo> getAll() {
+  public void update(String idInstitution, InstitutionSave institutionSave) throws NotFoundException {
 
-    return findAllFull()
-        .stream()
-        .map(InstitutionDBConverter::toInfo)
-        .collect(Collectors.toSet());
+    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
+    InstitutionEntity institutionEntityFromSave = InstitutionDBConverter
+        .fromSave(institutionSave, dbIntegrityService::preparePostgreSQLString);
+
+    // Проверка существования города и пособий по их ID
+    dbIntegrityService.checkExistenceById(
+        cityDBService.getRepository()::existsById, institutionEntityFromSave.getCityEntity());
+    dbIntegrityService.checkExistenceById(
+        benefitDBService.getRepository()::existsById, institutionEntityFromSave.getBenefitEntitySet());
+
+    // Проверка существования учреждения по его ID
+    dbIntegrityService.checkExistenceById(
+        institutionRepository::existsById, institutionEntityFromSave);
+
+    institutionRepository.saveAndFlush(institutionEntityFromSave);
+  }
+
+  /**
+   * Удаляет учреждение по его ID
+   * @param idInstitution ID учреждения
+   * @throws NotFoundException если учреждение с указанными данными не найдено
+   */
+  @Override
+  public void delete(String idInstitution) throws NotFoundException {
+
+    String prepareIdInstitution = dbIntegrityService.preparePostgreSQLString(idInstitution);
+
+    // Проверка существования учреждения по его ID
+    dbIntegrityService.checkExistenceById(
+        institutionRepository::existsById, prepareIdInstitution);
+
+    institutionRepository.deleteById(prepareIdInstitution);
   }
 
   /**
    * Возвращает множество учреждений, в которых нет пособий
-   * @return множество информаций об учреждениях
+   * @return множество кратких информаций об учреждениях
    */
   @Override
-  public Set<InstitutionInfo> getAllPartial() {
+  public Set<ObjectShortInfo> readAllPartial() {
 
     return findAllPartial()
         .stream()
-        .map(InstitutionDBConverter::toInfo)
+        .map(InstitutionDBConverter::toShortInfo)
         .collect(Collectors.toSet());
   }
 
