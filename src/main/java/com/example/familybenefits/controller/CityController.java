@@ -1,9 +1,8 @@
 package com.example.familybenefits.controller;
 
-import com.example.familybenefits.api_model.city.CityAdd;
 import com.example.familybenefits.api_model.city.CityInfo;
-import com.example.familybenefits.api_model.city.CityInitData;
-import com.example.familybenefits.api_model.city.CityUpdate;
+import com.example.familybenefits.api_model.city.CitySave;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.service.s_interface.CityService;
@@ -37,88 +36,60 @@ public class CityController {
   }
 
   /**
-   * Обрабатывает POST запрос "/city" на добавление нового города.
+   * Обрабатывает GET запрос "/cities/all" на получение множества городов,
+   * в которых есть учреждения и пособия.
+   * Фильтр по названию или ID пособия.
+   * Выполнить запрос может любой клиент
+   * @param name Название города
+   * @param idBenefit ID пособия
+   * @return множество городов, если запрос выполнен успешно, и код ответа
+   */
+  @GetMapping(value = "/cities")
+  public ResponseEntity<Set<ObjectShortInfo>> readAllFilter(@RequestParam(name = "name", required = false) String name,
+                                                            @RequestParam(name = "idBenefit", required = false) String idBenefit) {
+
+    Set<ObjectShortInfo> cityShortInfoSet = cityService.readAllFilter(name, idBenefit);
+    return ResponseEntity.status(HttpStatus.OK).body(cityShortInfoSet);
+  }
+
+  /**
+   * Обрабатывает POST запрос "/cities" на создание города.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param cityAdd объект запроса для добавления города
+   * @param citySave объект запроса для сохранения города
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/city")
-  public ResponseEntity<?> addCity(@RequestBody CityAdd cityAdd) {
+  @PostMapping(value = "/cities")
+  public ResponseEntity<?> create(@RequestBody CitySave citySave) {
 
-    if (cityAdd == null) {
-      log.warn("POST \"/city/\": {}", "Request body \"cityAdd\" is empty");
+    if (citySave == null) {
+      log.warn("POST \"/cities\": {}", "Request body \"citySave\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     try {
-      cityService.add(cityAdd);
+      cityService.create(citySave);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (AlreadyExistsException e) {
       // Город с указанным названием существует
-      log.error("POST \"/city/\": {}", e.getMessage());
+      log.error("POST \"/cities\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
     } catch (NotFoundException e) {
       // Не найдены пособия
-      log.error("POST \"/city/\": {}", e.getMessage());
+      log.error("POST \"/cities\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Обрабатывает PUT запрос "/city" на обновление города.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param cityUpdate объект запроса для обновления города
-   * @return код ответа, результат обработки запроса
-   */
-  @PutMapping(value = "/city")
-  public ResponseEntity<?> updateCity(@RequestBody CityUpdate cityUpdate) {
-
-    if (cityUpdate == null) {
-      log.warn("PUT \"/city/\": {}", "Request body \"cityUpdate\" is empty");
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    try {
-      cityService.update(cityUpdate);
-      return ResponseEntity.status(HttpStatus.CREATED).build();
-
-    } catch (NotFoundException e) {
-      // Не найден город или не найдены пособия
-      log.error("PUT \"/city/\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Обрабатывает DELETE запрос "/city/{id}" на удаление городе.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param idCity ID города
-   * @return код ответа, результат обработки запроса
-   */
-  @DeleteMapping(value = "/city/{id}")
-  public ResponseEntity<?> deleteCity(@PathVariable(name = "id") String idCity) {
-
-    try {
-      cityService.delete(idCity);
-      return ResponseEntity.status(HttpStatus.CREATED).build();
-
-    } catch (NotFoundException e) {
-      // Не найден город
-      log.error("DELETE \"/city/{id}\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Обрабатывает GET запрос "/city/{id}" на получение информации о городе.
+   * Обрабатывает GET запрос "/cities/{id}" на получение информации о городе.
    * Выполнить запрос может любой клиент
    * @param idCity ID города
    * @return информация о городе, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/city/{id}")
-  public ResponseEntity<CityInfo> getCity(@PathVariable(name = "id") String idCity) {
+  @GetMapping(value = "/cities/{id}")
+  public ResponseEntity<CityInfo> read(@PathVariable(name = "id") String idCity) {
 
     try {
       CityInfo cityInfo = cityService.read(idCity);
@@ -126,50 +97,69 @@ public class CityController {
 
     } catch (NotFoundException e) {
       // Не найден город
-      log.error("GET \"/city/{id}\": {}", e.getMessage());
+      log.error("GET \"/cities/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Обрабатывает GET запрос "/city/all" на получение множества городов,
-   * в которых есть учреждения и пособия.
-   * Выполнить запрос может любой клиент
-   * @return множество городов, если запрос выполнен успешно, и код ответа
+   * Обрабатывает PUT запрос "/cities/{id}" на обновление города.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @param idCity ID города
+   * @param citySave объект запроса для сохранения города
+   * @return код ответа, результат обработки запроса
    */
-  @GetMapping(value = "/city/all")
-  public ResponseEntity<Set<CityInfo>> getCities() {
+  @PutMapping(value = "/cities/{id}")
+  public ResponseEntity<?> update(@PathVariable(name = "id") String idCity,
+                                  @RequestBody CitySave citySave) {
 
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(cityService.getAll());
+    if (citySave == null) {
+      log.warn("PUT \"/cities/{id}\": {}", "Request body \"citySave\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    try {
+      cityService.update(idCity, citySave);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    } catch (NotFoundException e) {
+      // Не найден город или не найдены пособия
+      log.error("PUT \"/cities/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 
   /**
-   * Обрабатывает GET запрос "/city/allpartial" на получение множества городов,
+   * Обрабатывает DELETE запрос "/cities/{id}" на удаление городе.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @param idCity ID города
+   * @return код ответа, результат обработки запроса
+   */
+  @DeleteMapping(value = "/cities/{id}")
+  public ResponseEntity<?> delete(@PathVariable(name = "id") String idCity) {
+
+    try {
+      cityService.delete(idCity);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    } catch (NotFoundException e) {
+      // Не найден город
+      log.error("DELETE \"/cities/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  /**
+   * Обрабатывает GET запрос "/cities/partial" на получение множества городов,
    * в которых нет учреждений или пособий.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @return множество городов, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/city/allpartial")
-  public ResponseEntity<Set<CityInfo>> getPartialCities() {
+  @GetMapping(value = "/cities/partial")
+  public ResponseEntity<Set<ObjectShortInfo>> readAllPartial() {
 
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(cityService.getAllPartial());
-  }
-
-  /**
-   * Обрабатывает GET запрос "/city/initdata" на получение дополнительных данных для города.
-   * Данные содержат в себе множество кратких информаций о пособиях.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @return дополнительные данные для города, если запрос выполнен успешно, и код ответа
-   */
-  @GetMapping(value = "/city/initdata")
-  public ResponseEntity<CityInitData> getCityInitData() {
-
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(cityService.getInitData());
+        .body(cityService.readAllPartial());
   }
 }
