@@ -7,13 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Объект запроса для добавления администратора
+ * Объект запроса для сохранения администратора, создания или обновления
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminAdd {
+public class AdminSave {
 
   /**
    * Имя администратора
@@ -26,16 +26,4 @@ public class AdminAdd {
    */
   @JsonProperty("email")
   private String email;
-
-  /**
-   * Пароль администратора
-   */
-  @JsonProperty("password")
-  private String password;
-
-  /**
-   * Повторно введенный пароль администратора
-   */
-  @JsonProperty("repeatPassword")
-  private String repeatPassword;
 }

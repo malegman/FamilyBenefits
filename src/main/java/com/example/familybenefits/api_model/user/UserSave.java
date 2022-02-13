@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 import java.util.Set;
 
 /**
- * Объект запроса для добавления пользователя
+ * Объект запроса для сохранения пользователя, создания или обновления
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserAdd {
+public class UserSave {
 
   /**
    * Имя пользователя
@@ -28,18 +28,6 @@ public class UserAdd {
    */
   @JsonProperty("email")
   private String email;
-
-  /**
-   * Пароль пользователя
-   */
-  @JsonProperty("password")
-  private String password;
-
-  /**
-   * Повторно введенный пароль пользователя
-   */
-  @JsonProperty("repeatPassword")
-  private String repeatPassword;
 
   /**
    * Множество дат рождений детей пользователя
