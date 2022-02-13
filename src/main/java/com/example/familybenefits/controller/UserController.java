@@ -1,10 +1,8 @@
 package com.example.familybenefits.controller;
 
-import com.example.familybenefits.api_model.benefit.BenefitInfo;
-import com.example.familybenefits.api_model.user.UserAdd;
 import com.example.familybenefits.api_model.user.UserInfo;
 import com.example.familybenefits.api_model.user.UserInitData;
-import com.example.familybenefits.api_model.user.UserUpdate;
+import com.example.familybenefits.api_model.user.UserSave;
 import com.example.familybenefits.exception.*;
 import com.example.familybenefits.service.s_interface.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Set;
 
 /**
  * Контроллер запросов, связанных с пользователем
@@ -37,66 +33,84 @@ public class UserController {
   }
 
   /**
-   * Обрабатывает POST запрос "/user" на добавление нового пользователя. Регистрация гостя
+   * Обрабатывает POST запрос "/users" на создание пользователя. Регистрация гостя
    * Для незарегистрированного клиента.
-   * @param userAdd объект запроса для добавления пользователя
+   * @param userSave объект запроса для сохранения пользователя
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/user")
-  public ResponseEntity<?> addUser(@RequestBody UserAdd userAdd) {
+  @PostMapping(value = "/users")
+  public ResponseEntity<?> create(@RequestBody UserSave userSave) {
 
-    if (userAdd == null) {
-      log.warn("POST \"/user\": {}", "Request body \"userAdd\" is empty");
+    if (userSave == null) {
+      log.warn("POST \"/users\": {}", "Request body \"userSave\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     try {
-      userService.add(userAdd);
+      userService.create(userSave);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException e) {
       // Не найдены критерии или город
-      log.error("POST \"/user\": {}", e.getMessage());
+      log.error("POST \"/users\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException
         | InvalidEmailException
-        | PasswordNotSafetyException
-        | NotEqualException
         | DateTimeException
         | DateFormatException e) {
       // Администратор или пользователь с указанным email существует.
       // Строка в поле "email" не является email.
-      // Пароль небезопасный.
-      // Пароли не совпадают.
       // Даты позже текущей даты.
       // Даты не соответствуют формату "dd.mm.yyyy".
-      log.error("POST \"/user\": {}", e.getMessage());
+      log.error("POST \"/users\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
   /**
-   * Обрабатывает PUT запрос "/user" на обновление пользователя.
+   * Обрабатывает GET запрос "/users/{id}" на получение информации о пользователе.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
-   * @param userUpdate объект запроса для обновления пользователя
+   * @param idUser ID пользователя
+   * @return информация о пользователе, если запрос выполнен успешно, и код ответа
+   */
+  @GetMapping(value = "/users/{id}")
+  public ResponseEntity<UserInfo> read(@PathVariable(name = "id") String idUser) {
+
+    try {
+      UserInfo userInfo = userService.read(idUser);
+      return ResponseEntity.status(HttpStatus.OK).body(userInfo);
+
+    } catch (NotFoundException e) {
+      // Не найден пользователь
+      log.error("GET \"/users/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  /**
+   * Обрабатывает PUT запрос "/users/{id}" на обновление пользователя.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
+   * @param idUser ID пользователя
+   * @param userSave объект запроса для сохранения пользователя
    * @return код ответа, результат обработки запроса
    */
-  @PutMapping(value = "/user")
-  public ResponseEntity<?> updateUser(@RequestBody UserUpdate userUpdate) {
+  @PutMapping(value = "/users/{id}")
+  public ResponseEntity<?> update(@PathVariable(name = "id") String idUser,
+                                      @RequestBody UserSave userSave) {
 
-    if (userUpdate == null) {
-      log.warn("PUT \"/user\": {}", "Request body \"userUpdate\" is empty");
+    if (userSave == null) {
+      log.warn("PUT \"/users/{id}\": {}", "Request body \"userSave\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     try {
-      userService.update(userUpdate);
+      userService.update(idUser, userSave);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException e) {
       // Не найден пользователь или не найдены критерии или город
-      log.error("PUT \"/user\": {}", e.getMessage());
+      log.error("PUT \"/users/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (InvalidEmailException
@@ -105,19 +119,19 @@ public class UserController {
       // Строка в поле "email" не является email.
       // Даты позже текущей даты.
       // Даты не соответствуют формату "dd.mm.yyyy".
-      log.error("PUT \"/user\": {}", e.getMessage());
+      log.error("PUT \"/users/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
   /**
-   * Обрабатывает DELETE запрос "/user/{id}" на удаление пользователя.
+   * Обрабатывает DELETE запрос "/users/{id}" на удаление пользователя.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
    * @param idUser ID пользователя
    * @return код ответа, результат обработки запроса
    */
-  @DeleteMapping(value = "/user/{id}")
-  public ResponseEntity<?> deleteUser(@PathVariable(name = "id") String idUser) {
+  @DeleteMapping(value = "/users/{id}")
+  public ResponseEntity<?> delete(@PathVariable(name = "id") String idUser) {
 
     try {
       userService.delete(idUser);
@@ -125,63 +139,19 @@ public class UserController {
 
     } catch (NotFoundException e) {
       // Не найден пользователь
-      log.error("DELETE \"/user/{id}\": {}", e.getMessage());
+      log.error("DELETE \"/users/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Обрабатывает GET запрос "/user/{id}" на получение информации о пользователе.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
-   * @param idUser ID пользователя
-   * @return информация о пользователе, если запрос выполнен успешно, и код ответа
-   */
-  @GetMapping(value = "/user/{id}")
-  public ResponseEntity<UserInfo> getUser(@PathVariable(name = "id") String idUser) {
-
-    try {
-      UserInfo userInfo = userService.read(idUser);
-      return ResponseEntity.status(HttpStatus.OK).body(userInfo);
-
-    } catch (NotFoundException e) {
-      // Не найден пользователь
-      log.error("GET \"/user/{id}\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Обрабатывает GET запрос "/user/{id}/benefits" на получение множества предложенных пособий пользователя.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
-   * @return множество предложенных пособий пользователя и код ответа
-   */
-  @GetMapping(value = "/user/{id}/benefits")
-  public ResponseEntity<Set<BenefitInfo>> getUserBenefits(@PathVariable(name = "id") String idUser) {
-
-    try {
-      Set<BenefitInfo> benefitInfoSet = userService.getBenefits(idUser);
-      return ResponseEntity.status(HttpStatus.OK).body(benefitInfoSet);
-
-    } catch (NotFoundException e) {
-      // Не найден пользователь
-      log.error("GET \"/user/{id}/benefits\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-    } catch (DateTimeException e) {
-      // Критерии пользователя устарели
-      log.error("GET \"/user/{id}/benefits\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-  }
-
-  /**
-   * Обрабатывает GET запрос "/user/initdata" на получение дополнительных данных для пользователя.
+   * Обрабатывает GET запрос "/users/init-data" на получение дополнительных данных для пользователя.
    * Данные содержат в себе множества кратких информаций о городах и полных критериях.
    * Выполнить запрос может любой клиент
    * @return дополнительные данные для пользователя и код ответа
    */
-  @GetMapping(value = "/user/initdata")
-  public ResponseEntity<UserInitData> getUserInitData() {
+  @GetMapping(value = "/users/init-data")
+  public ResponseEntity<UserInitData> getInitData() {
 
     return ResponseEntity
         .status(HttpStatus.OK)
