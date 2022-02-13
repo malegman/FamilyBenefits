@@ -1,8 +1,7 @@
 package com.example.familybenefits.controller;
 
-import com.example.familybenefits.api_model.admin.AdminAdd;
+import com.example.familybenefits.api_model.admin.AdminSave;
 import com.example.familybenefits.api_model.admin.AdminInfo;
-import com.example.familybenefits.api_model.admin.AdminUpdate;
 import com.example.familybenefits.exception.*;
 import com.example.familybenefits.service.s_interface.AdminService;
 import lombok.extern.slf4j.Slf4j;
@@ -33,96 +32,39 @@ public class AdminController {
   }
 
   /**
-   * Обрабатывает POST запрос "/admin" на добавление нового администратора.
+   * Обрабатывает POST запрос "/admins" на создание администратора.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_SUPER_ADMIN"
-   * @param adminAdd объект запроса для добавления администратора
+   * @param adminSave объект запроса для сохранения администратора
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/admin")
-  public ResponseEntity<?> addAdmin(@RequestBody AdminAdd adminAdd) {
+  @PostMapping(value = "/admins")
+  public ResponseEntity<?> create(@RequestBody AdminSave adminSave) {
 
-    if (adminAdd == null) {
-      log.warn("POST \"/admin\": {}", "Request body \"adminAdd\" is empty");
+    if (adminSave == null) {
+      log.warn("POST \"/admins\": {}", "Request body \"adminSave\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     try {
-      adminService.add(adminAdd);
+      adminService.create(adminSave);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
-    } catch (AlreadyExistsException | PasswordNotSafetyException | InvalidEmailException | NotEqualException e) {
+    } catch (AlreadyExistsException | InvalidEmailException e) {
       // Администратор или пользователь с указанным email существует.
-      // Пароль небезопасный.
       // Строка в поле "email" не является email.
-      // Пароли не совпадают.
-      log.error("POST \"/admin\": {}", e.getMessage());
+      log.error("POST \"/admins\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
   /**
-   * Обрабатывает PUT запрос "/admin" на обновление администратора.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param adminUpdate объект запроса для обновления администратора
-   * @return код ответа, результат обработки запроса
-   */
-  @PutMapping(value = "/admin")
-  public ResponseEntity<?> updateAdmin(@RequestBody AdminUpdate adminUpdate) {
-
-    if (adminUpdate == null) {
-      log.warn("PUT \"/admin\": {}", "Request body \"adminUpdate\" is empty");
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    try {
-      adminService.update(adminUpdate);
-      return ResponseEntity.status(HttpStatus.CREATED).build();
-
-    } catch (NotFoundException e) {
-      // Не найден администратор
-      log.error("PUT \"/admin\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-    } catch (InvalidEmailException e) {
-      // Строка в поле "email" не является email
-      log.error("PUT \"/admin\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-  }
-
-  /**
-   * Обрабатывает DELETE запрос "/admin/{id}" на удаление администратора.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_SUPER_ADMIN"
-   * @param idAdmin ID администратора
-   * @return код ответа, результат обработки запроса
-   */
-  @DeleteMapping(value = "/admin/{id}")
-  public ResponseEntity<?> deleteAdmin(@PathVariable(name = "id") String idAdmin) {
-
-    try {
-      adminService.delete(idAdmin);
-      return ResponseEntity.status(HttpStatus.CREATED).build();
-
-    } catch (NotFoundException e) {
-      // Не найден администратор
-      log.error("DELETE \"/admin/{id}\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-    } catch (UserRoleException e) {
-      // Администратор имеет роль "ROLE_SUPER_ADMIN"
-      log.error("DELETE \"/admin/{id}\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-  }
-
-  /**
-   * Обрабатывает GET запрос "/admin/{id}" на получение информации об администраторе.
+   * Обрабатывает GET запрос "/admins/{id}" на получение информации об администраторе.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idAdmin ID администратора
    * @return информация об администраторе, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/admin/{id}")
-  public ResponseEntity<AdminInfo> getAdmin(@PathVariable(name = "id") String idAdmin) {
+  @GetMapping(value = "/admins/{id}")
+  public ResponseEntity<AdminInfo> read(@PathVariable(name = "id") String idAdmin) {
 
     try {
       AdminInfo adminInfo = adminService.read(idAdmin);
@@ -130,19 +72,76 @@ public class AdminController {
 
     } catch (NotFoundException e) {
       // Не найден администратор
-      log.error("GET \"/admin/{id}\": {}", e.getMessage());
+      log.error("GET \"/admins/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Обрабатывает POST запрос "/admin/fromuser/{id}" на добавление роли администратора пользователю.
+   * Обрабатывает PUT запрос "/admins/{id}" на обновление администратора.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @param idAdmin ID администратора
+   * @param adminSave объект запроса для сохранения администратора
+   * @return код ответа, результат обработки запроса
+   */
+  @PutMapping(value = "/admins/{id}")
+  public ResponseEntity<?> update(@PathVariable(name = "id") String idAdmin,
+                                  @RequestBody AdminSave adminSave) {
+
+    if (adminSave == null) {
+      log.warn("PUT \"/admins/{id}\": {}", "Request body \"adminSave\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    try {
+      adminService.update(idAdmin, adminSave);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    } catch (NotFoundException e) {
+      // Не найден администратор
+      log.error("PUT \"/admins/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+    } catch (InvalidEmailException e) {
+      // Строка в поле "email" не является email
+      log.error("PUT \"/admins/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+  }
+
+  /**
+   * Обрабатывает DELETE запрос "/admins/{id}" на удаление администратора.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_SUPER_ADMIN"
+   * @param idAdmin ID администратора
+   * @return код ответа, результат обработки запроса
+   */
+  @DeleteMapping(value = "/admins/{id}")
+  public ResponseEntity<?> delete(@PathVariable(name = "id") String idAdmin) {
+
+    try {
+      adminService.delete(idAdmin);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    } catch (NotFoundException e) {
+      // Не найден администратор
+      log.error("DELETE \"/admins/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+    } catch (UserRoleException e) {
+      // Администратор имеет роль "ROLE_SUPER_ADMIN"
+      log.error("DELETE \"/admins/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+  }
+
+  /**
+   * Обрабатывает POST запрос "/admins/from-user/{id}" на добавление роли администратора пользователю.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_SUPER_ADMIN"
    * @param idUser ID пользователя, которому добавляется роль
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/admin/fromuser/{id}")
-  public ResponseEntity<?> adminFromUser(@PathVariable(name = "id") String idUser) {
+  @PostMapping(value = "/admins/from-user/{id}")
+  public ResponseEntity<?> fromUser(@PathVariable(name = "id") String idUser) {
 
     try {
       adminService.fromUser(idUser);
@@ -150,24 +149,24 @@ public class AdminController {
 
     } catch (NotFoundException e) {
       // Не найден пользователь
-      log.error("POST \"/admin/fromuser/{id}\": {}", e.getMessage());
+      log.error("POST \"/admins/from-user/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (UserRoleException e) {
       // Пользователь имеет роль "ROLE_ADMIN" или не имеет роль "ROLE_USER"
-      log.error("POST \"/admin/fromuser/{id}\": {}", e.getMessage());
+      log.error("POST \"/admins/from-user/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
   /**
-   * Обрабатывает POST запрос "/admin/{id}/touser" на добавление роли пользователя администратору.
+   * Обрабатывает POST запрос "/admins/{id}/to-user" на добавление роли пользователя администратору.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_SUPER_ADMIN"
    * @param idAdmin ID администратора, которому добавляется роль
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/admin/{id}/touser")
-  public ResponseEntity<?> adminToUser(@PathVariable(name = "id") String idAdmin) {
+  @PostMapping(value = "/admins/{id}/to-user")
+  public ResponseEntity<?> toUser(@PathVariable(name = "id") String idAdmin) {
 
     try {
       adminService.toUser(idAdmin);
@@ -175,24 +174,24 @@ public class AdminController {
 
     } catch (NotFoundException e) {
       // Не найден администратор
-      log.error("POST \"/admin/{id}/touser\": {}", e.getMessage());
+      log.error("POST \"/admins/{id}/to-user\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (UserRoleException e) {
       // Пользователь имеет роль "ROLE_USER" или не имеет роль "ROLE_ADMIN"
-      log.error("POST \"/admin/{id}/touser\": {}", e.getMessage());
+      log.error("POST \"/admins/{id}/to-user\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
   /**
-   * Обрабатывает POST запрос "/admin/{id}/tosuper" на передачу роли "супер администратора".
+   * Обрабатывает POST запрос "/admins/{id}/to-super" на передачу роли "супер администратора".
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_SUPER_ADMIN"
    * @param idAdmin ID администратора, которому передается роль
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/admin/{id}/tosuper")
-  public ResponseEntity<?> adminToSuper(@PathVariable(name = "id") String idAdmin) {
+  @PostMapping(value = "/admins/{id}/to-super")
+  public ResponseEntity<?> toSuper(@PathVariable(name = "id") String idAdmin) {
 
     try {
       adminService.toSuper(idAdmin);
@@ -200,12 +199,12 @@ public class AdminController {
 
     } catch (NotFoundException e) {
       // Не найден пользователь
-      log.error("POST \"/admin/{id}/tosuper\": {}", e.getMessage());
+      log.error("POST \"/admins/{id}/to-super\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (UserRoleException e) {
       // Администратор имеет роль "ROLE_SUPER_ADMIN"
-      log.error("POST \"/admin/{id}/tosuper\": {}", e.getMessage());
+      log.error("POST \"/admins/{id}/to-super\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
