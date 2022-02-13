@@ -3,9 +3,9 @@ CREATE TABLE family_benefit.user (
   "id" TEXT NOT NULL DEFAULT family_benefit.generate_id(20),
   "name" TEXT NOT NULL,
   "email" TEXT NOT NULL,
-  "date_birth" DATE NOT NULL,
-  "date_select_criterion" DATE NOT NULL,
-  "is_fresh_benefits" BOOLEAN NOT NULL,
+  "date_birth" DATE NULL,
+  "date_select_criterion" DATE NULL,
+  "is_fresh_benefits" BOOLEAN NULL,
   "id_city" TEXT NULL,
 
   CONSTRAINT user_pk PRIMARY KEY ("id"),

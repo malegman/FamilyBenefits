@@ -46,14 +46,14 @@ public class UserEntity extends ObjectEntity {
   /**
    * Дата рождения пользователя
    */
-  @NonNull
+  @Nullable
   @Column(name = "date_birth")
   private LocalDate dateBirth;
 
   /**
    * Дата последнего выбора критерий пользователя
    */
-  @NonNull
+  @Nullable
   @Column(name = "date_select_criterion")
   private LocalDate dateSelectCriterion;
 
