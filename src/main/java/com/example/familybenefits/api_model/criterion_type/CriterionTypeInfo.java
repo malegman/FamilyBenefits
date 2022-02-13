@@ -1,10 +1,10 @@
 package com.example.familybenefits.api_model.criterion_type;
 
-import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-
-import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Информация о типе критерия
@@ -32,10 +32,4 @@ public class CriterionTypeInfo {
    */
   @JsonProperty("info")
   private String info;
-
-  /**
-   * Множество кратких информаций о критериях типа критерия
-   */
-  @JsonProperty("shortCriterionSet")
-  private Set<ObjectShortInfo> shortCriterionSet;
 }
