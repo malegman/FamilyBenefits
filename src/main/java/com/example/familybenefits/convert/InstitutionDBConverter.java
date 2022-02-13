@@ -1,9 +1,8 @@
 package com.example.familybenefits.convert;
 
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
-import com.example.familybenefits.api_model.institution.InstitutionAdd;
+import com.example.familybenefits.api_model.institution.InstitutionSave;
 import com.example.familybenefits.api_model.institution.InstitutionInfo;
-import com.example.familybenefits.api_model.institution.InstitutionUpdate;
 import com.example.familybenefits.dao.entity.BenefitEntity;
 import com.example.familybenefits.dao.entity.CityEntity;
 import com.example.familybenefits.dao.entity.InstitutionEntity;
@@ -17,54 +16,27 @@ import java.util.stream.Collectors;
 public class InstitutionDBConverter {
 
   /**
-   * Преобразует объект запроса на добавление учреждения в модель таблицы "institution", обрабатывая строковые поля для БД
-   * @param institutionAdd объект запроса на добавление учреждения
+   * Преобразует объект запроса на сохранение учреждения в модель таблицы "institution", обрабатывая строковые поля для БД
+   * @param institutionSave объект запроса на сохранение учреждения
    * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "institution"
    */
-  static public InstitutionEntity fromAdd(InstitutionAdd institutionAdd, Function<String, String> prepareDBFunc) {
+  static public InstitutionEntity fromSave(InstitutionSave institutionSave, Function<String, String> prepareDBFunc) {
 
-    if (institutionAdd == null) {
+    if (institutionSave == null) {
       return new InstitutionEntity();
     }
 
     return InstitutionEntity
         .builder()
-        .name(prepareDBFunc.apply(institutionAdd.getName()))
-        .address(prepareDBFunc.apply(institutionAdd.getAddress()))
-        .info(prepareDBFunc.apply(institutionAdd.getInfo()))
-        .phone(prepareDBFunc.apply(institutionAdd.getPhone()))
-        .schedule(prepareDBFunc.apply(institutionAdd.getSchedule()))
-        .cityEntity(new CityEntity(prepareDBFunc.apply(institutionAdd.getIdCity())))
-        .benefitEntitySet(institutionAdd.getIdBenefitSet()
-                              .stream()
-                              .map(id -> new BenefitEntity(prepareDBFunc.apply(id)))
-                              .collect(Collectors.toSet()))
-        .build();
-  }
-
-  /**
-   * Преобразует объект запроса на обновление учреждения в модель таблицы "institution", обрабатывая строковые поля для БД
-   * @param institutionUpdate объект запроса на обновление учреждения
-   * @param prepareDBFunc функция обработки строки для БД
-   * @return модель таблицы "institution"
-   */
-  static public InstitutionEntity fromUpdate(InstitutionUpdate institutionUpdate, Function<String, String> prepareDBFunc) {
-
-    if (institutionUpdate == null) {
-      return new InstitutionEntity();
-    }
-
-    return InstitutionEntity
-        .builder()
-        .id(prepareDBFunc.apply(institutionUpdate.getId()))
-        .name(prepareDBFunc.apply(institutionUpdate.getName()))
-        .address(prepareDBFunc.apply(institutionUpdate.getAddress()))
-        .info(prepareDBFunc.apply(institutionUpdate.getInfo()))
-        .phone(prepareDBFunc.apply(institutionUpdate.getPhone()))
-        .schedule(prepareDBFunc.apply(institutionUpdate.getSchedule()))
-        .cityEntity(new CityEntity(prepareDBFunc.apply(institutionUpdate.getIdCity())))
-        .benefitEntitySet(institutionUpdate.getIdBenefitSet()
+        .name(prepareDBFunc.apply(institutionSave.getName()))
+        .address(prepareDBFunc.apply(institutionSave.getAddress()))
+        .info(prepareDBFunc.apply(institutionSave.getInfo()))
+        .phone(prepareDBFunc.apply(institutionSave.getPhone()))
+        .email(prepareDBFunc.apply(institutionSave.getEmail()))
+        .schedule(prepareDBFunc.apply(institutionSave.getSchedule()))
+        .cityEntity(new CityEntity(prepareDBFunc.apply(institutionSave.getIdCity())))
+        .benefitEntitySet(institutionSave.getIdBenefitSet()
                               .stream()
                               .map(id -> new BenefitEntity(prepareDBFunc.apply(id)))
                               .collect(Collectors.toSet()))
@@ -91,11 +63,7 @@ public class InstitutionDBConverter {
         .phone(institutionEntity.getPhone())
         .email(institutionEntity.getEmail())
         .schedule(institutionEntity.getSchedule())
-        .shortCity(CityDBConverter.toShortInfo(institutionEntity.getCityEntity()))
-        .shortBenefitSet(institutionEntity.getBenefitEntitySet()
-                             .stream()
-                             .map(BenefitDBConverter::toShortInfo)
-                             .collect(Collectors.toSet()))
+        .nameCity(institutionEntity.getCityEntity().getName())
         .build();
   }
 

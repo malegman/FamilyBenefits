@@ -1,13 +1,11 @@
 package com.example.familybenefits.convert;
 
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
-import com.example.familybenefits.api_model.criterion_type.CriterionTypeAdd;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
-import com.example.familybenefits.api_model.criterion_type.CriterionTypeUpdate;
+import com.example.familybenefits.api_model.criterion_type.CriterionTypeSave;
 import com.example.familybenefits.dao.entity.CriterionTypeEntity;
 
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Класс преобразования модели таблицы "criterion_type" в другие объекты и получения из других объектов, обрабатывая строковые поля для БД.
@@ -15,41 +13,21 @@ import java.util.stream.Collectors;
 public class CriterionTypeDBConverter {
 
   /**
-   * Преобразует объект запроса на добавление типа критерия в модель таблицы "criterion_type", обрабатывая строковые поля для БД
-   * @param criterionTypeAdd объект запроса на добавление типа критерия
+   * Преобразует объект запроса на сохранение типа критерия в модель таблицы "criterion_type", обрабатывая строковые поля для БД
+   * @param criterionTypeSave объект запроса на сохранение типа критерия
    * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "criterion_type"
    */
-  static public CriterionTypeEntity fromAdd(CriterionTypeAdd criterionTypeAdd, Function<String, String> prepareDBFunc) {
+  static public CriterionTypeEntity fromSave(CriterionTypeSave criterionTypeSave, Function<String, String> prepareDBFunc) {
 
-    if (criterionTypeAdd == null) {
+    if (criterionTypeSave == null) {
       return new CriterionTypeEntity();
     }
 
     return CriterionTypeEntity
         .builder()
-        .name(prepareDBFunc.apply(criterionTypeAdd.getName()))
-        .info(prepareDBFunc.apply(criterionTypeAdd.getInfo()))
-        .build();
-  }
-
-  /**
-   * Преобразует объект запроса на обновление типа критерия в модель таблицы "criterion_type", обрабатывая строковые поля для БД
-   * @param criterionTypeUpdate объект запроса на обновление типа критерия
-   * @param prepareDBFunc функция обработки строки для БД
-   * @return модель таблицы "criterion_type"
-   */
-  static public CriterionTypeEntity fromUpdate(CriterionTypeUpdate criterionTypeUpdate, Function<String, String> prepareDBFunc) {
-
-    if (criterionTypeUpdate == null) {
-      return new CriterionTypeEntity();
-    }
-
-    return CriterionTypeEntity
-        .builder()
-        .id(prepareDBFunc.apply(criterionTypeUpdate.getId()))
-        .name(prepareDBFunc.apply(criterionTypeUpdate.getName()))
-        .info(prepareDBFunc.apply(criterionTypeUpdate.getInfo()))
+        .name(prepareDBFunc.apply(criterionTypeSave.getName()))
+        .info(prepareDBFunc.apply(criterionTypeSave.getInfo()))
         .build();
   }
 
@@ -69,10 +47,6 @@ public class CriterionTypeDBConverter {
         .id(criterionTypeEntity.getId())
         .name(criterionTypeEntity.getName())
         .info(criterionTypeEntity.getInfo())
-        .shortCriterionSet(criterionTypeEntity.getCriterionEntitySet()
-                               .stream()
-                               .map(CriterionDBConverter::toShortInfo)
-                               .collect(Collectors.toSet()))
         .build();
   }
 
