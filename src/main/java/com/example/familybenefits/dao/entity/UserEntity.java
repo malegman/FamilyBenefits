@@ -7,7 +7,6 @@ import org.springframework.lang.Nullable;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Модель записи таблицы "user"
@@ -43,19 +42,6 @@ public class UserEntity extends ObjectEntity {
   @NonNull
   @Column(name = "email")
   private String email;
-
-  /**
-   * Флаг подтверждения почты
-   */
-  @Column(name = "is_verified_email")
-  private boolean isVerifiedEmail;
-
-  /**
-   * Пароль пользователя
-   */
-  @NonNull
-  @Column(name = "password")
-  private String password;
 
   /**
    * Дата рождения пользователя
@@ -175,13 +161,5 @@ public class UserEntity extends ObjectEntity {
     if (roleEntityToRemove != null) {
       roleEntitySet.remove(roleEntityToRemove);
     }
-  }
-
-  /**
-   * Шифрует пароль пользователя указанной функцией шифрования
-   * @param encryptFunc функция шифрования
-   */
-  public void encryptPassword(Function<String, String> encryptFunc) {
-    password = encryptFunc.apply(password);
   }
 }
