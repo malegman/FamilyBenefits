@@ -1,9 +1,9 @@
 package com.example.familybenefits.controller;
 
-import com.example.familybenefits.api_model.criterion.CriterionAdd;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
+import com.example.familybenefits.api_model.criterion.CriterionSave;
 import com.example.familybenefits.api_model.criterion.CriterionInfo;
 import com.example.familybenefits.api_model.criterion.CriterionInitData;
-import com.example.familybenefits.api_model.criterion.CriterionUpdate;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.service.s_interface.CriterionService;
@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -37,88 +38,60 @@ public class CriterionController {
   }
 
   /**
-   * Обрабатывает POST запрос "/criterion" на добавление нового критерия.
+   * Обрабатывает GET запрос "/criteria" на получение множества критерий,
+   * в которых есть пособия.
+   * Фильтр по ID пособия или типа критерия.
+   * Выполнить запрос может любой клиент
+   * @param idBenefit ID пособия
+   * @param idCriterionType ID типа критерия
+   * @return множество критерий, если запрос выполнен успешно, и код ответа
+   */
+  @GetMapping(value = "/criteria")
+  public ResponseEntity<Set<ObjectShortInfo>> readAllFilter(@RequestParam(name = "idBenefit", required = false) String idBenefit,
+                                                          @RequestParam(name = "idCriterionType", required = false) String idCriterionType) {
+
+    Set<ObjectShortInfo> criterionShortInfoSet = criterionService.readAllFilter(idBenefit, idCriterionType);
+    return ResponseEntity.status(HttpStatus.OK).body(criterionShortInfoSet);
+  }
+
+  /**
+   * Обрабатывает POST запрос "/criteria" на создание критерия.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param criterionAdd объект запроса для добавления критерия
+   * @param criterionSave объект запроса для сохранения критерия
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/criterion")
-  public ResponseEntity<?> addCriterion(@RequestBody CriterionAdd criterionAdd) {
+  @PostMapping(value = "/criteria")
+  public ResponseEntity<?> create(@RequestBody CriterionSave criterionSave) {
 
-    if (criterionAdd == null) {
-      log.warn("POST \"/criterion\": {}", "Request body \"criterionAdd\" is empty");
+    if (criterionSave == null) {
+      log.warn("POST \"/criteria\": {}", "Request body \"criterionSave\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     try {
-      criterionService.add(criterionAdd);
+      criterionService.create(criterionSave);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException e) {
       // Не найден тип критерия
-      log.error("POST \"/criterion\": {}", e.getMessage());
+      log.error("POST \"/criteria\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException e) {
       // Критерий с указанным названием существует
-      log.error("POST \"/criterion\": {}", e.getMessage());
+      log.error("POST \"/criteria\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
   /**
-   * Обрабатывает PUT запрос "/criterion" на обновление критерия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param criterionUpdate объект запроса для обновления критерия
-   * @return код ответа, результат обработки запроса
-   */
-  @PutMapping(value = "/criterion")
-  public ResponseEntity<?> updateCriterion(@RequestBody CriterionUpdate criterionUpdate) {
-
-    if (criterionUpdate == null) {
-      log.warn("PUT \"/criterion\": {}", "Request body \"criterionUpdate\" is empty");
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    try {
-      criterionService.update(criterionUpdate);
-      return ResponseEntity.status(HttpStatus.CREATED).build();
-
-    } catch (NotFoundException e) {
-      // Не найден критерий или тип критерия
-      log.error("PUT \"/criterion\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Обрабатывает DELETE запрос "/criterion/{id}" на удаление критерия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param idCriterion ID критерия
-   * @return код ответа, результат обработки запроса
-   */
-  @DeleteMapping(value = "/criterion/{id}")
-  public ResponseEntity<?> deleteCriterion(@PathVariable(name = "id") String idCriterion) {
-
-    try {
-      criterionService.delete(idCriterion);
-      return ResponseEntity.status(HttpStatus.CREATED).build();
-
-    } catch (NotFoundException e) {
-      // Не найден критерий
-      log.error("DELETE \"/criterion/{id}\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Обрабатывает GET запрос "/criterion/{id}" на получение информации о критерии.
+   * Обрабатывает GET запрос "/criteria/{id}" на получение информации о критерии.
    * Выполнить запрос может любой клиент
    * @param idCriterion ID критерия
    * @return информация о критерии, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/criterion/{id}")
-  public ResponseEntity<CriterionInfo> getCriterion(@PathVariable(name = "id") String idCriterion) {
+  @GetMapping(value = "/criteria/{id}")
+  public ResponseEntity<CriterionInfo> read(@PathVariable(name = "id") String idCriterion) {
 
     try {
       CriterionInfo criterionInfo = criterionService.read(idCriterion);
@@ -126,50 +99,103 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найден критерий
-      log.error("GET \"/criterion/{id}\": {}", e.getMessage());
+      log.error("GET \"/criteria/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Обрабатывает GET запрос "/criterion/all" на получение множества критерий,
-   * в которых есть пособия.
-   * Выполнить запрос может любой клиент
-   * @return множество критерий, если запрос выполнен успешно, и код ответа
+   * Обрабатывает PUT запрос "/criteria/{id}" на обновление критерия.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @param idCriterion ID критерия
+   * @param criterionSave объект запроса для сохранения критерия
+   * @return код ответа, результат обработки запроса
    */
-  @GetMapping(value = "/criterion/all")
-  public ResponseEntity<Set<CriterionInfo>> getCriteria() {
+  @PutMapping(value = "/criteria/{id}")
+  public ResponseEntity<?> update(@PathVariable(name = "id") String idCriterion,
+                                  @RequestBody CriterionSave criterionSave) {
 
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(criterionService.getAll());
+    if (criterionSave == null) {
+      log.warn("PUT \"/criteria/{id}\": {}", "Request body \"criterionSave\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    try {
+      criterionService.update(idCriterion, criterionSave);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    } catch (NotFoundException e) {
+      // Не найден критерий или тип критерия
+      log.error("PUT \"/criteria/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 
   /**
-   * Обрабатывает GET запрос "/criterion/allpartial" на получение множества критерий,
+   * Обрабатывает DELETE запрос "/criteria/{id}" на удаление критерия.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @param idCriterion ID критерия
+   * @return код ответа, результат обработки запроса
+   */
+  @DeleteMapping(value = "/criteria/{id}")
+  public ResponseEntity<?> delete(@PathVariable(name = "id") String idCriterion) {
+
+    try {
+      criterionService.delete(idCriterion);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    } catch (NotFoundException e) {
+      // Не найден критерий
+      log.error("DELETE \"/criteria/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  /**
+   * Обрабатывает GET запрос "/criteria/partial" на получение множества критерий,
    * в которых нет пособий.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @return множество критерий, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/criterion/allpartial")
-  public ResponseEntity<Set<CriterionInfo>> getPartialCriteria() {
+  @GetMapping(value = "/criteria/partial")
+  public ResponseEntity<Set<ObjectShortInfo>> readAllPartial() {
 
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(criterionService.getAllPartial());
+        .body(criterionService.readAllPartial());
   }
 
   /**
-   * Обрабатывает GET запрос "/criterion/initdata" на получение дополнительных данных для критерия.
+   * Обрабатывает GET запрос "/criteria/init-data" на получение дополнительных данных для критерия.
    * Данные содержат в себе множество кратких информаций о типах критерий
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @return дополнительные данные для критерия, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/criterion/initdata")
-  public ResponseEntity<CriterionInitData> getCriterionInitData() {
+  @GetMapping(value = "/criteria/init-data")
+  public ResponseEntity<CriterionInitData> getInitData() {
 
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(criterionService.getInitData());
+  }
+
+  /**
+   * Обрабатывает GET запрос "/criteria/user/{idUser}" на получение критерий пользователя.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
+   * @param idUser ID пользователя
+   * @return информация о пособии, если запрос выполнен успешно, и код ответа
+   */
+  @GetMapping(value = "/criteria/user/{idUser}")
+  public ResponseEntity<Set<ObjectShortInfo>> readAllOfUser(@PathVariable(name = "idUser") String idUser) {
+
+    try {
+      Set<ObjectShortInfo> criterionShortInfoSet = criterionService.readAllOfUser(idUser);
+      return ResponseEntity.status(HttpStatus.OK).body(criterionShortInfoSet);
+
+    } catch (NotFoundException e) {
+      // Не найден пользователь
+      log.error("GET \"/benefits/user/{idUser}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
+    }
   }
 }
