@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 /**
- * Объект запроса для добавления типа критерия
+ * Объект запроса для сохранения типа критерия, создания или обновления
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CriterionTypeAdd {
+public class CriterionTypeSave {
 
   /**
    * Название типа критерия

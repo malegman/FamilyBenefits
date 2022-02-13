@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 import java.util.Set;
 
 /**
- * Объект запроса для добавления учреждения
+ * Объект запроса для сохранения учреждения, создания или обновления
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InstitutionAdd {
+public class InstitutionSave {
 
   /**
    * Название учреждения

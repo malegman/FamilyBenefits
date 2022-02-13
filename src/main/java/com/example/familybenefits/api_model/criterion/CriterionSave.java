@@ -7,13 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Объект запроса для добавления критерия
+ * Объект запроса для сохранения критерия, создания или обновления
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CriterionAdd {
+public class CriterionSave {
 
   /**
    * Название критерия
@@ -28,7 +28,7 @@ public class CriterionAdd {
   private String info;
 
   /**
-   * ID типа критерия критерия
+   * ID типа критерия данного критерия
    */
   @JsonProperty("idCriterionType")
   private String idCriterionType;
