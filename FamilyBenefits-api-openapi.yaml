@@ -16,10 +16,10 @@ tags:
     description: Получение и изменение администратора
   - name: city
     description: Получение и изменение города
-  - name: benefit
-    description: Получение и изменение пособия
   - name: institution
     description: Получение и изменение учреждения
+  - name: benefit
+    description: Получение и изменение пособия
   - name: criterion
     description: Получение и изменение критерия
   - name: criterion type
@@ -553,18 +553,45 @@ paths:
     get:
       tags:
         - city
-      summary: Возвращает множество городов, в которых есть учреждения и пособия
+      summary:
+        Возвращает множество городов, в которых есть учреждения и пособия.
+        Фильтр по названию или ID пособия.
       description:
         Возвращает множество городов, в которых есть учреждения и пособия.
+        Фильтр по названию или ID пособия.
+      parameters:
+        - name: name
+          in: query
+          description: Название города
+          schema:
+            type: string
+            example: name
+          required: false
+        - name: idBenefit
+          in: query
+          description: ID пособия
+          schema:
+            type: string
+            example: td56387fhj
+          required: false
       responses:
         '200':
           description: Множество городов получено
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
+                anyOf:
+                  - description: Если есть параметр названия, один город
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/CityInfo'
+                  - description: Если нет параметра названия, множество городов
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Город с указанным названием или пособие с указанным ID не найдены
+          content: { }
       security: [ ]
   /cities/{id}:
     get:
@@ -686,60 +713,6 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /cities/findByName:
-    get:
-      tags:
-        - city
-      summary: Возвращает информацию о городе по названию
-      description:
-        Возвращает информацию о городе по названию.
-      parameters:
-        - name: name
-          in: query
-          description: Название города
-          schema:
-            type: string
-            example: name
-          required: true
-      responses:
-        '200':
-          description: Данные о городе получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CityInfo'
-        '404':
-          description: Город с указанным названием не найден
-          content: { }
-      security: [ ]
-  /cities/findByIdBenefit:
-    get:
-      tags:
-        - city
-      summary: Возвращает множество городов по ID пособия
-      description:
-        Возвращает множество городов по ID пособия.
-      parameters:
-        - name: idBenefit
-          in: query
-          description: ID пособия
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '200':
-          description: Данные о городах получены
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Пособие с указанным ID не найдено
-          content: { }
-      security: [ ]
 
 
   /institutions:
@@ -775,9 +748,27 @@ paths:
     get:
       tags:
         - institution
-      summary: Возвращает множество учреждений, в которых есть пособия
+      summary:
+        Возвращает множество учреждений, в которых есть пособия.
+        Фильтр по ID города или учреждения.
       description:
         Возвращает множество учреждений, в которых есть пособия.
+        Фильтр по ID города или учреждения.
+      parameters:
+        - name: idCity
+          in: query
+          description: ID города
+          schema:
+            type: string
+            example: td56387fhj
+          required: false
+        - name: idBenefit
+          in: query
+          description: ID пособия
+          schema:
+            type: string
+            example: td56387fhj
+          required: false
       responses:
         '200':
           description: Множество учреждений получено
@@ -787,6 +778,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Не найдены город или пособие с указанным ID
+          content: { }
       security: [ ]
   /institutions/{id}:
     get:
@@ -934,62 +928,6 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /institutions/findByIdCity:
-    get:
-      tags:
-        - institution
-      summary: Возвращает множество учреждений по ID города
-      description:
-        Возвращает множество учреждений по ID города.
-      parameters:
-        - name: idCity
-          in: query
-          description: ID города
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '200':
-          description: Данные об учреждениях получены
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Город с указанным ID не найдено
-          content: { }
-      security: [ ]
-  /institutions/findByIdBenefit:
-    get:
-      tags:
-        - institution
-      summary: Возвращает множество учреждений по ID пособия
-      description:
-        Возвращает множество учреждений по ID пособия.
-      parameters:
-        - name: idBenefit
-          in: query
-          description: ID пособия
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '200':
-          description: Данные об учреждениях получены
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Пособие с указанным ID не найдено
-          content: { }
-      security: [ ]
 
 
   /benefits:
@@ -1025,9 +963,34 @@ paths:
     get:
       tags:
         - benefit
-      summary: Возвращает множество пособий, в которых есть города, учреждения и критерии
+      summary:
+        Возвращает множество пособий, в которых есть города, учреждения и критерии.
+        Фильтр по ID города, учреждения или критерия.
       description:
         Возвращает множество пособий, в которых есть города, учреждения и критерии.
+        Фильтр по ID города, учреждения или критерия.
+      parameters:
+        - name: idCity
+          in: query
+          description: ID города
+          schema:
+            type: string
+            example: td56387fhj
+          required: false
+        - name: idInstitution
+          in: query
+          description: ID учреждения
+          schema:
+            type: string
+            example: td56387fhj
+          required: false
+        - name: idCriterion
+          in: query
+          description: ID критерия
+          schema:
+            type: string
+            example: td56387fhj
+          required: false
       responses:
         '200':
           description: Множество пособий получено
@@ -1037,6 +1000,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Не найдены город, учреждение или критерий с указанным ID
+          content: { }
       security: [ ]
   /benefits/{id}:
     get:
@@ -1183,18 +1149,18 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /benefits/findByIdUser:
+  /benefits/user/{idUser}:
     get:
       tags:
         - benefit
-      summary: Возвращает множество предложенных пособий пользователя
+      summary: Возвращает множество предложенных пособий пользователя по его ID
       description:
-        Возвращает множество предложенных пособий.
+        Возвращает множество предложенных пособий пользователя по его ID.
         Для пользователя.
         Необходима авторизация.
       parameters:
         - name: idUser
-          in: query
+          in: path
           description: ID пользователя
           schema:
             type: string
@@ -1223,90 +1189,6 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /benefits/findByIdCity:
-    get:
-      tags:
-        - benefit
-      summary: Возвращает множество пособий по ID города
-      description:
-        Возвращает множество пособий по ID города.
-      parameters:
-        - name: idCity
-          in: query
-          description: ID города
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '200':
-          description: Множество пособий получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Не найден город с указанным ID
-          content: { }
-      security: [ ]
-  /benefits/findByIdInstitution:
-    get:
-      tags:
-        - benefit
-      summary: Возвращает множество пособий по ID учреждения
-      description:
-        Возвращает множество пособий по ID учреждения.
-      parameters:
-        - name: idInstitution
-          in: query
-          description: ID учреждения
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '200':
-          description: Множество пособий получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Не найдено учреждение с указанным ID
-          content: { }
-      security: [ ]
-  /benefits/findByIdCriterion:
-    get:
-      tags:
-        - benefit
-      summary: Возвращает множество пособий по ID критерия
-      description:
-        Возвращает множество пособий по ID критерия.
-      parameters:
-        - name: idCriterion
-          in: query
-          description: ID критерия
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '200':
-          description: Множество пособий получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Не найден критерий с указанным ID
-          content: { }
-      security: [ ]
 
 
   /criteria:
@@ -1342,9 +1224,27 @@ paths:
     get:
       tags:
         - criterion
-      summary: Возвращает множество критерий, в которых есть пособия
+      summary:
+        Возвращает множество критерий, в которых есть пособия.
+        Фильтр по ID пособия или типа критерия.
       description:
-        Возвращает множество критерий, в которых есть пособия
+        Возвращает множество критерий, в которых есть пособия.
+        Фильтр по ID пособия или типа критерия.
+      parameters:
+        - name: idBenefit
+          in: query
+          description: ID пособия
+          schema:
+            type: string
+            example: td56387fhj
+          required: false
+        - name: idCriterionType
+          in: query
+          description: ID типа критерия
+          schema:
+            type: string
+            example: td56387fhj
+          required: false
       responses:
         '200':
           description: Множество всех критерий получено
@@ -1354,6 +1254,9 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Не найдены пособие или тип критерия с указанным ID
+          content: { }
       security: [ ]
   /criteria/{id}:
     get:
@@ -1500,18 +1403,18 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /criteria/findByIdUser:
+  /criteria/user/{idUser}:
     get:
       tags:
         - criterion
-      summary: Возвращает множество критерий пользователя
+      summary: Возвращает множество критерий пользователя по его ID
       description:
-        Возвращает множество критерий пользователя.
+        Возвращает множество критерий пользователя по его ID.
         Для пользователя.
         Необходима авторизация.
       parameters:
         - name: idUser
-          in: query
+          in: path
           description: ID пользователя
           schema:
             type: string
@@ -1537,62 +1440,6 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /criteria/findByIdBenefit:
-    get:
-      tags:
-        - criterion
-      summary: Возвращает множество критерий по ID пособия
-      description:
-        Возвращает множество критерий по ID пособия.
-      parameters:
-        - name: idBenefit
-          in: query
-          description: ID пособия
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '200':
-          description: Множество критерий получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Не найдено пособие с указанным ID
-          content: { }
-      security: [ ]
-  /criteria/findByIdCriterionType:
-    get:
-      tags:
-        - criterion
-      summary: Возвращает множество критерий по ID типа критерия
-      description:
-        Возвращает множество критерий по ID типа критерия.
-      parameters:
-        - name: idCriterionType
-          in: query
-          description: ID типа критерия
-          schema:
-            type: string
-            example: td56387fhj
-          required: true
-      responses:
-        '200':
-          description: Множество критерий получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Не найден тип критерия с указанным ID
-          content: { }
-      security: [ ]
 
 
   /criterion-types:
@@ -1628,19 +1475,36 @@ paths:
     get:
       tags:
         - criterion type
-      summary: Возвращает множество типов критерия, в которых есть критерии
+      summary:
+        Возвращает множество типов критерия, в которых есть критерии.
       description:
-        Возвращает множество типов критерия, в которых есть критерии
-      operationId: getCriterionTypes
+        Возвращает множество типов критерия, в которых есть критерии.
+      parameters:
+        - name: name
+          in: query
+          description: Название типа критерия
+          schema:
+            type: string
+            example: name
+          required: false
       responses:
         '200':
           description: Множество типов критерия получено
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
+                anyOf:
+                  - description: Если есть параметр названия, один тип критерия
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/CriterionTypeInfo'
+                  - description: Если нет параметра названия, множество типов критерия
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Тип критерия с указанным названием не найден
+          content: { }
       security: [ ]
   /criterion-types/{id}:
     get:
@@ -1762,32 +1626,6 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /criterion-types/findByName:
-    get:
-      tags:
-        - criterion type
-      summary: Возвращает информацию о типе критерия по названию
-      description:
-        Возвращает информацию о типе критерия по названию.
-      parameters:
-        - name: name
-          in: query
-          description: Название типа критерия
-          schema:
-            type: string
-            example: name
-          required: true
-      responses:
-        '200':
-          description: Данные о типе критерия получены
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CityInfo'
-        '404':
-          description: Тип критерия с указанным названием не найден
-          content: { }
-      security: [ ]
 
 
 components:
