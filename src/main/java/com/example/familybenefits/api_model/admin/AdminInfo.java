@@ -36,12 +36,6 @@ public class AdminInfo {
   private String email;
 
   /**
-   * Статус почты, true, если подтверждена
-   */
-  @JsonProperty("isVerifiedEmail")
-  private boolean isVerifiedEmail;
-
-  /**
    * Множество названий ролей администратора
    */
   @JsonProperty("nameRoleSet")
