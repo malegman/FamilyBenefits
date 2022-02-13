@@ -3,6 +3,8 @@ package com.example.familybenefits.api_model.system;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.math.BigInteger;
+
 /**
  * Объект запроса пользователя для входа в систему
  */
@@ -19,8 +21,8 @@ public class LoginRequest {
   private String email;
 
   /**
-   * Пароль пользователя
+   * Код пользователя для входа в систему
    */
-  @JsonProperty("password")
-  private String password;
+  @JsonProperty("loginCode")
+  private BigInteger loginCode;
 }
