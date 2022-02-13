@@ -6,16 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
-
 /**
- * Объект запроса для добавления города
+ * Объект запроса для сохранения города, создания или обновления
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CityAdd {
+public class CitySave {
 
   /**
    * Название города
@@ -28,10 +26,4 @@ public class CityAdd {
    */
   @JsonProperty("info")
   private String info;
-
-  /**
-   * Множество ID пособий города
-   */
-  @JsonProperty("idBenefitSet")
-  private Set<String> idBenefitSet;
 }
