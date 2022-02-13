@@ -1,18 +1,19 @@
 package com.example.familybenefits.service.implementation;
 
-import com.example.familybenefits.api_model.admin.AdminAdd;
 import com.example.familybenefits.api_model.admin.AdminInfo;
-import com.example.familybenefits.api_model.admin.AdminUpdate;
+import com.example.familybenefits.api_model.admin.AdminSave;
 import com.example.familybenefits.convert.AdminDBConverter;
 import com.example.familybenefits.dao.entity.UserEntity;
 import com.example.familybenefits.dao.repository.UserRepository;
-import com.example.familybenefits.exception.*;
+import com.example.familybenefits.exception.AlreadyExistsException;
+import com.example.familybenefits.exception.InvalidEmailException;
+import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.exception.UserRoleException;
 import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import com.example.familybenefits.security.service.s_interface.UserSecurityService;
 import com.example.familybenefits.service.s_interface.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,103 +35,108 @@ public class AdminServiceFB implements AdminService {
    * Интерфейс сервиса, отвечающего за данные пользователя
    */
   private final UserSecurityService userSecurityService;
-  /**
-   * Интерфейс сервиса для шифрования паролей
-   */
-  private final PasswordEncoder passwordEncoder;
 
   /**
    * Конструктор для инициализации интерфейсов репозиториев и сервисов
    * @param userRepository репозиторий, работающий с моделью таблицы "user"
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
    * @param userSecurityService интерфейс сервиса, отвечающего за данные пользователя
-   * @param passwordEncoder интерфейс сервиса для шифрования паролей
    */
   @Autowired
   public AdminServiceFB(UserRepository userRepository,
                         DBIntegrityService dbIntegrityService,
-                        UserSecurityService userSecurityService,
-                        PasswordEncoder passwordEncoder) {
+                        UserSecurityService userSecurityService) {
     this.userRepository = userRepository;
     this.dbIntegrityService = dbIntegrityService;
     this.userSecurityService = userSecurityService;
-    this.passwordEncoder = passwordEncoder;
   }
 
   /**
-   * Добавляет администратора по запросу на добавление
-   * @param adminAdd adminAdd объект запроса на добавление администратора
+   * Создает администратора по запросу на сохранение
+   * @param adminSave объект запроса на сохранение администратора
    * @throws AlreadyExistsException если администратор или пользователь с указанным email уже существует
-   * @throws PasswordNotSafetyException если пароль не соответствует политике безопасности
-   * @throws NotEqualException если указанные пароли не эквивалентны
    * @throws InvalidEmailException если указанный "email" не является email
    */
   @Override
-  public void add(AdminAdd adminAdd) throws AlreadyExistsException, PasswordNotSafetyException, NotEqualException, InvalidEmailException {
-
-    // Проверка паролей на эквивалентность и безопасность
-    userSecurityService.checkPasswordElseThrow(
-        adminAdd.getPassword(), adminAdd.getRepeatPassword());
+  public void create(AdminSave adminSave) throws AlreadyExistsException, InvalidEmailException {
 
     // Проверка строки email на соответствие формату email
     userSecurityService.checkEmailElseThrowInvalidEmail(
-        adminAdd.getEmail());
+        adminSave.getEmail());
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    UserEntity userEntityFromAdd = AdminDBConverter
-        .fromAdd(adminAdd, dbIntegrityService::preparePostgreSQLString);
+    UserEntity userEntityFromSave = AdminDBConverter
+        .fromSave(adminSave, dbIntegrityService::preparePostgreSQLString);
 
     // Проверка на существование пользователя или администратора по email
     dbIntegrityService.checkAbsenceByUniqStr(
-        userRepository::existsByEmail, userEntityFromAdd.getEmail());
+        userRepository::existsByEmail, userEntityFromSave.getEmail());
 
     // Передача роли "ROLE_SUPER_ADMIN" новому администратору, если он первый администратор
     UserEntity userEntitySuperAdmin = userRepository.getSuperAdmin();
     if (userEntitySuperAdmin.getEmail().equals(R.DEFAULT_SUPER_ADMIN_EMAIL)) {
-      userEntityFromAdd.addRole(R.ROLE_SUPER_ADMIN);
-      userEntityFromAdd.setId(userEntitySuperAdmin.getId());
+      userEntityFromSave.addRole(R.ROLE_SUPER_ADMIN);
+      userEntityFromSave.setId(userEntitySuperAdmin.getId());
     }
 
-    userEntityFromAdd.addRole(R.ROLE_ADMIN);
-    userEntityFromAdd.setVerifiedEmail(false);
-    userEntityFromAdd.encryptPassword(passwordEncoder::encode);
+    userEntityFromSave.addRole(R.ROLE_ADMIN);
 
-    userRepository.saveAndFlush(userEntityFromAdd);
+    userRepository.saveAndFlush(userEntityFromSave);
   }
 
   /**
-   * Обновляет администратора по запросу на обновление
-   * @param adminUpdate объект запроса на обновление администратора
+   * Возвращает администратора об учреждении по его ID
+   * @param idAdmin ID администратора
+   * @return информация об администраторе
+   * @throws NotFoundException если администратор с данным ID не найдено
+   */
+  @Override
+  public AdminInfo read(String idAdmin) throws NotFoundException {
+
+    String prepareIdAdmin = dbIntegrityService.preparePostgreSQLString(idAdmin);
+
+    // Получение пользователя по его ID, если пользователь существует
+    UserEntity userEntityFromRequest = userRepository.findById(prepareIdAdmin)
+        .orElseThrow(() -> new NotFoundException(String.format(
+            "Administrator with ID \"%s\" not found", idAdmin)));
+
+    // Проверка наличия роли "ROLE_ADMIN" у пользователя
+    userSecurityService.checkHasRoleElseThrowNotFound(
+        userEntityFromRequest, R.ROLE_ADMIN, R.CLIENT_ADMIN);
+
+    return AdminDBConverter.toInfo(userEntityFromRequest);
+  }
+
+  /**
+   * Обновляет администратора по запросу на сохранение
+   * @param idAdmin ID администратора
+   * @param adminSave объект запроса на сохранение администратора
    * @throws NotFoundException если администратор с указанными данными не найден
    * @throws InvalidEmailException если указанный "email" не является email
    */
   @Override
-  public void update(AdminUpdate adminUpdate) throws NotFoundException, InvalidEmailException {
+  public void update(String idAdmin, AdminSave adminSave) throws NotFoundException, InvalidEmailException {
 
     // Проверка строки email на соответствие формату email
     userSecurityService.checkEmailElseThrowInvalidEmail(
-        adminUpdate.getEmail());
+        adminSave.getEmail());
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    UserEntity userEntityFromUpdate = AdminDBConverter
-        .fromUpdate(adminUpdate, dbIntegrityService::preparePostgreSQLString);
+    UserEntity userEntityFromSave = AdminDBConverter
+        .fromSave(adminSave, dbIntegrityService::preparePostgreSQLString);
+
+    String prepareIdAdmin = dbIntegrityService.preparePostgreSQLString(idAdmin);
 
     // Получение пользователя по его ID, если пользователь существует
-    UserEntity userEntityFromDB = userRepository.findById(adminUpdate.getId())
+    UserEntity userEntityFromDB = userRepository.findById(prepareIdAdmin)
         .orElseThrow(() -> new NotFoundException(String.format(
-            "Administrator with ID \"%s\" not found", userEntityFromUpdate.getId())));
+            "Administrator with ID \"%s\" not found", userEntityFromSave.getId())));
 
     // Проверка наличия роли "ROLE_ADMIN" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
         userEntityFromDB, R.ROLE_ADMIN, R.CLIENT_ADMIN);
 
-    // Изменение email и сброс его подтверждения, если новое email
-    if (!userEntityFromUpdate.getEmail().equals(userEntityFromDB.getEmail())) {
-      userEntityFromDB.setVerifiedEmail(false);
-      userEntityFromDB.setEmail(userEntityFromUpdate.getEmail());
-    }
-
-    userEntityFromDB.setName(userEntityFromUpdate.getName());
+    userEntityFromDB.setName(userEntityFromSave.getName());
 
     userRepository.saveAndFlush(userEntityFromDB);
   }
@@ -144,8 +150,10 @@ public class AdminServiceFB implements AdminService {
   @Override
   public void delete(String idAdmin) throws NotFoundException, UserRoleException {
 
+    String prepareIdAdmin = dbIntegrityService.preparePostgreSQLString(idAdmin);
+
     // Получение пользователя по его ID, если пользователь существует
-    UserEntity userEntityFromRequest = userRepository.findById(idAdmin)
+    UserEntity userEntityFromRequest = userRepository.findById(prepareIdAdmin)
         .orElseThrow(() -> new NotFoundException(String.format(
             "Administrator with ID \"%s\" not found", idAdmin)));
 
@@ -162,29 +170,8 @@ public class AdminServiceFB implements AdminService {
       userEntityFromRequest.removeRole(R.ROLE_ADMIN);
       userRepository.saveAndFlush(userEntityFromRequest);
     } else {
-      userRepository.deleteById(idAdmin);
+      userRepository.deleteById(prepareIdAdmin);
     }
-  }
-
-  /**
-   * Возвращает администратора об учреждении по его ID
-   * @param idAdmin ID администратора
-   * @return информация об администраторе
-   * @throws NotFoundException если администратор с данным ID не найдено
-   */
-  @Override
-  public AdminInfo read(String idAdmin) throws NotFoundException {
-
-    // Получение пользователя по его ID, если пользователь существует
-    UserEntity userEntityFromRequest = userRepository.findById(idAdmin)
-        .orElseThrow(() -> new NotFoundException(String.format(
-            "Administrator with ID \"%s\" not found", idAdmin)));
-
-    // Проверка наличия роли "ROLE_ADMIN" у пользователя
-    userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_ADMIN, R.CLIENT_ADMIN);
-
-    return AdminDBConverter.toInfo(userEntityFromRequest);
   }
 
   /**
@@ -196,8 +183,10 @@ public class AdminServiceFB implements AdminService {
   @Override
   public void fromUser(String idUser) throws NotFoundException, UserRoleException {
 
+    String prepareIdUser = dbIntegrityService.preparePostgreSQLString(idUser);
+
     // Получение пользователя по его ID, если пользователь существует
-    UserEntity userEntityFromRequest = userRepository.findById(idUser)
+    UserEntity userEntityFromRequest = userRepository.findById(prepareIdUser)
         .orElseThrow(() -> new NotFoundException(String.format(
             "User with ID \"%s\" not found", idUser)));
 
@@ -223,8 +212,10 @@ public class AdminServiceFB implements AdminService {
   @Override
   public void toUser(String idAdmin) throws NotFoundException, UserRoleException {
 
+    String prepareIdAdmin = dbIntegrityService.preparePostgreSQLString(idAdmin);
+
     // Получение пользователя по его ID, если пользователь существует
-    UserEntity userEntityFromRequest = userRepository.findById(idAdmin)
+    UserEntity userEntityFromRequest = userRepository.findById(prepareIdAdmin)
         .orElseThrow(() -> new NotFoundException(String.format(
             "Administrator with ID \"%s\" not found", idAdmin)));
 
@@ -250,8 +241,10 @@ public class AdminServiceFB implements AdminService {
   @Override
   public void toSuper(String idAdmin) throws NotFoundException, UserRoleException {
 
+    String prepareIdAdmin = dbIntegrityService.preparePostgreSQLString(idAdmin);
+
     // Получение пользователя по его ID, если пользователь существует
-    UserEntity userEntityFromRequest = userRepository.findById(idAdmin)
+    UserEntity userEntityFromRequest = userRepository.findById(prepareIdAdmin)
         .orElseThrow(() -> new NotFoundException(String.format(
             "Administrator with ID \"%s\" not found", idAdmin)));
 

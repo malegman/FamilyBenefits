@@ -1,8 +1,7 @@
 package com.example.familybenefits.service.s_interface;
 
-import com.example.familybenefits.api_model.admin.AdminAdd;
+import com.example.familybenefits.api_model.admin.AdminSave;
 import com.example.familybenefits.api_model.admin.AdminInfo;
-import com.example.familybenefits.api_model.admin.AdminUpdate;
 import com.example.familybenefits.exception.*;
 
 /**
@@ -11,30 +10,12 @@ import com.example.familybenefits.exception.*;
 public interface AdminService {
 
   /**
-   * Добавляет администратора по запросу на добавление
-   * @param adminAdd объект запроса на добавление администратора
+   * Создает администратора по запросу на сохранение
+   * @param adminSave объект запроса на сохранение администратора
    * @throws AlreadyExistsException если администратор или пользователь с указанным email уже существует
-   * @throws PasswordNotSafetyException если пароль не соответствует политике безопасности
-   * @throws NotEqualException если указанные пароли не эквивалентны
    * @throws InvalidEmailException если указанный "email" не является email
    */
-  void add(AdminAdd adminAdd) throws AlreadyExistsException, PasswordNotSafetyException, NotEqualException, InvalidEmailException;
-
-  /**
-   * Обновляет администратора по запросу на обновление
-   * @param adminUpdate объект запроса на обновление администратора
-   * @throws NotFoundException если администратор с указанными данными не найден
-   * @throws InvalidEmailException если указанный "email" не является email
-   */
-  void update(AdminUpdate adminUpdate) throws NotFoundException, InvalidEmailException;
-
-  /**
-   * Удаляет администратора по его ID или удаляет роль "ROLE_ADMIN" у пользователя
-   * @param idAdmin ID администратора
-   * @throws NotFoundException если администратор с указанным ID не найден
-   * @throws UserRoleException если администратор имеет роль "ROLE_SUPER_ADMIN"
-   */
-  void delete(String idAdmin) throws NotFoundException, UserRoleException;
+  void create(AdminSave adminSave) throws AlreadyExistsException, InvalidEmailException;
 
   /**
    * Возвращает администратора об учреждении по его ID
@@ -43,6 +24,23 @@ public interface AdminService {
    * @throws NotFoundException если администратор с данным ID не найден
    */
   AdminInfo read(String idAdmin) throws NotFoundException;
+
+  /**
+   * Обновляет администратора по запросу на сохранение
+   * @param idAdmin ID администратора
+   * @param adminSave объект запроса на сохранение администратора
+   * @throws NotFoundException если администратор с указанными данными не найден
+   * @throws InvalidEmailException если указанный "email" не является email
+   */
+  void update(String idAdmin, AdminSave adminSave) throws NotFoundException, InvalidEmailException;
+
+  /**
+   * Удаляет администратора по его ID или удаляет роль "ROLE_ADMIN" у пользователя
+   * @param idAdmin ID администратора
+   * @throws NotFoundException если администратор с указанным ID не найден
+   * @throws UserRoleException если администратор имеет роль "ROLE_SUPER_ADMIN"
+   */
+  void delete(String idAdmin) throws NotFoundException, UserRoleException;
 
   /**
    * Добавляет роль "ROLE_ADMIN" пользователю
