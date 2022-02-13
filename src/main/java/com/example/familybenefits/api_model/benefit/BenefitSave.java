@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 import java.util.Set;
 
 /**
- * Объект запроса для добавления пособия
+ * Объект запроса для сохранения пособия, создания или обновления
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BenefitAdd {
+public class BenefitSave {
 
   /**
    * Название пособия
@@ -40,12 +40,6 @@ public class BenefitAdd {
    */
   @JsonProperty("idCitySet")
   private Set<String> idCitySet;
-
-  /**
-   * Множество ID учреждений пособия
-   */
-  @JsonProperty("idInstitutionSet")
-  private Set<String> idInstitutionSet;
 
   /**
    * Множество ID критерий пособия
