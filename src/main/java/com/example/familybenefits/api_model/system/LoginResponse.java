@@ -34,10 +34,4 @@ public class LoginResponse {
    */
   @JsonProperty("nameRoleUserSet")
   private Set<String> nameRoleUserSet;
-
-  /**
-   * Токен доступа в формате jwt
-   */
-  @JsonProperty("jwt")
-  private String jwt;
 }
