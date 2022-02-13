@@ -1,13 +1,10 @@
 package com.example.familybenefits.api_model.institution;
 
-import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Set;
 
 /**
  * Информация об учреждении
@@ -61,14 +58,8 @@ public class InstitutionInfo {
   private String schedule;
 
   /**
-   * Краткая информация о городе учреждения
+   * Название города учреждения
    */
-  @JsonProperty("shortCity")
-  private ObjectShortInfo shortCity;
-
-  /**
-   * Множество кратких информаций о пособиях учреждения
-   */
-  @JsonProperty("shortBenefitSet")
-  private Set<ObjectShortInfo> shortBenefitSet;
+  @JsonProperty("nameCity")
+  private String nameCity;
 }
