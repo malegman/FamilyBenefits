@@ -1,10 +1,8 @@
 package com.example.familybenefits.service.implementation;
 
-import com.example.familybenefits.api_model.city.CityAdd;
 import com.example.familybenefits.api_model.city.CityInfo;
-import com.example.familybenefits.api_model.city.CityInitData;
-import com.example.familybenefits.api_model.city.CityUpdate;
-import com.example.familybenefits.convert.BenefitDBConverter;
+import com.example.familybenefits.api_model.city.CitySave;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.convert.CityDBConverter;
 import com.example.familybenefits.dao.entity.BenefitEntity;
 import com.example.familybenefits.dao.entity.CityEntity;
@@ -59,67 +57,51 @@ public class CityServiceFB implements CityService, EntityDBService<CityEntity, C
   }
 
   /**
-   * Добавляет город по запросу на добавление
-   * @param cityAdd объект запроса на добавление города
+   * Возвращает множество городов, в которых есть учреждения и пособия.
+   * Фильтр по названию города и пособию.
+   * В качестве параметра может быть указан null, если данный параметр не участвует в фильтрации
+   * @param nameCity Название города
+   * @param idBenefit ID пособия
+   * @return множество кратких информаций о городах
+   */
+  @Override
+  public Set<ObjectShortInfo> readAllFilter(String nameCity, String idBenefit) {
+
+    return findAllFull()
+        .stream()
+        .filter(cityEntity ->
+                    (nameCity == null || nameCity.equals(cityEntity.getName())
+                    ) && (idBenefit == null || cityEntity.getBenefitEntitySet()
+                        .stream()
+                        .map(BenefitEntity::getId)
+                        .collect(Collectors.toSet())
+                        .contains(idBenefit)))
+        .map(CityDBConverter::toShortInfo)
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * Создает город по запросу на сохранение
+   * @param citySave объект запроса на сохранение города
    * @throws AlreadyExistsException если город с указанным названием уже существует
    * @throws NotFoundException если пособие города с указанным ID не найдено
    */
   @Override
-  public void add(CityAdd cityAdd) throws AlreadyExistsException, NotFoundException {
+  public void create(CitySave citySave) throws AlreadyExistsException, NotFoundException {
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    CityEntity cityEntityFromAdd = CityDBConverter
-        .fromAdd(cityAdd, dbIntegrityService::preparePostgreSQLString);
+    CityEntity cityEntityFromSave = CityDBConverter
+        .fromSave(citySave, dbIntegrityService::preparePostgreSQLString);
 
     // Проверка существования пособий их ID
     dbIntegrityService.checkExistenceById(
-        benefitDBService.getRepository()::existsById, cityEntityFromAdd.getBenefitEntitySet());
+        benefitDBService.getRepository()::existsById, cityEntityFromSave.getBenefitEntitySet());
 
     // Проверка отсутствия города по его названию
     dbIntegrityService.checkAbsenceByUniqStr(
-        cityRepository::existsByName, cityEntityFromAdd.getName());
+        cityRepository::existsByName, cityEntityFromSave.getName());
 
-    cityRepository.saveAndFlush(cityEntityFromAdd);
-  }
-
-  /**
-   * Обновляет город по запросу на обновление
-   * @param cityUpdate объект запроса на обновление города
-   * @throws NotFoundException если город с указанными данными не найден
-   */
-  @Override
-  public void update(CityUpdate cityUpdate) throws NotFoundException {
-
-    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    CityEntity cityEntityFromUpdate = CityDBConverter
-        .fromUpdate(cityUpdate, dbIntegrityService::preparePostgreSQLString);
-
-    // Проверка существования пособий их ID
-    dbIntegrityService.checkExistenceById(
-        benefitDBService.getRepository()::existsById, cityEntityFromUpdate.getBenefitEntitySet());
-
-    // Проверка существование города по его ID
-    dbIntegrityService.checkExistenceById(
-        cityRepository::existsById, cityEntityFromUpdate);
-
-    cityRepository.saveAndFlush(cityEntityFromUpdate);
-  }
-
-  /**
-   * Удаляет город по его ID
-   * @param idCity ID города
-   * @throws NotFoundException если город с указанным ID не найден
-   */
-  @Override
-  public void delete(String idCity) throws NotFoundException {
-
-    String prepareIdCity = dbIntegrityService.preparePostgreSQLString(idCity);
-
-    // Проверка существование города по его ID
-    dbIntegrityService.checkExistenceById(
-        cityRepository::existsById, prepareIdCity);
-
-    cityRepository.deleteById(prepareIdCity);
+    cityRepository.saveAndFlush(cityEntityFromSave);
   }
 
   /**
@@ -142,47 +124,55 @@ public class CityServiceFB implements CityService, EntityDBService<CityEntity, C
   }
 
   /**
-   * Возвращает множество городов, в которых есть учреждения и пособия
-   * @return множество информаций о городах
+   * Обновляет город по запросу на сохранение
+   * @param idCity ID города
+   * @param citySave объект запроса на сохранение города
+   * @throws NotFoundException если город с указанным ID не найден
    */
   @Override
-  public Set<CityInfo> getAll() {
+  public void update(String idCity, CitySave citySave) throws NotFoundException {
 
-    return findAllFull()
-        .stream()
-        .map(CityDBConverter::toInfo)
-        .collect(Collectors.toSet());
+    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
+    CityEntity cityEntityFromSave = CityDBConverter
+        .fromSave(citySave, dbIntegrityService::preparePostgreSQLString);
+
+    String prepareIdCity = dbIntegrityService.preparePostgreSQLString(idCity);
+
+    // Проверка существование города по его ID
+    dbIntegrityService.checkExistenceById(
+        cityRepository::existsById, prepareIdCity);
+
+    cityRepository.saveAndFlush(cityEntityFromSave);
+  }
+
+  /**
+   * Удаляет город по его ID
+   * @param idCity ID города
+   * @throws NotFoundException если город с указанным ID не найден
+   */
+  @Override
+  public void delete(String idCity) throws NotFoundException {
+
+    String prepareIdCity = dbIntegrityService.preparePostgreSQLString(idCity);
+
+    // Проверка существование города по его ID
+    dbIntegrityService.checkExistenceById(
+        cityRepository::existsById, prepareIdCity);
+
+    cityRepository.deleteById(prepareIdCity);
   }
 
   /**
    * Возвращает множество городов, в которых нет учреждений или пособий
-   * @return множество информаций о городах
+   * @return множество кратких информаций о городах
    */
   @Override
-  public Set<CityInfo> getAllPartial() {
+  public Set<ObjectShortInfo> readAllPartial() {
 
     return findAllPartial()
         .stream()
-        .map(CityDBConverter::toInfo)
+        .map(CityDBConverter::toShortInfo)
         .collect(Collectors.toSet());
-  }
-
-  /**
-   * Возвращает дополнительные данные для города.
-   * Данные содержат в себе множества кратких информаций о пособиях
-   * @return дополнительные данные для города
-   */
-  @Override
-  public CityInitData getInitData() {
-
-    return CityInitData
-        .builder()
-        .shortBenefitSet(benefitDBService
-                             .findAllFull()
-                             .stream()
-                             .map(BenefitDBConverter::toShortInfo)
-                             .collect(Collectors.toSet()))
-        .build();
   }
 
   /**
