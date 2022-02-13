@@ -8,8 +8,8 @@ import lombok.*;
 import java.util.Set;
 
 /**
- * Дополнительные данные для добавления или обновления пособия.
- * Содержат в себе множества кратких информаций о городах, учреждениях и полных критериях
+ * Дополнительные данные для создания или обновления пособия.
+ * Содержат в себе множества кратких информаций о городах и полных критериях
  */
 @Data
 @Builder
@@ -22,12 +22,6 @@ public class BenefitInitData {
    */
   @JsonProperty("shortCitySet")
   private Set<ObjectShortInfo> shortCitySet;
-
-  /**
-   * Множество кратких информаций об учреждениях
-   */
-  @JsonProperty("shortInstitutionSet")
-  private Set<ObjectShortInfo> shortInstitutionSet;
 
   /**
    * Множество информаций о критериях
