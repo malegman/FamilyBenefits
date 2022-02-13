@@ -1,9 +1,9 @@
 package com.example.familybenefits.service.s_interface;
 
-import com.example.familybenefits.api_model.institution.InstitutionAdd;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
+import com.example.familybenefits.api_model.institution.InstitutionSave;
 import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.api_model.institution.InstitutionInitData;
-import com.example.familybenefits.api_model.institution.InstitutionUpdate;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 
@@ -15,26 +15,22 @@ import java.util.Set;
 public interface InstitutionService {
 
   /**
-   * Добавляет учреждение по запросу на добавление
-   * @param institutionAdd объект запроса на добавление учреждения
+   * Возвращает множество учреждений, в которых есть пособия.
+   * Фильтр по городу и пособию.
+   * В качестве параметра может быть указан null, если данный параметр не участвует в фильтрации
+   * @param idCity ID города
+   * @param idBenefit ID пособия
+   * @return множество кратких информаций об учреждениях
+   */
+  Set<ObjectShortInfo> readAllFilter(String idCity, String idBenefit);
+
+  /**
+   * Создает учреждение по запросу на сохранение
+   * @param institutionSave объект запроса на сохранение учреждения
    * @throws AlreadyExistsException если учреждение с таким названием уже существует
-   * @throws NotFoundException если город учреждения с указанным ID не найден
+   * @throws NotFoundException если город или пособия с указанными ID не найдены
    */
-  void add(InstitutionAdd institutionAdd) throws AlreadyExistsException, NotFoundException;
-
-  /**
-   * Обновляет учреждение по запросу на обновление
-   * @param institutionUpdate объект запроса на обновление учреждения
-   * @throws NotFoundException если учреждение с указанными данными не найдено
-   */
-  void update(InstitutionUpdate institutionUpdate) throws NotFoundException;
-
-  /**
-   * Удаляет учреждение по его ID
-   * @param idInstitution ID учреждения
-   * @throws NotFoundException если учреждение с указанным ID не найдено
-   */
-  void delete(String idInstitution) throws NotFoundException;
+  void create(InstitutionSave institutionSave) throws AlreadyExistsException, NotFoundException;
 
   /**
    * Возвращает информацию об учреждении по его ID
@@ -45,16 +41,25 @@ public interface InstitutionService {
   InstitutionInfo read(String idInstitution) throws NotFoundException;
 
   /**
-   * Возвращает множество учреждений, в которых есть пособия
-   * @return множество информаций об учреждениях
+   * Обновляет учреждение по запросу на сохранение
+   * @param idInstitution ID учреждения
+   * @param institutionSave объект запроса на сохранение учреждения
+   * @throws NotFoundException если учреждение, город или пособия с указанными ID не найдены
    */
-  Set<InstitutionInfo> getAll();
+  void update(String idInstitution, InstitutionSave institutionSave) throws NotFoundException;
+
+  /**
+   * Удаляет учреждение по его ID
+   * @param idInstitution ID учреждения
+   * @throws NotFoundException если учреждение с указанным ID не найдено
+   */
+  void delete(String idInstitution) throws NotFoundException;
 
   /**
    * Возвращает множество учреждений, в которых нет пособий
-   * @return множество информаций об учреждениях
+   * @return множество кратких информаций об учреждениях
    */
-  Set<InstitutionInfo> getAllPartial();
+  Set<ObjectShortInfo> readAllPartial();
 
   /**
    * Возвращает дополнительные данные для учреждения.
