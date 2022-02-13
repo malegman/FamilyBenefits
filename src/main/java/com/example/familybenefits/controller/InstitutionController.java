@@ -1,9 +1,9 @@
 package com.example.familybenefits.controller;
 
-import com.example.familybenefits.api_model.institution.InstitutionAdd;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.api_model.institution.InstitutionInfo;
 import com.example.familybenefits.api_model.institution.InstitutionInitData;
-import com.example.familybenefits.api_model.institution.InstitutionUpdate;
+import com.example.familybenefits.api_model.institution.InstitutionSave;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.service.s_interface.InstitutionService;
@@ -37,88 +37,60 @@ public class InstitutionController {
   }
 
   /**
-   * Обрабатывает POST запрос "/institution" на добавление нового учреждения.
+   * Обрабатывает GET запрос "/institutions/all" на получение множества учреждений,
+   * в которых есть пособия.
+   * Фильтр по ID города или пособия.
+   * Выполнить запрос может любой клиент
+   * @param idCity ID города
+   * @param idBenefit ID пособия
+   * @return множество учреждений и код ответа
+   */
+  @GetMapping(value = "/institutions/all")
+  public ResponseEntity<Set<ObjectShortInfo>> readAllFilter(@RequestParam(name = "idCity", required = false) String idCity,
+                                                            @RequestParam(name = "idBenefit", required = false) String idBenefit) {
+
+    Set<ObjectShortInfo> institutionShortInfoSet = institutionService.readAllFilter(idCity, idBenefit);
+    return ResponseEntity.status(HttpStatus.OK).body(institutionShortInfoSet);
+  }
+
+  /**
+   * Обрабатывает POST запрос "/institutions" на создание учреждения.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param institutionAdd объект запроса для добавления учреждения
+   * @param institutionSave объект запроса для сохранения учреждения
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/institution")
-  public ResponseEntity<?> addInstitution(@RequestBody InstitutionAdd institutionAdd) {
+  @PostMapping(value = "/institutions")
+  public ResponseEntity<?> create(@RequestBody InstitutionSave institutionSave) {
 
-    if (institutionAdd == null) {
-      log.warn("POST \"/institution\": {}", "Request body \"institutionAdd\" is empty");
+    if (institutionSave == null) {
+      log.warn("POST \"/institutions\": {}", "Request body \"institutionSave\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     try {
-      institutionService.add(institutionAdd);
+      institutionService.create(institutionSave);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (NotFoundException e) {
       // Не найдены города или пособия
-      log.error("POST \"/institution\": {}", e.getMessage());
+      log.error("POST \"/institutions\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException e) {
       // Учреждение с указанным названием существует
-      log.error("POST \"/institution\": {}", e.getMessage());
+      log.error("POST \"/institutions\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
   /**
-   * Обрабатывает PUT запрос "/institution" на обновление учреждения.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param institutionUpdate объект запроса для обновления учреждения
-   * @return код ответа, результат обработки запроса
-   */
-  @PutMapping(value = "/institution")
-  public ResponseEntity<?> updateInstitution(@RequestBody InstitutionUpdate institutionUpdate) {
-
-    if (institutionUpdate == null) {
-      log.warn("PUT \"/institution\": {}", "Request body \"institutionUpdate\" is empty");
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    try {
-      institutionService.update(institutionUpdate);
-      return ResponseEntity.status(HttpStatus.CREATED).build();
-
-    } catch (NotFoundException e) {
-      // Не найдено учреждение
-      log.error("PUT \"/institution\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Обрабатывает DELETE запрос "/institution/{id}" на удаление учреждения.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param idInstitution ID учреждения
-   * @return код ответа, результат обработки запроса
-   */
-  @DeleteMapping(value = "/institution/{id}")
-  public ResponseEntity<?> deleteInstitution(@PathVariable(name = "id") String idInstitution) {
-
-    try {
-      institutionService.delete(idInstitution);
-      return ResponseEntity.status(HttpStatus.CREATED).build();
-
-    } catch (NotFoundException e) {
-      // Не найдено учреждение
-      log.error("DELETE \"/institution/{id}\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Обрабатывает GET запрос "/institution/{id}" на получение информации об учреждении.
+   * Обрабатывает GET запрос "/institutions/{id}" на получение информации об учреждении.
    * Выполнить запрос может любой клиент
    * @param idInstitution ID учреждения
    * @return информация об учреждении, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/institution/{id}")
-  public ResponseEntity<InstitutionInfo> getInstitution(@PathVariable(name = "id") String idInstitution) {
+  @GetMapping(value = "/institutions/{id}")
+  public ResponseEntity<InstitutionInfo> read(@PathVariable(name = "id") String idInstitution) {
 
     try {
       InstitutionInfo institutionInfo = institutionService.read(idInstitution);
@@ -126,47 +98,80 @@ public class InstitutionController {
 
     } catch (NotFoundException e) {
       // Не найдено учреждение
-      log.error("GET \"/institution/{id}\": {}", e.getMessage());
+      log.error("GET \"/institutions/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Обрабатывает GET запрос "/institution/all" на получение множества учреждений,
-   * в которых есть пособия.
-   * Выполнить запрос может любой клиент
-   * @return множество учреждений и код ответа
+   * Обрабатывает PUT запрос "/institutions/{id}" на обновление учреждения.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @param idInstitution ID учреждения
+   * @param institutionSave объект запроса для сохранения учреждения
+   * @return код ответа, результат обработки запроса
    */
-  @GetMapping(value = "/institution/all")
-  public ResponseEntity<Set<InstitutionInfo>> getInstitutions() {
+  @PutMapping(value = "/institutions/{id}")
+  public ResponseEntity<?> update(@PathVariable(name = "id") String idInstitution,
+                                  @RequestBody InstitutionSave institutionSave) {
 
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(institutionService.getAll());
+    if (institutionSave == null) {
+      log.warn("PUT \"/institutions/{id}\": {}", "Request body \"institutionSave\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    try {
+      institutionService.update(idInstitution, institutionSave);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    } catch (NotFoundException e) {
+      // Не найдено учреждение
+      log.error("PUT \"/institutions/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 
   /**
-   * Обрабатывает GET запрос "/institution/allpartial" на получение множества учреждений,
+   * Обрабатывает DELETE запрос "/institutions/{id}" на удаление учреждения.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @param idInstitution ID учреждения
+   * @return код ответа, результат обработки запроса
+   */
+  @DeleteMapping(value = "/institutions/{id}")
+  public ResponseEntity<?> delete(@PathVariable(name = "id") String idInstitution) {
+
+    try {
+      institutionService.delete(idInstitution);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    } catch (NotFoundException e) {
+      // Не найдено учреждение
+      log.error("DELETE \"/institutions/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  /**
+   * Обрабатывает GET запрос "/institutions/partial" на получение множества учреждений,
    * в которых нет пособий.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @return множество учреждений и код ответа
    */
-  @GetMapping(value = "/institution/allpartial")
-  public ResponseEntity<Set<InstitutionInfo>> getPartialInstitutions() {
+  @GetMapping(value = "/institutions/partial")
+  public ResponseEntity<Set<ObjectShortInfo>> readAllPartial() {
 
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(institutionService.getAllPartial());
+        .body(institutionService.readAllPartial());
   }
 
   /**
-   * Обрабатывает GET запрос "/institution/initdata" на получение дополнительных данных для учреждения.
+   * Обрабатывает GET запрос "/institutions/init-data" на получение дополнительных данных для учреждения.
    * Данные содержат в себе множество кратких информаций о городах и пособиях.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @return дополнительные данные для учреждения и код ответа
    */
-  @GetMapping(value = "/institution/initdata")
-  public ResponseEntity<InstitutionInitData> getInstitutionInitData() {
+  @GetMapping(value = "/institutions/init-data")
+  public ResponseEntity<InstitutionInitData> getInitData() {
 
     return ResponseEntity
         .status(HttpStatus.OK)
