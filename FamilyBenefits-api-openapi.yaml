@@ -251,7 +251,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /users/initdata:
+  /users/init-data:
     get:
       tags:
         - user
@@ -413,7 +413,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /admins/fromuser/{id}:
+  /admins/from-user/{idUser}:
     post:
       tags:
         - admin
@@ -423,7 +423,7 @@ paths:
         Для супер администратора.
         Необходима авторизация.
       parameters:
-        - name: id
+        - name: idUser
           in: path
           description: ID пользователя
           schema:
@@ -448,7 +448,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /admins/{id}/touser:
+  /admins/{id}/to-user:
     post:
       tags:
         - admin
@@ -483,7 +483,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /admins/{id}/tosuper:
+  /admins/{id}/to-super:
     post:
       tags:
         - admin
@@ -521,35 +521,6 @@ paths:
 
 
   /cities:
-    post:
-      tags:
-        - city
-      summary: Создает город
-      description:
-        Создает город.
-        Для администратора.
-        Необходима авторизация.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CitySave'
-        required: true
-      responses:
-        '201':
-          description: Город добавлен
-          content: { }
-        '400':
-          description: Город с указанными данными уже существует
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-      security:
-        - bearerAuth: [ ]
     get:
       tags:
         - city
@@ -580,19 +551,42 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
-                  - description: Если есть параметр названия, один город
-                    type: object
-                    items:
-                      $ref: '#/components/schemas/CityInfo'
-                  - description: Если нет параметра названия, множество городов
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ObjectShortInfo'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
         '404':
           description: Город с указанным названием или пособие с указанным ID не найдены
           content: { }
       security: [ ]
+    post:
+      tags:
+        - city
+      summary: Создает город
+      description:
+        Создает город.
+        Для администратора.
+        Необходима авторизация.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CitySave'
+        required: true
+      responses:
+        '201':
+          description: Город добавлен
+          content: { }
+        '400':
+          description: Город с указанными данными уже существует
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+      security:
+        - bearerAuth: [ ]
   /cities/{id}:
     get:
       tags:
@@ -716,6 +710,43 @@ paths:
 
 
   /institutions:
+    get:
+      tags:
+        - institution
+      summary:
+        Возвращает множество учреждений, в которых есть пособия.
+        Фильтр по ID города или пособия.
+      description:
+        Возвращает множество учреждений, в которых есть пособия.
+        Фильтр по ID города или пособия.
+      parameters:
+        - name: idCity
+          in: query
+          description: ID города
+          schema:
+            type: string
+            example: td56387fhj
+          required: false
+        - name: idBenefit
+          in: query
+          description: ID пособия
+          schema:
+            type: string
+            example: td56387fhj
+          required: false
+      responses:
+        '200':
+          description: Множество учреждений получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Не найдены город или пособие с указанным ID
+          content: { }
+      security: [ ]
     post:
       tags:
         - institution
@@ -745,43 +776,6 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-    get:
-      tags:
-        - institution
-      summary:
-        Возвращает множество учреждений, в которых есть пособия.
-        Фильтр по ID города или учреждения.
-      description:
-        Возвращает множество учреждений, в которых есть пособия.
-        Фильтр по ID города или учреждения.
-      parameters:
-        - name: idCity
-          in: query
-          description: ID города
-          schema:
-            type: string
-            example: td56387fhj
-          required: false
-        - name: idBenefit
-          in: query
-          description: ID пособия
-          schema:
-            type: string
-            example: td56387fhj
-          required: false
-      responses:
-        '200':
-          description: Множество учреждений получено
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Не найдены город или пособие с указанным ID
-          content: { }
-      security: [ ]
   /institutions/{id}:
     get:
       tags:
@@ -902,7 +896,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /institutions/initdata:
+  /institutions/init-data:
     get:
       tags:
         - institution
@@ -931,35 +925,6 @@ paths:
 
 
   /benefits:
-    post:
-      tags:
-        - benefit
-      summary: Создает пособие
-      description:
-        Создает пособие.
-        Для администратора.
-        Необходима авторизация.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BenefitSave'
-        required: true
-      responses:
-        '201':
-          description: Пособие создано
-          content: { }
-        '400':
-          description: Пособие с указанными данными уже существует
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-      security:
-        - bearerAuth: [ ]
     get:
       tags:
         - benefit
@@ -1004,6 +969,35 @@ paths:
           description: Не найдены город, учреждение или критерий с указанным ID
           content: { }
       security: [ ]
+    post:
+      tags:
+        - benefit
+      summary: Создает пособие
+      description:
+        Создает пособие.
+        Для администратора.
+        Необходима авторизация.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BenefitSave'
+        required: true
+      responses:
+        '201':
+          description: Пособие создано
+          content: { }
+        '400':
+          description: Пособие с указанными данными уже существует
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+      security:
+        - bearerAuth: [ ]
   /benefits/{id}:
     get:
       tags:
@@ -1124,7 +1118,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /benefits/initdata:
+  /benefits/init-data:
     get:
       tags:
         - benefit
@@ -1192,35 +1186,6 @@ paths:
 
 
   /criteria:
-    post:
-      tags:
-        - criterion
-      summary: Создает критерий
-      description:
-        Создает критерий.
-        Для администратора.
-        Необходима авторизация.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CriterionSave'
-        required: true
-      responses:
-        '201':
-          description: Критерий добавлен
-          content: { }
-        '400':
-          description: Критерий с указанными данными уже существует
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-      security:
-        - bearerAuth: [ ]
     get:
       tags:
         - criterion
@@ -1258,6 +1223,35 @@ paths:
           description: Не найдены пособие или тип критерия с указанным ID
           content: { }
       security: [ ]
+    post:
+      tags:
+        - criterion
+      summary: Создает критерий
+      description:
+        Создает критерий.
+        Для администратора.
+        Необходима авторизация.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CriterionSave'
+        required: true
+      responses:
+        '201':
+          description: Критерий добавлен
+          content: { }
+        '400':
+          description: Критерий с указанными данными уже существует
+          content: { }
+        '401':
+          description: Клиент не авторизован или токен не действительный
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+      security:
+        - bearerAuth: [ ]
   /criteria/{id}:
     get:
       tags:
@@ -1378,7 +1372,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /criteria/initdata:
+  /criteria/init-data:
     get:
       tags:
         - criterion
@@ -1443,6 +1437,34 @@ paths:
 
 
   /criterion-types:
+    get:
+      tags:
+        - criterion type
+      summary:
+        Возвращает множество типов критерия, в которых есть критерии.
+      description:
+        Возвращает множество типов критерия, в которых есть критерии.
+      parameters:
+        - name: name
+          in: query
+          description: Название типа критерия
+          schema:
+            type: string
+            example: name
+          required: false
+      responses:
+        '200':
+          description: Множество типов критерия получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectShortInfo'
+        '404':
+          description: Тип критерия с указанным названием не найден
+          content: { }
+      security: [ ]
     post:
       tags:
         - criterion type
@@ -1472,40 +1494,6 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-    get:
-      tags:
-        - criterion type
-      summary:
-        Возвращает множество типов критерия, в которых есть критерии.
-      description:
-        Возвращает множество типов критерия, в которых есть критерии.
-      parameters:
-        - name: name
-          in: query
-          description: Название типа критерия
-          schema:
-            type: string
-            example: name
-          required: false
-      responses:
-        '200':
-          description: Множество типов критерия получено
-          content:
-            application/json:
-              schema:
-                anyOf:
-                  - description: Если есть параметр названия, один тип критерия
-                    type: object
-                    items:
-                      $ref: '#/components/schemas/CriterionTypeInfo'
-                  - description: Если нет параметра названия, множество типов критерия
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Тип критерия с указанным названием не найден
-          content: { }
-      security: [ ]
   /criterion-types/{id}:
     get:
       tags:
