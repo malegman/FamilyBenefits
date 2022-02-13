@@ -1,8 +1,8 @@
 package com.example.familybenefits.controller;
 
-import com.example.familybenefits.api_model.criterion_type.CriterionTypeAdd;
+import com.example.familybenefits.api_model.common.ObjectShortInfo;
+import com.example.familybenefits.api_model.criterion_type.CriterionTypeSave;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
-import com.example.familybenefits.api_model.criterion_type.CriterionTypeUpdate;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.service.s_interface.CriterionTypeService;
@@ -36,83 +36,52 @@ public class CriterionTypeController {
   }
 
   /**
-   * Обрабатывает POST запрос "/criteriontype" на добавление нового типа критерия.
+   * Обрабатывает GET запрос "/criterion-types/all" на получение множества типов критерия,
+   * в которых есть критерии.
+   * Выполнить запрос может любой клиент
+   * @return множество типов критерий и код ответа
+   */
+  @GetMapping(value = "/criterion-types/all")
+  public ResponseEntity<Set<ObjectShortInfo>> readAll() {
+
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(criterionTypeService.readAll());
+  }
+
+  /**
+   * Обрабатывает POST запрос "/criterion-types" на создание типа критерия.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param criterionTypeAdd объект запроса для добавления типа критерия
+   * @param criterionTypeSave объект запроса для сохранения типа критерия
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/criteriontype")
-  public ResponseEntity<?> addCriterionType(@RequestBody CriterionTypeAdd criterionTypeAdd) {
+  @PostMapping(value = "/criterion-types")
+  public ResponseEntity<?> create(@RequestBody CriterionTypeSave criterionTypeSave) {
 
-    if (criterionTypeAdd == null) {
-      log.warn("POST \"/criteriontype\": {}", "Request body \"criterionTypeAdd\" is empty");
+    if (criterionTypeSave == null) {
+      log.warn("POST \"/criterion-types\": {}", "Request body \"criterionTypeSave\" is empty");
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     try {
-      criterionTypeService.add(criterionTypeAdd);
+      criterionTypeService.create(criterionTypeSave);
       return ResponseEntity.status(HttpStatus.CREATED).build();
 
     } catch (AlreadyExistsException e) {
       // Тип критерия с указанным названием существует
-      log.error("POST \"/criteriontype\": {}", e.getMessage());
+      log.error("POST \"/criterion-types\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 
   /**
-   * Обрабатывает PUT запрос "/criteriontype" на обновление типа критерия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param criterionTypeUpdate объект запроса для обновления типа критерия
-   * @return код ответа, результат обработки запроса
-   */
-  @PutMapping(value = "/criteriontype")
-  public ResponseEntity<?> updateCriterionType(@RequestBody CriterionTypeUpdate criterionTypeUpdate) {
-
-    if (criterionTypeUpdate == null) {
-      log.warn("PUT \"/criteriontype\": {}", "Request body \"criterionTypeUpdate\" is empty");
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-    }
-
-    try {
-      criterionTypeService.update(criterionTypeUpdate);
-      return ResponseEntity.status(HttpStatus.CREATED).build();
-
-    } catch (NotFoundException e) {
-      // Не найден тип критерия
-      log.error("PUT \"/criteriontype\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Обрабатывает DELETE запрос "/criteriontype/{id}" на удаление типа критерия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
-   * @param idCriterionType ID типа критерия
-   * @return код ответа, результат обработки запроса
-   */
-  @DeleteMapping(value = "/criteriontype/{id}")
-  public ResponseEntity<?> deleteCriterionType(@PathVariable(name = "id") String idCriterionType) {
-
-    try {
-      criterionTypeService.delete(idCriterionType);
-      return ResponseEntity.status(HttpStatus.CREATED).build();
-
-    } catch (NotFoundException e) {
-      // Не найден тип критерия
-      log.error("DELETE \"/criteriontype/{id}\": {}", e.getMessage());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-  }
-
-  /**
-   * Обрабатывает GET запрос "/criteriontype/{id}" на получение информации о типе критерия.
+   * Обрабатывает GET запрос "/criterion-types/{id}" на получение информации о типе критерия.
    * Выполнить запрос может любой клиент
    * @param idCriterionType ID типа критерия
    * @return информация о типе критерия, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/criteriontype/{id}")
-  public ResponseEntity<CriterionTypeInfo> getCriterionType(@PathVariable(name = "id") String idCriterionType) {
+  @GetMapping(value = "/criterion-types/{id}")
+  public ResponseEntity<CriterionTypeInfo> read(@PathVariable(name = "id") String idCriterionType) {
 
     try {
       CriterionTypeInfo criterionTypeInfo = criterionTypeService.read(idCriterionType);
@@ -120,36 +89,69 @@ public class CriterionTypeController {
 
     } catch (NotFoundException e) {
       // Не найден тип критерия
-      log.error("GET \"/criteriontype/{id}\": {}", e.getMessage());
+      log.error("GET \"/criterion-types/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
 
   /**
-   * Обрабатывает GET запрос "/criteriontype/all" на получение множества типов критерия,
-   * в которых есть критерии.
-   * Выполнить запрос может любой клиент
-   * @return множество типов критерий и код ответа
+   * Обрабатывает PUT запрос "/criterion-types/{id}" на обновление типа критерия.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @param idCriterionType ID типа критерия
+   * @param criterionTypeSave объект запроса для сохранения типа критерия
+   * @return код ответа, результат обработки запроса
    */
-  @GetMapping(value = "/criteriontype/all")
-  public ResponseEntity<Set<CriterionTypeInfo>> getCriterionTypes() {
+  @PutMapping(value = "/criterion-types/{id}")
+  public ResponseEntity<?> update(@PathVariable(name = "id") String idCriterionType,
+                                  @RequestBody CriterionTypeSave criterionTypeSave) {
 
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(criterionTypeService.getAll());
+    if (criterionTypeSave == null) {
+      log.warn("PUT \"/criterion-types/{id}\": {}", "Request body \"criterionTypeSave\" is empty");
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+
+    try {
+      criterionTypeService.update(idCriterionType, criterionTypeSave);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    } catch (NotFoundException e) {
+      // Не найден тип критерия
+      log.error("PUT \"/criterion-types/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 
   /**
-   * Обрабатывает GET запрос "/criteriontype/allpartial" на получение множества типов критерия,
+   * Обрабатывает DELETE запрос "/criterion-types/{id}" на удаление типа критерия.
+   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * @param idCriterionType ID типа критерия
+   * @return код ответа, результат обработки запроса
+   */
+  @DeleteMapping(value = "/criterion-types/{id}")
+  public ResponseEntity<?> delete(@PathVariable(name = "id") String idCriterionType) {
+
+    try {
+      criterionTypeService.delete(idCriterionType);
+      return ResponseEntity.status(HttpStatus.CREATED).build();
+
+    } catch (NotFoundException e) {
+      // Не найден тип критерия
+      log.error("DELETE \"/criterion-types/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+  }
+
+  /**
+   * Обрабатывает GET запрос "/criterion-types/partial" на получение множества типов критерия,
    * в которых нет критерий.
    * Выполнить запрос может любой клиент
    * @return множество типов критерий и код ответа
    */
-  @GetMapping(value = "/criteriontype/allpartial")
-  public ResponseEntity<Set<CriterionTypeInfo>> getPartialCriterionTypes() {
+  @GetMapping(value = "/criterion-types/partial")
+  public ResponseEntity<Set<ObjectShortInfo>> readAllPartial() {
 
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(criterionTypeService.getAllPartial());
+        .body(criterionTypeService.readAllPartial());
   }
 }
