@@ -1,12 +1,10 @@
-package com.example.familybenefits.dao.entity;
+package com.example.familybenefits.dto.entity;
 
 import lombok.*;
-import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
-import java.util.Objects;
 import java.util.Set;
 
 /**

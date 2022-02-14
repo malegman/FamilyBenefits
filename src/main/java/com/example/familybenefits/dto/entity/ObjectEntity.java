@@ -1,4 +1,4 @@
-package com.example.familybenefits.dao.entity;
+package com.example.familybenefits.dto.entity;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
