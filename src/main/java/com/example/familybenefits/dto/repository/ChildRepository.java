@@ -1,6 +1,6 @@
-package com.example.familybenefits.dao.repository;
+package com.example.familybenefits.dto.repository;
 
-import com.example.familybenefits.dao.entity.ChildEntity;
+import com.example.familybenefits.dto.entity.ChildEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
