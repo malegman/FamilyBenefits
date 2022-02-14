@@ -3,9 +3,9 @@ package com.example.familybenefits.convert;
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.benefit.BenefitSave;
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
-import com.example.familybenefits.dao.entity.BenefitEntity;
-import com.example.familybenefits.dao.entity.CityEntity;
-import com.example.familybenefits.dao.entity.CriterionEntity;
+import com.example.familybenefits.dto.entity.BenefitEntity;
+import com.example.familybenefits.dto.entity.CityEntity;
+import com.example.familybenefits.dto.entity.CriterionEntity;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;

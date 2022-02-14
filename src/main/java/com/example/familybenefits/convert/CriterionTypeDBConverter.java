@@ -3,7 +3,7 @@ package com.example.familybenefits.convert;
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeSave;
-import com.example.familybenefits.dao.entity.CriterionTypeEntity;
+import com.example.familybenefits.dto.entity.CriterionTypeEntity;
 
 import java.util.function.Function;
 

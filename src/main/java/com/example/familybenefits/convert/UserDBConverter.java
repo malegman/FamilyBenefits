@@ -2,10 +2,10 @@ package com.example.familybenefits.convert;
 
 import com.example.familybenefits.api_model.user.UserSave;
 import com.example.familybenefits.api_model.user.UserInfo;
-import com.example.familybenefits.dao.entity.CityEntity;
-import com.example.familybenefits.dao.entity.CriterionEntity;
-import com.example.familybenefits.dao.entity.RoleEntity;
-import com.example.familybenefits.dao.entity.UserEntity;
+import com.example.familybenefits.dto.entity.CityEntity;
+import com.example.familybenefits.dto.entity.CriterionEntity;
+import com.example.familybenefits.dto.entity.RoleEntity;
+import com.example.familybenefits.dto.entity.UserEntity;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;

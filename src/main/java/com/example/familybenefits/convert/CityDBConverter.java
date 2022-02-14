@@ -3,7 +3,7 @@ package com.example.familybenefits.convert;
 import com.example.familybenefits.api_model.city.CityInfo;
 import com.example.familybenefits.api_model.city.CitySave;
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
-import com.example.familybenefits.dao.entity.CityEntity;
+import com.example.familybenefits.dto.entity.CityEntity;
 
 import java.util.function.Function;
 
