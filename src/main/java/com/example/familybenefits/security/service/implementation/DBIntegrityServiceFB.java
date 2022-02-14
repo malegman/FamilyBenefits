@@ -1,12 +1,13 @@
 package com.example.familybenefits.security.service.implementation;
 
-import com.example.familybenefits.dao.entity.ObjectEntity;
+import com.example.familybenefits.dto.entity.ObjectEntity;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -17,7 +18,7 @@ public class DBIntegrityServiceFB implements DBIntegrityService {
 
   /**
    * Проверяет существование в базе данных объекта по его ID
-   * @param existFunc функция проверки
+   * @param existFunc функция проверки, принимающая параметр типа {@link String} и возвращающая значение типа {@link Boolean}
    * @param id ID проверяемого объекта
    * @throws NotFoundException если объект не найден
    */
@@ -32,9 +33,9 @@ public class DBIntegrityServiceFB implements DBIntegrityService {
 
   /**
    * Проверяет существование в базе данных объекта по его ID
-   * @param existFunc функция проверки
+   * @param existFunc функция проверки, принимающая параметр типа {@link String} и возвращающая значение типа {@link Boolean}
    * @param entity проверяемый объект
-   * @param <E> Тип объекта
+   * @param <E> Тип проверяемого объекта
    * @throws NotFoundException если объект не найден
    */
   @Override
@@ -45,9 +46,9 @@ public class DBIntegrityServiceFB implements DBIntegrityService {
 
   /**
    * Проверяет существование в базе данных объекта из множества по ID
-   * @param existFunc функция проверки
+   * @param existFunc функция проверки, принимающая параметр типа {@link String} и возвращающая значение типа {@link Boolean}
    * @param entitySet множество проверяемых объектов
-   * @param <E> Тип объекта в множестве
+   * @param <E> Тип проверяемого объекта в множестве
    * @throws NotFoundException если объект из множества не найден
    */
   @Override
@@ -60,6 +61,7 @@ public class DBIntegrityServiceFB implements DBIntegrityService {
 
   /**
    * Проверяет отсутствие в базе данных объекта по его уникальному строковому полю
+   * @param existFunc функция проверки, принимающая параметр типа {@link String} и возвращающая значение типа {@link Boolean}
    * @param uniqueStr уникальное строковое поле объекта
    * @throws AlreadyExistsException если объект найден
    */
@@ -68,7 +70,23 @@ public class DBIntegrityServiceFB implements DBIntegrityService {
 
     if (existFunc.apply(uniqueStr)) {
       throw new AlreadyExistsException(String.format(
-          "Benefit with name \"%s\" already exists", uniqueStr));
+          "Entity with name \"%s\" already exists in repository %s", uniqueStr, existFunc.getClass().getName()));
+    }
+  }
+
+  /**
+   * Проверяет отсутствие в базе данных объекта с отличным от данного ID с уникальным строковым полем
+   * @param existBiFunc функция проверки, принимающая 2 параметра типа {@link String} и возвращающая значение типа {@link Boolean}
+   * @param idThis ID данного объекта
+   * @param uniqueStr уникальное строковое поле объекта
+   * @throws AlreadyExistsException если объект с отличным ID и данным строковым полем найден
+   */
+  @Override
+  public void checkAbsenceAnotherByUniqStr(BiFunction<String, String, Boolean> existBiFunc, String idThis, String uniqueStr) throws AlreadyExistsException {
+
+    if (existBiFunc.apply(idThis, uniqueStr)) {
+      throw new AlreadyExistsException(String.format(
+          "Entity with name \"%s\" already exists in repository %s", uniqueStr, existBiFunc.getClass().getName()));
     }
   }
 
