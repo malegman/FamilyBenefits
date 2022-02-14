@@ -1,6 +1,6 @@
-package com.example.familybenefits.dao.repository;
+package com.example.familybenefits.dto.repository;
 
-import com.example.familybenefits.dao.entity.InstitutionEntity;
+import com.example.familybenefits.dto.entity.InstitutionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -14,4 +14,12 @@ public interface InstitutionRepository extends JpaRepository<InstitutionEntity, 
    * @return true, если учреждение с указанным названием существует
    */
   boolean existsByName(String name);
+
+  /**
+   * Проверяет наличие учреждения с отличным от данного ID и данным названием
+   * @param id ID учреждения
+   * @param name название учреждения
+   * @return true, если учреждение с отличным ID и указанным названием существует
+   */
+  boolean existsByIdIsNotAndName(String id, String name);
 }

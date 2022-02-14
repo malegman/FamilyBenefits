@@ -1,6 +1,6 @@
-package com.example.familybenefits.dao.repository;
+package com.example.familybenefits.dto.repository;
 
-import com.example.familybenefits.dao.entity.CityEntity;
+import com.example.familybenefits.dto.entity.CityEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -14,4 +14,12 @@ public interface CityRepository extends JpaRepository<CityEntity, String> {
    * @return true, если город с указанным именем существует
    */
   boolean existsByName(String name);
+
+  /**
+   * Проверяет наличие города с отличным от данного ID и данным названием
+   * @param id ID города
+   * @param name название города
+   * @return true, если город с отличным ID и указанным названием существует
+   */
+  boolean existsByIdIsNotAndName(String id, String name);
 }

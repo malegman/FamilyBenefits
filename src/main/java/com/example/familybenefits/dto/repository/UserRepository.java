@@ -1,6 +1,6 @@
-package com.example.familybenefits.dao.repository;
+package com.example.familybenefits.dto.repository;
 
-import com.example.familybenefits.dao.entity.UserEntity;
+import com.example.familybenefits.dto.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -24,6 +24,14 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
    * @return true, если пользователь с указанным email существует
    */
   boolean existsByEmail(String email);
+
+  /**
+   * Проверяет наличие пользователя с отличным от данного ID и данным email
+   * @param id ID пользователя
+   * @param email email пользователя
+   * @return true, если пользователь с отличным ID и указанным email существует
+   */
+  boolean existsByIdIsNotAndName(String id, String email);
 
   /**
    * Возвращает пользователя с ролью "ROLE_SUPER_ADMIN"
