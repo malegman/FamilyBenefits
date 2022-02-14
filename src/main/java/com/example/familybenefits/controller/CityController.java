@@ -126,6 +126,11 @@ public class CityController {
       // Не найден город или не найдены пособия
       log.error("PUT \"/cities/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+    } catch (AlreadyExistsException e) {
+      // Город с отличным ID и данным названием уже существует
+      log.error("PUT \"/cities/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 

@@ -47,8 +47,9 @@ public interface BenefitService {
    * @param idBenefit ID пособия
    * @param benefitSave объект запроса для сохранения пособия
    * @throws NotFoundException если пособие с указанным ID не найдено
+   * @throws AlreadyExistsException если пособие с отличным ID и данным названием уже существует
    */
-  void update(String idBenefit, BenefitSave benefitSave) throws NotFoundException;
+  void update(String idBenefit, BenefitSave benefitSave) throws NotFoundException, AlreadyExistsException;
 
   /**
    * Удаляет пособие по его ID

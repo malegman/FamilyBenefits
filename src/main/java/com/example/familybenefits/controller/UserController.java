@@ -115,10 +115,12 @@ public class UserController {
 
     } catch (InvalidEmailException
         | DateTimeException
-        | DateFormatException e) {
+        | DateFormatException
+        | AlreadyExistsException e) {
       // Строка в поле "email" не является email.
       // Даты позже текущей даты.
       // Даты не соответствуют формату "dd.mm.yyyy".
+      // Пользователь с отличным ID и данным email уже существует.
       log.error("PUT \"/users/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }

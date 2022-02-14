@@ -131,6 +131,11 @@ public class BenefitController {
       // Не найдено пособие или не найдены города или критерии
       log.error("PUT \"/benefits/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+    } catch (AlreadyExistsException e) {
+      // Пособие с отличным ID и данным названием уже существует
+      log.error("PUT \"/benefits/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 

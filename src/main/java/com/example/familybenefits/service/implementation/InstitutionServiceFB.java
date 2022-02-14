@@ -7,12 +7,12 @@ import com.example.familybenefits.api_model.institution.InstitutionInitData;
 import com.example.familybenefits.convert.BenefitDBConverter;
 import com.example.familybenefits.convert.CityDBConverter;
 import com.example.familybenefits.convert.InstitutionDBConverter;
-import com.example.familybenefits.dao.entity.BenefitEntity;
-import com.example.familybenefits.dao.entity.CityEntity;
-import com.example.familybenefits.dao.entity.InstitutionEntity;
-import com.example.familybenefits.dao.repository.BenefitRepository;
-import com.example.familybenefits.dao.repository.CityRepository;
-import com.example.familybenefits.dao.repository.InstitutionRepository;
+import com.example.familybenefits.dto.entity.BenefitEntity;
+import com.example.familybenefits.dto.entity.CityEntity;
+import com.example.familybenefits.dto.entity.InstitutionEntity;
+import com.example.familybenefits.dto.repository.BenefitRepository;
+import com.example.familybenefits.dto.repository.CityRepository;
+import com.example.familybenefits.dto.repository.InstitutionRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
@@ -142,9 +142,10 @@ public class InstitutionServiceFB implements InstitutionService, EntityDBService
    * @param idInstitution ID учреждения
    * @param institutionSave объект запроса на сохранение учреждения
    * @throws NotFoundException если учреждение, город или пособия с указанными ID не найдены
+   * @throws AlreadyExistsException если учреждение с отличным ID и данным названием уже существует
    */
   @Override
-  public void update(String idInstitution, InstitutionSave institutionSave) throws NotFoundException {
+  public void update(String idInstitution, InstitutionSave institutionSave) throws NotFoundException, AlreadyExistsException {
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
     InstitutionEntity institutionEntityFromSave = InstitutionDBConverter
@@ -156,9 +157,17 @@ public class InstitutionServiceFB implements InstitutionService, EntityDBService
     dbIntegrityService.checkExistenceById(
         benefitDBService.getRepository()::existsById, institutionEntityFromSave.getBenefitEntitySet());
 
+    String prepareIdInstitution = dbIntegrityService.preparePostgreSQLString(idInstitution);
+
     // Проверка существования учреждения по его ID
     dbIntegrityService.checkExistenceById(
-        institutionRepository::existsById, institutionEntityFromSave);
+        institutionRepository::existsById, prepareIdInstitution);
+
+    // Проверка отсутствия учреждения с отличным от данного ID и данным названием
+    dbIntegrityService.checkAbsenceAnotherByUniqStr(
+        institutionRepository::existsByIdIsNotAndName, prepareIdInstitution, institutionEntityFromSave.getName());
+
+    institutionEntityFromSave.setId(prepareIdInstitution);
 
     institutionRepository.saveAndFlush(institutionEntityFromSave);
   }

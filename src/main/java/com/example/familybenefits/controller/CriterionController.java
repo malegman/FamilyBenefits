@@ -128,6 +128,11 @@ public class CriterionController {
       // Не найден критерий или тип критерия
       log.error("PUT \"/criteria/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+    } catch (AlreadyExistsException e) {
+      // Критерий с отличным ID и данным названием уже существует
+      log.error("PUT \"/criteria/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 

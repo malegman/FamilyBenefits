@@ -42,12 +42,14 @@ public interface UserService {
    * @throws InvalidEmailException если указанный "email" не является email
    * @throws DateFormatException если даты рождения пользователя или детей не соответствуют формату "dd.mm.yyyy"
    * @throws DateTimeException если даты рождения пользователя или детей позже текущей даты
+   * @throws AlreadyExistsException если пользователь с отличным ID и данным email уже существует
    */
   void update(String idUser, UserSave userSave) throws
       NotFoundException,
       InvalidEmailException,
       DateFormatException,
-      DateTimeException;
+      DateTimeException,
+      AlreadyExistsException;
 
   /**
    * Удаляет пользователя по его ID или удаляет роль "ROLE_USER" у администратора

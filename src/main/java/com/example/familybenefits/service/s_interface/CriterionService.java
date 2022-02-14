@@ -45,8 +45,9 @@ public interface CriterionService {
    * @param idCriterion ID критерия
    * @param criterionSave объект запроса для сохранения критерия
    * @throws NotFoundException если критерий с указанными данными не найден
+   * @throws AlreadyExistsException если критерий с отличным ID и данным названием уже существует
    */
-  void update(String idCriterion, CriterionSave criterionSave) throws NotFoundException;
+  void update(String idCriterion, CriterionSave criterionSave) throws NotFoundException, AlreadyExistsException;
 
   /**
    * Удаляет критерий по его ID

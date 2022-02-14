@@ -3,8 +3,8 @@ package com.example.familybenefits.service.implementation;
 import com.example.familybenefits.api_model.admin.AdminInfo;
 import com.example.familybenefits.api_model.admin.AdminSave;
 import com.example.familybenefits.convert.AdminDBConverter;
-import com.example.familybenefits.dao.entity.UserEntity;
-import com.example.familybenefits.dao.repository.UserRepository;
+import com.example.familybenefits.dto.entity.UserEntity;
+import com.example.familybenefits.dto.repository.UserRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.InvalidEmailException;
 import com.example.familybenefits.exception.NotFoundException;
@@ -113,9 +113,10 @@ public class AdminServiceFB implements AdminService {
    * @param adminSave объект запроса на сохранение администратора
    * @throws NotFoundException если администратор с указанными данными не найден
    * @throws InvalidEmailException если указанный "email" не является email
+   * @throws AlreadyExistsException если администратор или пользователь с отличным ID и данным email уже существует
    */
   @Override
-  public void update(String idAdmin, AdminSave adminSave) throws NotFoundException, InvalidEmailException {
+  public void update(String idAdmin, AdminSave adminSave) throws NotFoundException, InvalidEmailException, AlreadyExistsException {
 
     // Проверка строки email на соответствие формату email
     userSecurityService.checkEmailElseThrowInvalidEmail(
@@ -127,6 +128,10 @@ public class AdminServiceFB implements AdminService {
 
     String prepareIdAdmin = dbIntegrityService.preparePostgreSQLString(idAdmin);
 
+    // Проверка отсутствия пользователя с отличным от данного ID и данным email
+    dbIntegrityService.checkAbsenceAnotherByUniqStr(
+        userRepository::existsByIdIsNotAndName, prepareIdAdmin, userEntityFromSave.getEmail());
+
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromDB = userRepository.findById(prepareIdAdmin)
         .orElseThrow(() -> new NotFoundException(String.format(
@@ -136,6 +141,7 @@ public class AdminServiceFB implements AdminService {
     userSecurityService.checkHasRoleElseThrowNotFound(
         userEntityFromDB, R.ROLE_ADMIN, R.CLIENT_ADMIN);
 
+    userEntityFromDB.setEmail(userEntityFromSave.getEmail());
     userEntityFromDB.setName(userEntityFromSave.getName());
 
     userRepository.saveAndFlush(userEntityFromDB);

@@ -6,13 +6,13 @@ import com.example.familybenefits.api_model.criterion.CriterionInitData;
 import com.example.familybenefits.api_model.criterion.CriterionSave;
 import com.example.familybenefits.convert.CriterionDBConverter;
 import com.example.familybenefits.convert.CriterionTypeDBConverter;
-import com.example.familybenefits.dao.entity.BenefitEntity;
-import com.example.familybenefits.dao.entity.CriterionEntity;
-import com.example.familybenefits.dao.entity.CriterionTypeEntity;
-import com.example.familybenefits.dao.entity.UserEntity;
-import com.example.familybenefits.dao.repository.CriterionRepository;
-import com.example.familybenefits.dao.repository.CriterionTypeRepository;
-import com.example.familybenefits.dao.repository.UserRepository;
+import com.example.familybenefits.dto.entity.BenefitEntity;
+import com.example.familybenefits.dto.entity.CriterionEntity;
+import com.example.familybenefits.dto.entity.CriterionTypeEntity;
+import com.example.familybenefits.dto.entity.UserEntity;
+import com.example.familybenefits.dto.repository.CriterionRepository;
+import com.example.familybenefits.dto.repository.CriterionTypeRepository;
+import com.example.familybenefits.dto.repository.UserRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.resource.R;
@@ -148,9 +148,10 @@ public class CriterionServiceFB implements CriterionService, EntityDBService<Cri
    * @param idCriterion ID критерия
    * @param criterionSave объект запроса для сохранения критерия
    * @throws NotFoundException если критерий с указанными данными не найден
+   * @throws AlreadyExistsException если критерий с отличным ID и данным названием уже существует
    */
   @Override
-  public void update(String idCriterion, CriterionSave criterionSave) throws NotFoundException {
+  public void update(String idCriterion, CriterionSave criterionSave) throws NotFoundException, AlreadyExistsException {
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
     CriterionEntity criterionEntityFromSave = CriterionDBConverter
@@ -165,6 +166,12 @@ public class CriterionServiceFB implements CriterionService, EntityDBService<Cri
     // Проверка существования критерия по его ID
     dbIntegrityService.checkExistenceById(
         criterionRepository::existsById, prepareIdCriterion);
+
+    // Проверка отсутствия критерия с отличным от данного ID и данным названием
+    dbIntegrityService.checkAbsenceAnotherByUniqStr(
+        criterionRepository::existsByIdIsNotAndName, prepareIdCriterion, criterionEntityFromSave.getName());
+
+    criterionEntityFromSave.setId(prepareIdCriterion);
 
     criterionRepository.saveAndFlush(criterionEntityFromSave);
   }

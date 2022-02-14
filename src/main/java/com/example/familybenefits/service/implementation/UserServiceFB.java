@@ -6,14 +6,14 @@ import com.example.familybenefits.api_model.user.UserSave;
 import com.example.familybenefits.convert.CityDBConverter;
 import com.example.familybenefits.convert.CriterionDBConverter;
 import com.example.familybenefits.convert.UserDBConverter;
-import com.example.familybenefits.dao.entity.ChildEntity;
-import com.example.familybenefits.dao.entity.CityEntity;
-import com.example.familybenefits.dao.entity.CriterionEntity;
-import com.example.familybenefits.dao.entity.UserEntity;
-import com.example.familybenefits.dao.repository.ChildRepository;
-import com.example.familybenefits.dao.repository.CityRepository;
-import com.example.familybenefits.dao.repository.CriterionRepository;
-import com.example.familybenefits.dao.repository.UserRepository;
+import com.example.familybenefits.dto.entity.ChildEntity;
+import com.example.familybenefits.dto.entity.CityEntity;
+import com.example.familybenefits.dto.entity.CriterionEntity;
+import com.example.familybenefits.dto.entity.UserEntity;
+import com.example.familybenefits.dto.repository.ChildRepository;
+import com.example.familybenefits.dto.repository.CityRepository;
+import com.example.familybenefits.dto.repository.CriterionRepository;
+import com.example.familybenefits.dto.repository.UserRepository;
 import com.example.familybenefits.exception.*;
 import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
@@ -118,33 +118,33 @@ public class UserServiceFB implements UserService {
         userSave.getEmail());
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    UserEntity userEntityFromAdd = UserDBConverter
+    UserEntity userEntityFromSave = UserDBConverter
         .fromSave(userSave, dbIntegrityService::preparePostgreSQLString);
 
     // Проверка существования города и критерий по их ID
     dbIntegrityService.checkExistenceById(
-        cityDBService.getRepository()::existsById, userEntityFromAdd.getCityEntity());
+        cityDBService.getRepository()::existsById, userEntityFromSave.getCityEntity());
     dbIntegrityService.checkExistenceById(
-        criterionDBService.getRepository()::existsById, userEntityFromAdd.getCriterionEntitySet());
+        criterionDBService.getRepository()::existsById, userEntityFromSave.getCriterionEntitySet());
 
     // Проверка на существование пользователя или администратора по email
     dbIntegrityService.checkAbsenceByUniqStr(
-        userRepository::existsByEmail, userEntityFromAdd.getEmail());
+        userRepository::existsByEmail, userEntityFromSave.getEmail());
 
     // Преобразование дат рождения пользователя и рождения детей
-    userEntityFromAdd.setDateBirth(dateTimeService.strToDate(userSave.getDateBirth()));
-    userEntityFromAdd.setChildEntitySet(strBirthSetToChildEntity(userSave.getBirthDateChildren()));
+    userEntityFromSave.setDateBirth(dateTimeService.strToDate(userSave.getDateBirth()));
+    userEntityFromSave.setChildEntitySet(strBirthSetToChildEntity(userSave.getBirthDateChildren()));
 
     // Проверка дат рождения пользователя и детей на предшествие текущей даты
-    dateTimeService.checkDateBeforeNow(userEntityFromAdd.getDateBirth());
-    dateTimeService.checkDateBeforeNow(userEntityFromAdd.getChildEntitySet()
+    dateTimeService.checkDateBeforeNow(userEntityFromSave.getDateBirth());
+    dateTimeService.checkDateBeforeNow(userEntityFromSave.getChildEntitySet()
                            .stream().map(ChildEntity::getDateBirth).collect(Collectors.toSet()));
 
-    userEntityFromAdd.addRole(R.ROLE_USER);
-    userEntityFromAdd.setDateSelectCriterion(LocalDate.from(Instant.now()));
-    userEntityFromAdd.setFreshBenefits(false);
+    userEntityFromSave.addRole(R.ROLE_USER);
+    userEntityFromSave.setDateSelectCriterion(LocalDate.from(Instant.now()));
+    userEntityFromSave.setFreshBenefits(false);
 
-    userRepository.saveAndFlush(userEntityFromAdd);
+    userRepository.saveAndFlush(userEntityFromSave);
   }
 
   /**
@@ -178,38 +178,44 @@ public class UserServiceFB implements UserService {
    * @throws InvalidEmailException если указанный "email" не является email
    * @throws DateFormatException если даты рождения пользователя или детей не соответствуют формату "dd.mm.yyyy"
    * @throws DateTimeException если даты рождения пользователя или детей позже текущей даты
+   * @throws AlreadyExistsException если пользователь с отличным ID и данным email уже существует
    */
   @Override
   public void update(String idUser, UserSave userSave) throws
       NotFoundException,
       InvalidEmailException,
       DateFormatException,
-      DateTimeException {
+      DateTimeException,
+      AlreadyExistsException {
 
     // Проверка строки email на соответствие формату email
     userSecurityService.checkEmailElseThrowInvalidEmail(
         userSave.getEmail());
 
+    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
+    UserEntity userEntityFromSave = UserDBConverter
+        .fromSave(userSave, dbIntegrityService::preparePostgreSQLString);
+
     String prepareIdUser = dbIntegrityService.preparePostgreSQLString(idUser);
+
+    // Проверка существования города и критерий по их ID
+    dbIntegrityService.checkExistenceById(
+        cityDBService.getRepository()::existsById, userEntityFromSave.getCityEntity());
+    dbIntegrityService.checkExistenceById(
+        criterionDBService.getRepository()::existsById, userEntityFromSave.getCriterionEntitySet());
+
+    // Проверка отсутствия пользователя с отличным от данного ID и данным email
+    dbIntegrityService.checkAbsenceAnotherByUniqStr(
+        userRepository::existsByIdIsNotAndName, prepareIdUser, userEntityFromSave.getEmail());
 
     // Получение пользователя по его ID, если пользователь существует
     UserEntity userEntityFromDB = userRepository.findById(prepareIdUser)
         .orElseThrow(() -> new NotFoundException(String.format(
             "User with ID \"%s\" not found", idUser)));
 
-    // Проверка существования города и критерий по их ID
-    dbIntegrityService.checkExistenceById(
-        cityDBService.getRepository()::existsById, userEntityFromDB.getCityEntity());
-    dbIntegrityService.checkExistenceById(
-        criterionDBService.getRepository()::existsById, userEntityFromDB.getCriterionEntitySet());
-
     // Проверка наличия роли "ROLE_USER" у пользователя
     userSecurityService.checkHasRoleElseThrowNotFound(
         userEntityFromDB, R.ROLE_USER, R.CLIENT_USER);
-
-    // Получение модели таблицы из запроса с подготовкой строковых значений для БД
-    UserEntity userEntityFromSave = UserDBConverter
-        .fromSave(userSave, dbIntegrityService::preparePostgreSQLString);
 
     // Преобразование дат рождения пользователя и рождения детей
     userEntityFromDB.setDateBirth(dateTimeService.strToDate(
@@ -219,11 +225,12 @@ public class UserServiceFB implements UserService {
 
     // Проверка дат рождения пользователя и детей на предшествие текущей даты
     dateTimeService.checkDateBeforeNow(
-        userEntityFromSave.getDateBirth());
+        userEntityFromDB.getDateBirth());
     dateTimeService.checkDateBeforeNow(
-        userEntityFromSave.getChildEntitySet().stream()
+        userEntityFromDB.getChildEntitySet().stream()
             .map(ChildEntity::getDateBirth).collect(Collectors.toSet()));
 
+    userEntityFromDB.setEmail(userEntityFromSave.getEmail());
     userEntityFromDB.setName(userEntityFromSave.getName());
     userEntityFromDB.setDateSelectCriterion(LocalDate.from(Instant.now()));
     userEntityFromDB.setFreshBenefits(true);

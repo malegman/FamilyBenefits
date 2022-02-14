@@ -45,8 +45,9 @@ public interface InstitutionService {
    * @param idInstitution ID учреждения
    * @param institutionSave объект запроса на сохранение учреждения
    * @throws NotFoundException если учреждение, город или пособия с указанными ID не найдены
+   * @throws AlreadyExistsException если учреждение с отличным ID и данным названием уже существует
    */
-  void update(String idInstitution, InstitutionSave institutionSave) throws NotFoundException;
+  void update(String idInstitution, InstitutionSave institutionSave) throws NotFoundException, AlreadyExistsException;
 
   /**
    * Удаляет учреждение по его ID

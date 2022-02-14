@@ -7,8 +7,8 @@ import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.convert.BenefitDBConverter;
 import com.example.familybenefits.convert.CityDBConverter;
 import com.example.familybenefits.convert.CriterionDBConverter;
-import com.example.familybenefits.dao.entity.*;
-import com.example.familybenefits.dao.repository.*;
+import com.example.familybenefits.dto.entity.*;
+import com.example.familybenefits.dto.repository.*;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.DateTimeException;
 import com.example.familybenefits.exception.NotFoundException;
@@ -175,9 +175,10 @@ public class BenefitServiceFB implements BenefitService, EntityDBService<Benefit
    * @param idBenefit ID пособия
    * @param benefitSave объект запроса для сохранения пособия
    * @throws NotFoundException если пособие с указанным ID не найдено
+   * @throws AlreadyExistsException если пособие с отличным ID и данным названием уже существует
    */
   @Override
-  public void update(String idBenefit, BenefitSave benefitSave) throws NotFoundException {
+  public void update(String idBenefit, BenefitSave benefitSave) throws NotFoundException, AlreadyExistsException {
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
     BenefitEntity benefitEntityFromSave = BenefitDBConverter
@@ -194,6 +195,12 @@ public class BenefitServiceFB implements BenefitService, EntityDBService<Benefit
     // Проверка существования пособия по его ID
     dbIntegrityService.checkExistenceById(
         benefitRepository::existsById, prepareIdBenefit);
+
+    // Проверка отсутствия пособия с отличным от данного ID и данным названием
+    dbIntegrityService.checkAbsenceAnotherByUniqStr(
+        benefitRepository::existsByIdIsNotAndName, prepareIdBenefit, benefitEntityFromSave.getName());
+
+    benefitEntityFromSave.setId(prepareIdBenefit);
 
     benefitRepository.saveAndFlush(benefitEntityFromSave);
   }

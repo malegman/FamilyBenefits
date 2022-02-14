@@ -44,8 +44,9 @@ public interface CityService {
    * @param idCity ID города
    * @param citySave объект запроса на сохранение города
    * @throws NotFoundException если город с указанным ID не найден
+   * @throws AlreadyExistsException если город с отличным ID и данным названием уже существует
    */
-  void update(String idCity, CitySave citySave) throws NotFoundException;
+  void update(String idCity, CitySave citySave) throws NotFoundException, AlreadyExistsException;
 
   /**
    * Удаляет город по его ID

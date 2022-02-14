@@ -4,8 +4,8 @@ import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeSave;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
 import com.example.familybenefits.convert.CriterionTypeDBConverter;
-import com.example.familybenefits.dao.entity.CriterionTypeEntity;
-import com.example.familybenefits.dao.repository.CriterionTypeRepository;
+import com.example.familybenefits.dto.entity.CriterionTypeEntity;
+import com.example.familybenefits.dto.repository.CriterionTypeRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
@@ -100,17 +100,26 @@ public class CriterionTypeServiceFB implements CriterionTypeService, EntityDBSer
    * @param idCriterionType ID типа критерия
    * @param criterionTypeSave объект запроса для сохранения типа критерия
    * @throws NotFoundException если тип критерия с указанными данными не найден
+   * @throws AlreadyExistsException если тип критерия с отличным ID и данным названием уже существует
    */
   @Override
-  public void update(String idCriterionType, CriterionTypeSave criterionTypeSave) throws NotFoundException {
+  public void update(String idCriterionType, CriterionTypeSave criterionTypeSave) throws NotFoundException, AlreadyExistsException {
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
     CriterionTypeEntity criterionTypeEntityFromSave = CriterionTypeDBConverter
         .fromSave(criterionTypeSave, dbIntegrityService::preparePostgreSQLString);
 
+    String prepareIdCriterionType = dbIntegrityService.preparePostgreSQLString(idCriterionType);
+
     // Проверка существования типа критерия по его ID
     dbIntegrityService.checkExistenceById(
-        criterionTypeRepository::existsById, criterionTypeEntityFromSave);
+        criterionTypeRepository::existsById, prepareIdCriterionType);
+
+    // Проверка отсутствия критерия с отличным от данного ID и данным названием
+    dbIntegrityService.checkAbsenceAnotherByUniqStr(
+        criterionTypeRepository::existsByIdIsNotAndName, prepareIdCriterionType, criterionTypeEntityFromSave.getName());
+
+    criterionTypeEntityFromSave.setId(prepareIdCriterionType);
 
     criterionTypeRepository.saveAndFlush(criterionTypeEntityFromSave);
   }

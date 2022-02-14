@@ -31,8 +31,9 @@ public interface AdminService {
    * @param adminSave объект запроса на сохранение администратора
    * @throws NotFoundException если администратор с указанными данными не найден
    * @throws InvalidEmailException если указанный "email" не является email
+   * @throws AlreadyExistsException если администратор или пользователь с отличным ID и данным email уже существует
    */
-  void update(String idAdmin, AdminSave adminSave) throws NotFoundException, InvalidEmailException;
+  void update(String idAdmin, AdminSave adminSave) throws NotFoundException, InvalidEmailException, AlreadyExistsException;
 
   /**
    * Удаляет администратора по его ID или удаляет роль "ROLE_ADMIN" у пользователя

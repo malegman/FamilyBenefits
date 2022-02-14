@@ -1,12 +1,9 @@
 package com.example.familybenefits.service.s_interface;
 
-import com.example.familybenefits.dao.entity.ObjectEntity;
-import com.example.familybenefits.exception.AlreadyExistsException;
-import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.dto.entity.ObjectEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * Интерфейс сервиса модели таблицы, целостность которой зависит от наличия моделей из связанных таблиц

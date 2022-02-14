@@ -39,8 +39,9 @@ public interface CriterionTypeService {
    * @param idCriterionType ID типа критерия
    * @param criterionTypeSave объект запроса для сохранения типа критерия
    * @throws NotFoundException если тип критерия с указанными данными не найден
+   * @throws AlreadyExistsException если тип критерия с отличным ID и данным названием уже существует
    */
-  void update(String idCriterionType, CriterionTypeSave criterionTypeSave) throws NotFoundException;
+  void update(String idCriterionType, CriterionTypeSave criterionTypeSave) throws NotFoundException, AlreadyExistsException;
 
   /**
    * Удаляет тип критерия по его ID

@@ -127,6 +127,11 @@ public class InstitutionController {
       // Не найдено учреждение
       log.error("PUT \"/institutions/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+    } catch (AlreadyExistsException e) {
+      // Учреждение с отличным ID и данным названием уже существует
+      log.error("PUT \"/institutions/{id}\": {}", e.getMessage());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
 

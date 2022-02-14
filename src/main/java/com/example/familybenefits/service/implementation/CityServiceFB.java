@@ -4,10 +4,10 @@ import com.example.familybenefits.api_model.city.CityInfo;
 import com.example.familybenefits.api_model.city.CitySave;
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.convert.CityDBConverter;
-import com.example.familybenefits.dao.entity.BenefitEntity;
-import com.example.familybenefits.dao.entity.CityEntity;
-import com.example.familybenefits.dao.repository.BenefitRepository;
-import com.example.familybenefits.dao.repository.CityRepository;
+import com.example.familybenefits.dto.entity.BenefitEntity;
+import com.example.familybenefits.dto.entity.CityEntity;
+import com.example.familybenefits.dto.repository.BenefitRepository;
+import com.example.familybenefits.dto.repository.CityRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
@@ -128,9 +128,10 @@ public class CityServiceFB implements CityService, EntityDBService<CityEntity, C
    * @param idCity ID города
    * @param citySave объект запроса на сохранение города
    * @throws NotFoundException если город с указанным ID не найден
+   * @throws AlreadyExistsException если город с отличным ID и данным названием уже существует
    */
   @Override
-  public void update(String idCity, CitySave citySave) throws NotFoundException {
+  public void update(String idCity, CitySave citySave) throws NotFoundException, AlreadyExistsException {
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
     CityEntity cityEntityFromSave = CityDBConverter
@@ -141,6 +142,12 @@ public class CityServiceFB implements CityService, EntityDBService<CityEntity, C
     // Проверка существование города по его ID
     dbIntegrityService.checkExistenceById(
         cityRepository::existsById, prepareIdCity);
+
+    // Проверка отсутствия города с отличным от данного ID и данным названием
+    dbIntegrityService.checkAbsenceAnotherByUniqStr(
+        cityRepository::existsByIdIsNotAndName, prepareIdCity, cityEntityFromSave.getName());
+
+    cityEntityFromSave.setId(prepareIdCity);
 
     cityRepository.saveAndFlush(cityEntityFromSave);
   }

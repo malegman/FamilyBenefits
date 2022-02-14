@@ -102,8 +102,9 @@ public class AdminController {
       log.error("PUT \"/admins/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
-    } catch (InvalidEmailException e) {
-      // Строка в поле "email" не является email
+    } catch (InvalidEmailException | AlreadyExistsException e) {
+      // Строка в поле "email" не является email.
+      // Администратор или пользователь с отличным ID и данным email уже существует
       log.error("PUT \"/admins/{id}\": {}", e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
