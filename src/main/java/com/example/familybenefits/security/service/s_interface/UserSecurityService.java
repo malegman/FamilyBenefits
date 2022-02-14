@@ -1,21 +1,12 @@
 package com.example.familybenefits.security.service.s_interface;
 
-import com.example.familybenefits.dao.entity.UserEntity;
+import com.example.familybenefits.dto.entity.UserEntity;
 import com.example.familybenefits.exception.*;
 
 /**
  * Интерфейс сервиса, отвечающего за данные пользователя
  */
 public interface UserSecurityService {
-
-  /**
-   * Проверяет пароль на эквивалентность с повторно введенным и на соответствие политике безопасности паролей.
-   * @param password проверяемый пароль
-   * @param repeatPassword повторно введенный пароль
-   * @throws NotEqualException если указанные пароли не эквивалентны
-   * @throws PasswordNotSafetyException если пароль не соответствует политике безопасности
-   */
-  void checkPasswordElseThrow(String password, String repeatPassword) throws NotEqualException, PasswordNotSafetyException;
 
   /**
    * Проверяет корректность email
