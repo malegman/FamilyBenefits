@@ -6,11 +6,13 @@ import com.example.familybenefits.api_model.criterion.CriterionInfo;
 import com.example.familybenefits.api_model.criterion.CriterionInitData;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import com.example.familybenefits.service.s_interface.CriterionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -58,13 +60,18 @@ public class CriterionController {
    * Обрабатывает POST запрос "/criteria" на создание критерия.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param criterionSave объект запроса для сохранения критерия
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @PostMapping(value = "/criteria")
-  public ResponseEntity<?> create(@RequestBody CriterionSave criterionSave) {
+  public ResponseEntity<?> create(@RequestBody CriterionSave criterionSave,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
 
+    String userIp = userAuth.getIpAddress();
+
+    // Если тело запроса пустое
     if (criterionSave == null) {
-      log.warn("POST \"/criteria\": {}", "Request body \"criterionSave\" is empty");
+      log.warn("{} POST \"/criteria\": Request body \"criterionSave\" is empty", userIp);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -74,12 +81,12 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найден тип критерия
-      log.error("POST \"/criteria\": {}", e.getMessage());
+      log.error("{} POST \"/criteria\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException e) {
       // Критерий с указанным названием существует
-      log.error("POST \"/criteria\": {}", e.getMessage());
+      log.error("{} POST \"/criteria\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -88,10 +95,14 @@ public class CriterionController {
    * Обрабатывает GET запрос "/criteria/{id}" на получение информации о критерии.
    * Выполнить запрос может любой клиент
    * @param idCriterion ID критерия
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return информация о критерии, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/criteria/{id}")
-  public ResponseEntity<CriterionInfo> read(@PathVariable(name = "id") String idCriterion) {
+  public ResponseEntity<CriterionInfo> read(@PathVariable(name = "id") String idCriterion,
+                                            @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
 
     try {
       CriterionInfo criterionInfo = criterionService.read(idCriterion);
@@ -99,7 +110,7 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найден критерий
-      log.error("GET \"/criteria/{id}\": {}", e.getMessage());
+      log.error("{} GET \"/criteria/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -109,14 +120,19 @@ public class CriterionController {
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idCriterion ID критерия
    * @param criterionSave объект запроса для сохранения критерия
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @PutMapping(value = "/criteria/{id}")
   public ResponseEntity<?> update(@PathVariable(name = "id") String idCriterion,
-                                  @RequestBody CriterionSave criterionSave) {
+                                  @RequestBody CriterionSave criterionSave,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
 
+    String userIp = userAuth.getIpAddress();
+
+    // Если тело запроса пустое
     if (criterionSave == null) {
-      log.warn("PUT \"/criteria/{id}\": {}", "Request body \"criterionSave\" is empty");
+      log.warn("{} PUT \"/criteria/{id}\": Request body \"criterionSave\" is empty", userIp);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -126,12 +142,12 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найден критерий или тип критерия
-      log.error("PUT \"/criteria/{id}\": {}", e.getMessage());
+      log.error("{} PUT \"/criteria/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException e) {
       // Критерий с отличным ID и данным названием уже существует
-      log.error("PUT \"/criteria/{id}\": {}", e.getMessage());
+      log.error("{} PUT \"/criteria/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -140,10 +156,14 @@ public class CriterionController {
    * Обрабатывает DELETE запрос "/criteria/{id}" на удаление критерия.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idCriterion ID критерия
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @DeleteMapping(value = "/criteria/{id}")
-  public ResponseEntity<?> delete(@PathVariable(name = "id") String idCriterion) {
+  public ResponseEntity<?> delete(@PathVariable(name = "id") String idCriterion,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
 
     try {
       criterionService.delete(idCriterion);
@@ -151,7 +171,7 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найден критерий
-      log.error("DELETE \"/criteria/{id}\": {}", e.getMessage());
+      log.error("{} DELETE \"/criteria/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -188,10 +208,20 @@ public class CriterionController {
    * Обрабатывает GET запрос "/criteria/user/{idUser}" на получение критерий пользователя.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
    * @param idUser ID пользователя
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return информация о пособии, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/criteria/user/{idUser}")
-  public ResponseEntity<Set<ObjectShortInfo>> readAllOfUser(@PathVariable(name = "idUser") String idUser) {
+  public ResponseEntity<Set<ObjectShortInfo>> readAllOfUser(@PathVariable(name = "idUser") String idUser,
+                                                            @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
+
+    // Если пользователь пытается получить не свои критерии
+    if (!userAuth.getIdUser().equals(idUser)) {
+      log.warn("{} GET \"/benefits/user/{idUser}\": User with id {} tried to read criteria of user with id {}", userIp, userAuth.getIdUser(), idUser);
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 
     try {
       Set<ObjectShortInfo> criterionShortInfoSet = criterionService.readAllOfUser(idUser);
@@ -199,7 +229,7 @@ public class CriterionController {
 
     } catch (NotFoundException e) {
       // Не найден пользователь
-      log.error("GET \"/benefits/user/{idUser}\": {}", e.getMessage());
+      log.error("{} GET \"/benefits/user/{idUser}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
     }
   }

@@ -4,11 +4,13 @@ import com.example.familybenefits.api_model.user.UserInfo;
 import com.example.familybenefits.api_model.user.UserInitData;
 import com.example.familybenefits.api_model.user.UserSave;
 import com.example.familybenefits.exception.*;
+import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import com.example.familybenefits.service.s_interface.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -36,13 +38,18 @@ public class UserController {
    * Обрабатывает POST запрос "/users" на создание пользователя. Регистрация гостя
    * Для незарегистрированного клиента.
    * @param userSave объект запроса для сохранения пользователя
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @PostMapping(value = "/users")
-  public ResponseEntity<?> create(@RequestBody UserSave userSave) {
+  public ResponseEntity<?> create(@RequestBody UserSave userSave,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
 
+    String userIp = userAuth.getIpAddress();
+
+    // Если тело запроса пустое
     if (userSave == null) {
-      log.warn("POST \"/users\": {}", "Request body \"userSave\" is empty");
+      log.warn("{} POST \"/users\": Request body \"userSave\" is empty", userIp);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -52,7 +59,7 @@ public class UserController {
 
     } catch (NotFoundException e) {
       // Не найдены критерии или город
-      log.error("POST \"/users\": {}", e.getMessage());
+      log.error("{} POST \"/users\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException
@@ -63,7 +70,7 @@ public class UserController {
       // Строка в поле "email" не является email.
       // Даты позже текущей даты.
       // Даты не соответствуют формату "dd.mm.yyyy".
-      log.error("POST \"/users\": {}", e.getMessage());
+      log.error("{} POST \"/users\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -72,10 +79,20 @@ public class UserController {
    * Обрабатывает GET запрос "/users/{id}" на получение информации о пользователе.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
    * @param idUser ID пользователя
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return информация о пользователе, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/users/{id}")
-  public ResponseEntity<UserInfo> read(@PathVariable(name = "id") String idUser) {
+  public ResponseEntity<UserInfo> read(@PathVariable(name = "id") String idUser,
+                                       @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
+
+    // Если пользователь пытается получить информацию не о своем профиле
+    if (!userAuth.getIdUser().equals(idUser)) {
+      log.warn("{} GET \"/admins/{id}\": User with id {} tried to read user with id {}", userIp, userAuth.getIdUser(), idUser);
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 
     try {
       UserInfo userInfo = userService.read(idUser);
@@ -83,7 +100,7 @@ public class UserController {
 
     } catch (NotFoundException e) {
       // Не найден пользователь
-      log.error("GET \"/users/{id}\": {}", e.getMessage());
+      log.error("{} GET \"/users/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -93,14 +110,25 @@ public class UserController {
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
    * @param idUser ID пользователя
    * @param userSave объект запроса для сохранения пользователя
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @PutMapping(value = "/users/{id}")
   public ResponseEntity<?> update(@PathVariable(name = "id") String idUser,
-                                      @RequestBody UserSave userSave) {
+                                  @RequestBody UserSave userSave,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
 
+    String userIp = userAuth.getIpAddress();
+
+    // Если пользователь пытается обновить не свой профиль
+    if (!userAuth.getIdUser().equals(idUser)) {
+      log.warn("{} PUT \"/admins/{id}\": User with id {} tried to update user with id {}", userIp, userAuth.getIdUser(), idUser);
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    // Если тело запроса пустое
     if (userSave == null) {
-      log.warn("PUT \"/users/{id}\": {}", "Request body \"userSave\" is empty");
+      log.warn("{} PUT \"/users/{id}\": Request body \"userSave\" is empty", userIp);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -110,7 +138,7 @@ public class UserController {
 
     } catch (NotFoundException e) {
       // Не найден пользователь или не найдены критерии или город
-      log.error("PUT \"/users/{id}\": {}", e.getMessage());
+      log.error("{} PUT \"/users/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (InvalidEmailException
@@ -121,7 +149,7 @@ public class UserController {
       // Даты позже текущей даты.
       // Даты не соответствуют формату "dd.mm.yyyy".
       // Пользователь с отличным ID и данным email уже существует.
-      log.error("PUT \"/users/{id}\": {}", e.getMessage());
+      log.error("{} PUT \"/users/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -130,10 +158,20 @@ public class UserController {
    * Обрабатывает DELETE запрос "/users/{id}" на удаление пользователя.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
    * @param idUser ID пользователя
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @DeleteMapping(value = "/users/{id}")
-  public ResponseEntity<?> delete(@PathVariable(name = "id") String idUser) {
+  public ResponseEntity<?> delete(@PathVariable(name = "id") String idUser,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
+
+    // Если пользователь пытается удалить не свой профиль
+    if (!userAuth.getIdUser().equals(idUser)) {
+      log.warn("{} PUT \"/admins/{id}\": User with id {} tried to delete user with id {}", userIp, userAuth.getIdUser(), idUser);
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 
     try {
       userService.delete(idUser);
@@ -141,7 +179,7 @@ public class UserController {
 
     } catch (NotFoundException e) {
       // Не найден пользователь
-      log.error("DELETE \"/users/{id}\": {}", e.getMessage());
+      log.error("{} DELETE \"/users/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }

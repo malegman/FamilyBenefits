@@ -7,11 +7,13 @@ import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.DateTimeException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import com.example.familybenefits.service.s_interface.BenefitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -61,13 +63,18 @@ public class BenefitController {
    * Обрабатывает POST запрос "/benefits" на создание пособия.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param benefitSave объект запроса для сохранения пособия
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @PostMapping(value = "/benefits")
-  public ResponseEntity<?> create(@RequestBody BenefitSave benefitSave) {
+  public ResponseEntity<?> create(@RequestBody BenefitSave benefitSave,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
 
+    String userIp = userAuth.getIpAddress();
+
+    // Если тело запроса пустое
     if (benefitSave == null) {
-      log.warn("POST \"/benefits\": {}", "Request body \"benefitSave\" is empty");
+      log.warn("{} POST \"/benefits\": Request body \"benefitSave\" is empty", userIp);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -77,12 +84,12 @@ public class BenefitController {
 
     } catch (NotFoundException e) {
       // Не найдены города или критерии
-      log.error("POST \"/benefits\": {}", e.getMessage());
+      log.error("{} POST \"/benefits\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException e) {
       // Пособие с указанным названием существует
-      log.error("POST \"/benefits\": {}", e.getMessage());
+      log.error("{} POST \"/benefits\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -91,10 +98,14 @@ public class BenefitController {
    * Обрабатывает GET запрос "/benefits/{id}" на получение информации о пособии.
    * Выполнить запрос может любой клиент
    * @param idBenefit ID пособия
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return информация о пособии, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/benefits/{id}")
-  public ResponseEntity<BenefitInfo> read(@PathVariable(name = "id") String idBenefit) {
+  public ResponseEntity<BenefitInfo> read(@PathVariable(name = "id") String idBenefit,
+                                          @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
 
     try {
       BenefitInfo benefitInfo = benefitService.read(idBenefit);
@@ -102,7 +113,7 @@ public class BenefitController {
 
     } catch (NotFoundException e) {
       // Не найдено пособие
-      log.error("GET \"/benefits/{id}\": {}", e.getMessage());
+      log.error("{} GET \"/benefits/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -112,14 +123,19 @@ public class BenefitController {
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idBenefit ID пособия
    * @param benefitSave объект запроса для сохранения пособия
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @PutMapping(value = "/benefits/{id}")
   public ResponseEntity<?> update(@PathVariable(name = "id") String idBenefit,
-                                  @RequestBody BenefitSave benefitSave) {
+                                  @RequestBody BenefitSave benefitSave,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
 
+    String userIp = userAuth.getIpAddress();
+
+    // Если тело запроса пустое
     if (benefitSave == null) {
-      log.warn("PUT \"/benefits/{id}\": {}", "Request body \"benefitSave\" is empty");
+      log.warn("{} PUT \"/benefits/{id}\": Request body \"benefitSave\" is empty", userIp);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -129,12 +145,12 @@ public class BenefitController {
 
     } catch (NotFoundException e) {
       // Не найдено пособие или не найдены города или критерии
-      log.error("PUT \"/benefits/{id}\": {}", e.getMessage());
+      log.error("{} PUT \"/benefits/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException e) {
       // Пособие с отличным ID и данным названием уже существует
-      log.error("PUT \"/benefits/{id}\": {}", e.getMessage());
+      log.error("{} PUT \"/benefits/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -143,10 +159,14 @@ public class BenefitController {
    * Обрабатывает DELETE запрос "/benefits/{id}" на удаление пособия.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idBenefit ID пособия
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @DeleteMapping(value = "/benefits/{id}")
-  public ResponseEntity<?> delete(@PathVariable(name = "id") String idBenefit) {
+  public ResponseEntity<?> delete(@PathVariable(name = "id") String idBenefit,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
 
     try {
       benefitService.delete(idBenefit);
@@ -154,7 +174,7 @@ public class BenefitController {
 
     } catch (NotFoundException e) {
       // Не найдено пособие
-      log.error("DELETE \"/benefits/{id}\": {}", e.getMessage());
+      log.error("{} DELETE \"/benefits/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -191,10 +211,20 @@ public class BenefitController {
    * Обрабатывает GET запрос "/benefits/user/{idUser}" на получение пособий пользователя.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
    * @param idUser ID пользователя
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return информация о пособии, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/benefits/user/{idUser}")
-  public ResponseEntity<Set<ObjectShortInfo>> readAllOfUser(@PathVariable(name = "idUser") String idUser) {
+  public ResponseEntity<Set<ObjectShortInfo>> readAllOfUser(@PathVariable(name = "idUser") String idUser,
+                                                            @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
+
+    // Если пользователь пытается получить не свои пособия
+    if (!userAuth.getIdUser().equals(idUser)) {
+      log.warn("{} GET \"/benefits/user/{idUser}\": User with id {} tried to read benefits of user with id {}", userIp, userAuth.getIdUser(), idUser);
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 
     try {
       Set<ObjectShortInfo> benefitShortInfoSet = benefitService.readAllOfUser(idUser);
@@ -202,12 +232,12 @@ public class BenefitController {
 
     } catch (NotFoundException e) {
       // Не найден пользователь
-      log.error("GET \"/benefits/user/{idUser}\": {}", e.getMessage());
+      log.error("{} GET \"/benefits/user/{idUser}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptySet());
 
     } catch (DateTimeException e) {
       // Устарели критерии
-      log.error("GET \"/benefits/user/{idUser}\": {}", e.getMessage());
+      log.error("{} GET \"/benefits/user/{idUser}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.emptySet());
     }
   }
