@@ -5,11 +5,13 @@ import com.example.familybenefits.api_model.city.CitySave;
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import com.example.familybenefits.service.s_interface.CityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -56,13 +58,18 @@ public class CityController {
    * Обрабатывает POST запрос "/cities" на создание города.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param citySave объект запроса для сохранения города
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @PostMapping(value = "/cities")
-  public ResponseEntity<?> create(@RequestBody CitySave citySave) {
+  public ResponseEntity<?> create(@RequestBody CitySave citySave,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
 
+    String userIp = userAuth.getIpAddress();
+
+    // Если тело запроса пустое
     if (citySave == null) {
-      log.warn("POST \"/cities\": {}", "Request body \"citySave\" is empty");
+      log.warn("{} POST \"/cities\": Request body \"citySave\" is empty", userIp);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -72,12 +79,12 @@ public class CityController {
 
     } catch (AlreadyExistsException e) {
       // Город с указанным названием существует
-      log.error("POST \"/cities\": {}", e.getMessage());
+      log.error("{} POST \"/cities\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
     } catch (NotFoundException e) {
       // Не найдены пособия
-      log.error("POST \"/cities\": {}", e.getMessage());
+      log.error("{} POST \"/cities\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -86,10 +93,14 @@ public class CityController {
    * Обрабатывает GET запрос "/cities/{id}" на получение информации о городе.
    * Выполнить запрос может любой клиент
    * @param idCity ID города
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return информация о городе, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/cities/{id}")
-  public ResponseEntity<CityInfo> read(@PathVariable(name = "id") String idCity) {
+  public ResponseEntity<CityInfo> read(@PathVariable(name = "id") String idCity,
+                                       @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
 
     try {
       CityInfo cityInfo = cityService.read(idCity);
@@ -97,7 +108,7 @@ public class CityController {
 
     } catch (NotFoundException e) {
       // Не найден город
-      log.error("GET \"/cities/{id}\": {}", e.getMessage());
+      log.error("{} GET \"/cities/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -107,14 +118,19 @@ public class CityController {
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idCity ID города
    * @param citySave объект запроса для сохранения города
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @PutMapping(value = "/cities/{id}")
   public ResponseEntity<?> update(@PathVariable(name = "id") String idCity,
-                                  @RequestBody CitySave citySave) {
+                                  @RequestBody CitySave citySave,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
 
+    String userIp = userAuth.getIpAddress();
+
+    // Если тело запроса пустое
     if (citySave == null) {
-      log.warn("PUT \"/cities/{id}\": {}", "Request body \"citySave\" is empty");
+      log.warn("{} PUT \"/cities/{id}\": Request body \"citySave\" is empty", userIp);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -124,12 +140,12 @@ public class CityController {
 
     } catch (NotFoundException e) {
       // Не найден город или не найдены пособия
-      log.error("PUT \"/cities/{id}\": {}", e.getMessage());
+      log.error("{} PUT \"/cities/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException e) {
       // Город с отличным ID и данным названием уже существует
-      log.error("PUT \"/cities/{id}\": {}", e.getMessage());
+      log.error("{} PUT \"/cities/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -138,10 +154,14 @@ public class CityController {
    * Обрабатывает DELETE запрос "/cities/{id}" на удаление городе.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idCity ID города
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @DeleteMapping(value = "/cities/{id}")
-  public ResponseEntity<?> delete(@PathVariable(name = "id") String idCity) {
+  public ResponseEntity<?> delete(@PathVariable(name = "id") String idCity,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
 
     try {
       cityService.delete(idCity);
@@ -149,7 +169,7 @@ public class CityController {
 
     } catch (NotFoundException e) {
       // Не найден город
-      log.error("DELETE \"/cities/{id}\": {}", e.getMessage());
+      log.error("{} DELETE \"/cities/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }

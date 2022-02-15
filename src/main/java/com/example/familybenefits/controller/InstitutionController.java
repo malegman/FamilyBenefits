@@ -6,11 +6,13 @@ import com.example.familybenefits.api_model.institution.InstitutionInitData;
 import com.example.familybenefits.api_model.institution.InstitutionSave;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import com.example.familybenefits.service.s_interface.InstitutionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -57,13 +59,18 @@ public class InstitutionController {
    * Обрабатывает POST запрос "/institutions" на создание учреждения.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param institutionSave объект запроса для сохранения учреждения
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @PostMapping(value = "/institutions")
-  public ResponseEntity<?> create(@RequestBody InstitutionSave institutionSave) {
+  public ResponseEntity<?> create(@RequestBody InstitutionSave institutionSave,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
 
+    String userIp = userAuth.getIpAddress();
+
+    // Если тело запроса пустое
     if (institutionSave == null) {
-      log.warn("POST \"/institutions\": {}", "Request body \"institutionSave\" is empty");
+      log.warn("{} POST \"/institutions\": Request body \"institutionSave\" is empty", userIp);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -73,12 +80,12 @@ public class InstitutionController {
 
     } catch (NotFoundException e) {
       // Не найдены города или пособия
-      log.error("POST \"/institutions\": {}", e.getMessage());
+      log.error("{} POST \"/institutions\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException e) {
       // Учреждение с указанным названием существует
-      log.error("POST \"/institutions\": {}", e.getMessage());
+      log.error("{} POST \"/institutions\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -87,10 +94,14 @@ public class InstitutionController {
    * Обрабатывает GET запрос "/institutions/{id}" на получение информации об учреждении.
    * Выполнить запрос может любой клиент
    * @param idInstitution ID учреждения
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return информация об учреждении, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/institutions/{id}")
-  public ResponseEntity<InstitutionInfo> read(@PathVariable(name = "id") String idInstitution) {
+  public ResponseEntity<InstitutionInfo> read(@PathVariable(name = "id") String idInstitution,
+                                              @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
 
     try {
       InstitutionInfo institutionInfo = institutionService.read(idInstitution);
@@ -98,7 +109,7 @@ public class InstitutionController {
 
     } catch (NotFoundException e) {
       // Не найдено учреждение
-      log.error("GET \"/institutions/{id}\": {}", e.getMessage());
+      log.error("{} GET \"/institutions/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -108,14 +119,19 @@ public class InstitutionController {
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idInstitution ID учреждения
    * @param institutionSave объект запроса для сохранения учреждения
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @PutMapping(value = "/institutions/{id}")
   public ResponseEntity<?> update(@PathVariable(name = "id") String idInstitution,
-                                  @RequestBody InstitutionSave institutionSave) {
+                                  @RequestBody InstitutionSave institutionSave,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
 
+    String userIp = userAuth.getIpAddress();
+
+    // Если тело запроса пустое
     if (institutionSave == null) {
-      log.warn("PUT \"/institutions/{id}\": {}", "Request body \"institutionSave\" is empty");
+      log.warn("{} PUT \"/institutions/{id}\": Request body \"institutionSave\" is empty", userIp);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -125,12 +141,12 @@ public class InstitutionController {
 
     } catch (NotFoundException e) {
       // Не найдено учреждение
-      log.error("PUT \"/institutions/{id}\": {}", e.getMessage());
+      log.error("{} PUT \"/institutions/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException e) {
       // Учреждение с отличным ID и данным названием уже существует
-      log.error("PUT \"/institutions/{id}\": {}", e.getMessage());
+      log.error("{} PUT \"/institutions/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -139,10 +155,14 @@ public class InstitutionController {
    * Обрабатывает DELETE запрос "/institutions/{id}" на удаление учреждения.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idInstitution ID учреждения
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @DeleteMapping(value = "/institutions/{id}")
-  public ResponseEntity<?> delete(@PathVariable(name = "id") String idInstitution) {
+  public ResponseEntity<?> delete(@PathVariable(name = "id") String idInstitution,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
 
     try {
       institutionService.delete(idInstitution);
@@ -150,7 +170,7 @@ public class InstitutionController {
 
     } catch (NotFoundException e) {
       // Не найдено учреждение
-      log.error("DELETE \"/institutions/{id}\": {}", e.getMessage());
+      log.error("{} DELETE \"/institutions/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }

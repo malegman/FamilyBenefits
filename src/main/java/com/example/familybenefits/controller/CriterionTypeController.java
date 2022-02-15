@@ -5,11 +5,13 @@ import com.example.familybenefits.api_model.criterion_type.CriterionTypeSave;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
+import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import com.example.familybenefits.service.s_interface.CriterionTypeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -53,13 +55,19 @@ public class CriterionTypeController {
    * Обрабатывает POST запрос "/criterion-types" на создание типа критерия.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param criterionTypeSave объект запроса для сохранения типа критерия
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @PostMapping(value = "/criterion-types")
-  public ResponseEntity<?> create(@RequestBody CriterionTypeSave criterionTypeSave) {
+  public ResponseEntity<?> create(@RequestBody CriterionTypeSave criterionTypeSave,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
 
+    String userIp = userAuth.getIpAddress();
+
+
+    // Если тело запроса пустое
     if (criterionTypeSave == null) {
-      log.warn("POST \"/criterion-types\": {}", "Request body \"criterionTypeSave\" is empty");
+      log.warn("{} POST \"/criterion-types\": Request body \"criterionTypeSave\" is empty", userIp);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -69,7 +77,7 @@ public class CriterionTypeController {
 
     } catch (AlreadyExistsException e) {
       // Тип критерия с указанным названием существует
-      log.error("POST \"/criterion-types\": {}", e.getMessage());
+      log.error("{} POST \"/criterion-types\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -78,10 +86,14 @@ public class CriterionTypeController {
    * Обрабатывает GET запрос "/criterion-types/{id}" на получение информации о типе критерия.
    * Выполнить запрос может любой клиент
    * @param idCriterionType ID типа критерия
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return информация о типе критерия, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/criterion-types/{id}")
-  public ResponseEntity<CriterionTypeInfo> read(@PathVariable(name = "id") String idCriterionType) {
+  public ResponseEntity<CriterionTypeInfo> read(@PathVariable(name = "id") String idCriterionType,
+                                                @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
 
     try {
       CriterionTypeInfo criterionTypeInfo = criterionTypeService.read(idCriterionType);
@@ -89,7 +101,7 @@ public class CriterionTypeController {
 
     } catch (NotFoundException e) {
       // Не найден тип критерия
-      log.error("GET \"/criterion-types/{id}\": {}", e.getMessage());
+      log.error("{} GET \"/criterion-types/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
@@ -99,14 +111,20 @@ public class CriterionTypeController {
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idCriterionType ID типа критерия
    * @param criterionTypeSave объект запроса для сохранения типа критерия
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @PutMapping(value = "/criterion-types/{id}")
   public ResponseEntity<?> update(@PathVariable(name = "id") String idCriterionType,
-                                  @RequestBody CriterionTypeSave criterionTypeSave) {
+                                  @RequestBody CriterionTypeSave criterionTypeSave,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
 
+    String userIp = userAuth.getIpAddress();
+
+
+    // Если тело запроса пустое
     if (criterionTypeSave == null) {
-      log.warn("PUT \"/criterion-types/{id}\": {}", "Request body \"criterionTypeSave\" is empty");
+      log.warn("{} PUT \"/criterion-types/{id}\": Request body \"criterionTypeSave\" is empty", userIp);
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -116,12 +134,12 @@ public class CriterionTypeController {
 
     } catch (NotFoundException e) {
       // Не найден тип критерия
-      log.error("PUT \"/criterion-types/{id}\": {}", e.getMessage());
+      log.error("{} PUT \"/criterion-types/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     } catch (AlreadyExistsException e) {
       // Тип критерия с отличным ID и данным названием уже существует
-      log.error("PUT \"/criterion-types/{id}\": {}", e.getMessage());
+      log.error("{} PUT \"/criterion-types/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
   }
@@ -130,10 +148,14 @@ public class CriterionTypeController {
    * Обрабатывает DELETE запрос "/criterion-types/{id}" на удаление типа критерия.
    * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
    * @param idCriterionType ID типа критерия
+   * @param userAuth данные пользователя из jwt, отправившего запрос
    * @return код ответа, результат обработки запроса
    */
   @DeleteMapping(value = "/criterion-types/{id}")
-  public ResponseEntity<?> delete(@PathVariable(name = "id") String idCriterionType) {
+  public ResponseEntity<?> delete(@PathVariable(name = "id") String idCriterionType,
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+
+    String userIp = userAuth.getIpAddress();
 
     try {
       criterionTypeService.delete(idCriterionType);
@@ -141,7 +163,7 @@ public class CriterionTypeController {
 
     } catch (NotFoundException e) {
       // Не найден тип критерия
-      log.error("DELETE \"/criterion-types/{id}\": {}", e.getMessage());
+      log.error("{} DELETE \"/criterion-types/{id}\": {}", userIp, e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }
