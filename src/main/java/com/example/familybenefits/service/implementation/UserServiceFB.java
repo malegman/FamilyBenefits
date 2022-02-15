@@ -114,7 +114,7 @@ public class UserServiceFB implements UserService {
       DateTimeException {
 
     // Проверка строки email на соответствие формату email
-    userSecurityService.checkEmailElseThrowInvalidEmail(
+    userSecurityService.checkEmailElseThrow(
         userSave.getEmail());
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
@@ -189,7 +189,7 @@ public class UserServiceFB implements UserService {
       AlreadyExistsException {
 
     // Проверка строки email на соответствие формату email
-    userSecurityService.checkEmailElseThrowInvalidEmail(
+    userSecurityService.checkEmailElseThrow(
         userSave.getEmail());
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД

@@ -13,7 +13,7 @@ public interface UserSecurityService {
    * @param email проверяемый email
    * @throws InvalidEmailException если указанный "email" не является email
    */
-  void checkEmailElseThrowInvalidEmail(String email) throws InvalidEmailException;
+  void checkEmailElseThrow(String email) throws InvalidEmailException;
 
   /**
    * Проверяет наличие указанной роли по её названию у указанной модели таблицы "user"

@@ -61,7 +61,7 @@ public class AdminServiceFB implements AdminService {
   public void create(AdminSave adminSave) throws AlreadyExistsException, InvalidEmailException {
 
     // Проверка строки email на соответствие формату email
-    userSecurityService.checkEmailElseThrowInvalidEmail(
+    userSecurityService.checkEmailElseThrow(
         adminSave.getEmail());
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
@@ -119,7 +119,7 @@ public class AdminServiceFB implements AdminService {
   public void update(String idAdmin, AdminSave adminSave) throws NotFoundException, InvalidEmailException, AlreadyExistsException {
 
     // Проверка строки email на соответствие формату email
-    userSecurityService.checkEmailElseThrowInvalidEmail(
+    userSecurityService.checkEmailElseThrow(
         adminSave.getEmail());
 
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД

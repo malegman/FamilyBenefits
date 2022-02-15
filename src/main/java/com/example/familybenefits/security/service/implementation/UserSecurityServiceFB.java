@@ -21,7 +21,7 @@ public class UserSecurityServiceFB implements UserSecurityService {
    * @throws InvalidEmailException если указанный "email" не является email
    */
   @Override
-  public void checkEmailElseThrowInvalidEmail(String email) throws InvalidEmailException {
+  public void checkEmailElseThrow(String email) throws InvalidEmailException {
 
     if (!PATTERN_EMAIL.matcher(email).matches()) {
       throw new InvalidEmailException(String.format(
