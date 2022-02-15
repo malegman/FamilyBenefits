@@ -10,10 +10,7 @@ import com.example.familybenefits.dto.entity.ChildEntity;
 import com.example.familybenefits.dto.entity.CityEntity;
 import com.example.familybenefits.dto.entity.CriterionEntity;
 import com.example.familybenefits.dto.entity.UserEntity;
-import com.example.familybenefits.dto.repository.ChildRepository;
-import com.example.familybenefits.dto.repository.CityRepository;
-import com.example.familybenefits.dto.repository.CriterionRepository;
-import com.example.familybenefits.dto.repository.UserRepository;
+import com.example.familybenefits.dto.repository.*;
 import com.example.familybenefits.exception.*;
 import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
@@ -40,7 +37,10 @@ public class UserServiceFB implements UserService {
    * Репозиторий, работающий с моделью таблицы "user"
    */
   private final UserRepository userRepository;
-
+  /**
+   * Репозиторий, работающий с моделью таблицы "access_token"
+   */
+  private final AccessTokenRepository accessTokenRepository;
   /**
    * Репозиторий, работающий с моделью таблицы "child"
    */
@@ -72,6 +72,7 @@ public class UserServiceFB implements UserService {
   /**
    * Конструктор для инициализации интерфейсов репозиториев и сервисов
    * @param userRepository репозиторий, работающий с моделью таблицы "user"
+   * @param accessTokenRepository репозиторий, работающий с моделью таблицы "access_token"
    * @param childRepository репозиторий, работающий с моделью таблицы "child"
    * @param cityDBService интерфейс сервиса модели таблицы "city", целостность которой зависит от связанных таблиц
    * @param criterionDBService интерфейс сервиса модели таблицы "criterion", целостность которой зависит от связанных таблиц
@@ -81,6 +82,7 @@ public class UserServiceFB implements UserService {
    */
   @Autowired
   public UserServiceFB(UserRepository userRepository,
+                       AccessTokenRepository accessTokenRepository,
                        ChildRepository childRepository,
                        EntityDBService<CityEntity, CityRepository> cityDBService,
                        EntityDBService<CriterionEntity, CriterionRepository> criterionDBService,
@@ -88,6 +90,7 @@ public class UserServiceFB implements UserService {
                        DBIntegrityService dbIntegrityService,
                        UserSecurityService userSecurityService) {
     this.userRepository = userRepository;
+    this.accessTokenRepository = accessTokenRepository;
     this.childRepository = childRepository;
     this.cityDBService = cityDBService;
     this.criterionDBService = criterionDBService;
@@ -163,10 +166,6 @@ public class UserServiceFB implements UserService {
         .orElseThrow(() -> new NotFoundException(String.format(
             "User with ID \"%s\" not found", idUser)));
 
-    // Проверка наличия роли "ROLE_USER" у пользователя
-    userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_USER, R.CLIENT_USER);
-
     return UserDBConverter.toInfo(userEntityFromRequest);
   }
 
@@ -213,10 +212,6 @@ public class UserServiceFB implements UserService {
         .orElseThrow(() -> new NotFoundException(String.format(
             "User with ID \"%s\" not found", idUser)));
 
-    // Проверка наличия роли "ROLE_USER" у пользователя
-    userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromDB, R.ROLE_USER, R.CLIENT_USER);
-
     // Преобразование дат рождения пользователя и рождения детей
     userEntityFromDB.setDateBirth(dateTimeService.strToDate(
         userSave.getDateBirth()));
@@ -253,16 +248,13 @@ public class UserServiceFB implements UserService {
         .orElseThrow(() -> new NotFoundException(String.format(
             "User with ID \"%s\" not found", idUser)));
 
-    // Проверка наличия роли "ROLE_USER" у пользователя
-    userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_USER, R.CLIENT_USER);
-
-    // Если есть роль "ROLE_ADMIN", удаление роли "ROLE_USER", иначе удаление пользователя
+    // Если есть роль "ROLE_ADMIN", удаление роли "ROLE_USER", иначе удаление пользователя и его токена доступа
     if (userEntityFromRequest.hasRole(R.ROLE_ADMIN)) {
       userEntityFromRequest.removeRole(R.ROLE_USER);
       userRepository.saveAndFlush(userEntityFromRequest);
     } else {
       userRepository.deleteById(prepareIdUser);
+      accessTokenRepository.deleteById(prepareIdUser);
     }
   }
 
