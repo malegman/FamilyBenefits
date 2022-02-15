@@ -1,0 +1,11 @@
+org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer = \
+  com.example.familybenefits.security.web.config.HttpSecurityConfig,\
+  com.example.familybenefits.security.web.config.SystemHttpRequestConfig,\
+  com.example.familybenefits.security.web.config.UserHttpRequestConfig,\
+  com.example.familybenefits.security.web.config.AdminHttpRequestConfig,\
+  com.example.familybenefits.security.web.config.CityHttpRequestConfig,\
+  com.example.familybenefits.security.web.config.InstitutionHttpRequestConfig,\
+  com.example.familybenefits.security.web.config.BenefitHttpRequestConfig,\
+  com.example.familybenefits.security.web.config.CriterionHttpRequestConfig,\
+  com.example.familybenefits.security.web.config.CriterionTypeHttpRequestConfig
+
