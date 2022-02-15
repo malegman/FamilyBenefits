@@ -9,9 +9,12 @@ import com.example.familybenefits.service.s_interface.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Контроллер запросов, связанных с пользователем
@@ -38,14 +41,16 @@ public class UserController {
    * Обрабатывает POST запрос "/users" на создание пользователя. Регистрация гостя
    * Для незарегистрированного клиента.
    * @param userSave объект запроса для сохранения пользователя
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/users")
+  @PostMapping(
+      value = "/users",
+      consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<?> create(@RequestBody UserSave userSave,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если тело запроса пустое
     if (userSave == null) {
@@ -77,16 +82,21 @@ public class UserController {
 
   /**
    * Обрабатывает GET запрос "/users/{id}" на получение информации о пользователе.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_USER"
    * @param idUser ID пользователя
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param userAuth данные пользователя из jwt, отправившего запрос, для получения ID пользователя
+   * @param request http запрос
    * @return информация о пользователе, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/users/{id}")
+  @GetMapping(
+      value = "/users/{id}",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<UserInfo> read(@PathVariable(name = "id") String idUser,
-                                       @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                       @AuthenticationPrincipal JwtAuthenticationUserData userAuth,
+                                       HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если пользователь пытается получить информацию не о своем профиле
     if (!userAuth.getIdUser().equals(idUser)) {
@@ -107,18 +117,22 @@ public class UserController {
 
   /**
    * Обрабатывает PUT запрос "/users/{id}" на обновление пользователя.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_USER"
    * @param idUser ID пользователя
    * @param userSave объект запроса для сохранения пользователя
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param userAuth данные пользователя из jwt, отправившего запрос, для получения ID пользователя
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @PutMapping(value = "/users/{id}")
+  @PutMapping(
+      value = "/users/{id}",
+      consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<?> update(@PathVariable(name = "id") String idUser,
                                   @RequestBody UserSave userSave,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth,
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если пользователь пытается обновить не свой профиль
     if (!userAuth.getIdUser().equals(idUser)) {
@@ -156,16 +170,19 @@ public class UserController {
 
   /**
    * Обрабатывает DELETE запрос "/users/{id}" на удаление пользователя.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_USER"
    * @param idUser ID пользователя
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param userAuth данные пользователя из jwt, отправившего запрос, для получения ID пользователя
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @DeleteMapping(value = "/users/{id}")
+  @DeleteMapping(
+      value = "/users/{id}")
   public ResponseEntity<?> delete(@PathVariable(name = "id") String idUser,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth,
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если пользователь пытается удалить не свой профиль
     if (!userAuth.getIdUser().equals(idUser)) {
@@ -190,7 +207,10 @@ public class UserController {
    * Выполнить запрос может любой клиент
    * @return дополнительные данные для пользователя и код ответа
    */
-  @GetMapping(value = "/users/init-data")
+  @GetMapping(
+      value = "/users/init-data",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<UserInitData> getInitData() {
 
     return ResponseEntity

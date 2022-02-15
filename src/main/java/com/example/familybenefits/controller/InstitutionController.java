@@ -6,15 +6,15 @@ import com.example.familybenefits.api_model.institution.InstitutionInitData;
 import com.example.familybenefits.api_model.institution.InstitutionSave;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import com.example.familybenefits.service.s_interface.InstitutionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Set;
 
 /**
@@ -47,7 +47,10 @@ public class InstitutionController {
    * @param idBenefit ID пособия
    * @return множество учреждений и код ответа
    */
-  @GetMapping(value = "/institutions/all")
+  @GetMapping(
+      value = "/institutions",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<Set<ObjectShortInfo>> readAllFilter(@RequestParam(name = "idCity", required = false) String idCity,
                                                             @RequestParam(name = "idBenefit", required = false) String idBenefit) {
 
@@ -57,16 +60,18 @@ public class InstitutionController {
 
   /**
    * Обрабатывает POST запрос "/institutions" на создание учреждения.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param institutionSave объект запроса для сохранения учреждения
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/institutions")
+  @PostMapping(
+      value = "/institutions",
+      consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<?> create(@RequestBody InstitutionSave institutionSave,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если тело запроса пустое
     if (institutionSave == null) {
@@ -94,14 +99,17 @@ public class InstitutionController {
    * Обрабатывает GET запрос "/institutions/{id}" на получение информации об учреждении.
    * Выполнить запрос может любой клиент
    * @param idInstitution ID учреждения
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return информация об учреждении, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/institutions/{id}")
+  @GetMapping(
+      value = "/institutions/{id}",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<InstitutionInfo> read(@PathVariable(name = "id") String idInstitution,
-                                              @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                              HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     try {
       InstitutionInfo institutionInfo = institutionService.read(idInstitution);
@@ -116,18 +124,20 @@ public class InstitutionController {
 
   /**
    * Обрабатывает PUT запрос "/institutions/{id}" на обновление учреждения.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param idInstitution ID учреждения
    * @param institutionSave объект запроса для сохранения учреждения
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @PutMapping(value = "/institutions/{id}")
+  @PutMapping(
+      value = "/institutions/{id}",
+      consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<?> update(@PathVariable(name = "id") String idInstitution,
                                   @RequestBody InstitutionSave institutionSave,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если тело запроса пустое
     if (institutionSave == null) {
@@ -153,16 +163,17 @@ public class InstitutionController {
 
   /**
    * Обрабатывает DELETE запрос "/institutions/{id}" на удаление учреждения.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param idInstitution ID учреждения
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @DeleteMapping(value = "/institutions/{id}")
+  @DeleteMapping(
+      value = "/institutions/{id}")
   public ResponseEntity<?> delete(@PathVariable(name = "id") String idInstitution,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     try {
       institutionService.delete(idInstitution);
@@ -178,10 +189,13 @@ public class InstitutionController {
   /**
    * Обрабатывает GET запрос "/institutions/partial" на получение множества учреждений,
    * в которых нет пособий.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @return множество учреждений и код ответа
    */
-  @GetMapping(value = "/institutions/partial")
+  @GetMapping(
+      value = "/institutions/partial",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<Set<ObjectShortInfo>> readAllPartial() {
 
     return ResponseEntity
@@ -192,10 +206,13 @@ public class InstitutionController {
   /**
    * Обрабатывает GET запрос "/institutions/init-data" на получение дополнительных данных для учреждения.
    * Данные содержат в себе множество кратких информаций о городах и пособиях.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @return дополнительные данные для учреждения и код ответа
    */
-  @GetMapping(value = "/institutions/init-data")
+  @GetMapping(
+      value = "/institutions/init-data",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<InstitutionInitData> getInitData() {
 
     return ResponseEntity

@@ -11,10 +11,12 @@ import com.example.familybenefits.service.s_interface.CriterionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Set;
 
@@ -48,9 +50,12 @@ public class CriterionController {
    * @param idCriterionType ID типа критерия
    * @return множество критерий, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/criteria")
+  @GetMapping(
+      value = "/criteria",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<Set<ObjectShortInfo>> readAllFilter(@RequestParam(name = "idBenefit", required = false) String idBenefit,
-                                                          @RequestParam(name = "idCriterionType", required = false) String idCriterionType) {
+                                                            @RequestParam(name = "idCriterionType", required = false) String idCriterionType) {
 
     Set<ObjectShortInfo> criterionShortInfoSet = criterionService.readAllFilter(idBenefit, idCriterionType);
     return ResponseEntity.status(HttpStatus.OK).body(criterionShortInfoSet);
@@ -58,16 +63,18 @@ public class CriterionController {
 
   /**
    * Обрабатывает POST запрос "/criteria" на создание критерия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param criterionSave объект запроса для сохранения критерия
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/criteria")
+  @PostMapping(
+      value = "/criteria",
+      consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<?> create(@RequestBody CriterionSave criterionSave,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если тело запроса пустое
     if (criterionSave == null) {
@@ -95,14 +102,17 @@ public class CriterionController {
    * Обрабатывает GET запрос "/criteria/{id}" на получение информации о критерии.
    * Выполнить запрос может любой клиент
    * @param idCriterion ID критерия
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return информация о критерии, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/criteria/{id}")
+  @GetMapping(
+      value = "/criteria/{id}",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<CriterionInfo> read(@PathVariable(name = "id") String idCriterion,
-                                            @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                            HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     try {
       CriterionInfo criterionInfo = criterionService.read(idCriterion);
@@ -117,18 +127,20 @@ public class CriterionController {
 
   /**
    * Обрабатывает PUT запрос "/criteria/{id}" на обновление критерия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param idCriterion ID критерия
    * @param criterionSave объект запроса для сохранения критерия
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @PutMapping(value = "/criteria/{id}")
+  @PutMapping(
+      value = "/criteria/{id}",
+      consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<?> update(@PathVariable(name = "id") String idCriterion,
                                   @RequestBody CriterionSave criterionSave,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если тело запроса пустое
     if (criterionSave == null) {
@@ -154,16 +166,17 @@ public class CriterionController {
 
   /**
    * Обрабатывает DELETE запрос "/criteria/{id}" на удаление критерия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param idCriterion ID критерия
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @DeleteMapping(value = "/criteria/{id}")
+  @DeleteMapping(
+      value = "/criteria/{id}")
   public ResponseEntity<?> delete(@PathVariable(name = "id") String idCriterion,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     try {
       criterionService.delete(idCriterion);
@@ -179,10 +192,13 @@ public class CriterionController {
   /**
    * Обрабатывает GET запрос "/criteria/partial" на получение множества критерий,
    * в которых нет пособий.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @return множество критерий, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/criteria/partial")
+  @GetMapping(
+      value = "/criteria/partial",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<Set<ObjectShortInfo>> readAllPartial() {
 
     return ResponseEntity
@@ -193,7 +209,7 @@ public class CriterionController {
   /**
    * Обрабатывает GET запрос "/criteria/init-data" на получение дополнительных данных для критерия.
    * Данные содержат в себе множество кратких информаций о типах критерий
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @return дополнительные данные для критерия, если запрос выполнен успешно, и код ответа
    */
   @GetMapping(value = "/criteria/init-data")
@@ -206,16 +222,21 @@ public class CriterionController {
 
   /**
    * Обрабатывает GET запрос "/criteria/user/{idUser}" на получение критерий пользователя.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_USER"
    * @param idUser ID пользователя
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param userAuth данные пользователя из jwt, отправившего запрос, для получения ID пользователя
+   * @param request http запрос
    * @return информация о пособии, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/criteria/user/{idUser}")
+  @GetMapping(
+      value = "/criteria/user/{idUser}",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<Set<ObjectShortInfo>> readAllOfUser(@PathVariable(name = "idUser") String idUser,
-                                                            @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                                            @AuthenticationPrincipal JwtAuthenticationUserData userAuth,
+                                                            HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если пользователь пытается получить не свои критерии
     if (!userAuth.getIdUser().equals(idUser)) {

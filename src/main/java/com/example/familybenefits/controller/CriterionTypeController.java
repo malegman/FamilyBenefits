@@ -5,15 +5,15 @@ import com.example.familybenefits.api_model.criterion_type.CriterionTypeSave;
 import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import com.example.familybenefits.service.s_interface.CriterionTypeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Set;
 
 /**
@@ -43,7 +43,10 @@ public class CriterionTypeController {
    * Выполнить запрос может любой клиент
    * @return множество типов критерий и код ответа
    */
-  @GetMapping(value = "/criterion-types/all")
+  @GetMapping(
+      value = "/criterion-types",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<Set<ObjectShortInfo>> readAll() {
 
     return ResponseEntity
@@ -53,16 +56,18 @@ public class CriterionTypeController {
 
   /**
    * Обрабатывает POST запрос "/criterion-types" на создание типа критерия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param criterionTypeSave объект запроса для сохранения типа критерия
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/criterion-types")
+  @PostMapping(
+      value = "/criterion-types",
+      consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<?> create(@RequestBody CriterionTypeSave criterionTypeSave,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
 
     // Если тело запроса пустое
@@ -86,14 +91,17 @@ public class CriterionTypeController {
    * Обрабатывает GET запрос "/criterion-types/{id}" на получение информации о типе критерия.
    * Выполнить запрос может любой клиент
    * @param idCriterionType ID типа критерия
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return информация о типе критерия, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/criterion-types/{id}")
+  @GetMapping(
+      value = "/criterion-types/{id}",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<CriterionTypeInfo> read(@PathVariable(name = "id") String idCriterionType,
-                                                @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                                HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     try {
       CriterionTypeInfo criterionTypeInfo = criterionTypeService.read(idCriterionType);
@@ -108,18 +116,20 @@ public class CriterionTypeController {
 
   /**
    * Обрабатывает PUT запрос "/criterion-types/{id}" на обновление типа критерия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param idCriterionType ID типа критерия
    * @param criterionTypeSave объект запроса для сохранения типа критерия
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @PutMapping(value = "/criterion-types/{id}")
+  @PutMapping(
+      value = "/criterion-types/{id}",
+      consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<?> update(@PathVariable(name = "id") String idCriterionType,
                                   @RequestBody CriterionTypeSave criterionTypeSave,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
 
     // Если тело запроса пустое
@@ -146,16 +156,17 @@ public class CriterionTypeController {
 
   /**
    * Обрабатывает DELETE запрос "/criterion-types/{id}" на удаление типа критерия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param idCriterionType ID типа критерия
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @DeleteMapping(value = "/criterion-types/{id}")
+  @DeleteMapping(
+      value = "/criterion-types/{id}")
   public ResponseEntity<?> delete(@PathVariable(name = "id") String idCriterionType,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     try {
       criterionTypeService.delete(idCriterionType);
@@ -174,7 +185,10 @@ public class CriterionTypeController {
    * Выполнить запрос может любой клиент
    * @return множество типов критерий и код ответа
    */
-  @GetMapping(value = "/criterion-types/partial")
+  @GetMapping(
+      value = "/criterion-types/partial",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<Set<ObjectShortInfo>> readAllPartial() {
 
     return ResponseEntity

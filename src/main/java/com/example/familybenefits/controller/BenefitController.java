@@ -12,10 +12,12 @@ import com.example.familybenefits.service.s_interface.BenefitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Set;
 
@@ -50,7 +52,10 @@ public class BenefitController {
    * @param idInstitution ID учреждения
    * @return множество пособий и код ответа
    */
-  @GetMapping(value = "/benefits")
+  @GetMapping(
+      value = "/benefits",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<Set<ObjectShortInfo>> readAllFilter(@RequestParam(name = "idCity", required = false) String idCity,
                                                             @RequestParam(name = "idCriterion", required = false) String idCriterion,
                                                             @RequestParam(name = "idInstitution", required = false) String idInstitution) {
@@ -61,16 +66,18 @@ public class BenefitController {
 
   /**
    * Обрабатывает POST запрос "/benefits" на создание пособия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param benefitSave объект запроса для сохранения пособия
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/benefits")
+  @PostMapping(
+      value = "/benefits",
+      consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<?> create(@RequestBody BenefitSave benefitSave,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если тело запроса пустое
     if (benefitSave == null) {
@@ -98,14 +105,17 @@ public class BenefitController {
    * Обрабатывает GET запрос "/benefits/{id}" на получение информации о пособии.
    * Выполнить запрос может любой клиент
    * @param idBenefit ID пособия
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return информация о пособии, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/benefits/{id}")
+  @GetMapping(
+      value = "/benefits/{id}",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<BenefitInfo> read(@PathVariable(name = "id") String idBenefit,
-                                          @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                          HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     try {
       BenefitInfo benefitInfo = benefitService.read(idBenefit);
@@ -120,18 +130,20 @@ public class BenefitController {
 
   /**
    * Обрабатывает PUT запрос "/benefits/{id}" на обновление пособия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param idBenefit ID пособия
    * @param benefitSave объект запроса для сохранения пособия
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @PutMapping(value = "/benefits/{id}")
+  @PutMapping(
+      value = "/benefits/{id}",
+      consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<?> update(@PathVariable(name = "id") String idBenefit,
                                   @RequestBody BenefitSave benefitSave,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если тело запроса пустое
     if (benefitSave == null) {
@@ -157,16 +169,17 @@ public class BenefitController {
 
   /**
    * Обрабатывает DELETE запрос "/benefits/{id}" на удаление пособия.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param idBenefit ID пособия
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @DeleteMapping(value = "/benefits/{id}")
+  @DeleteMapping(
+      value = "/benefits/{id}")
   public ResponseEntity<?> delete(@PathVariable(name = "id") String idBenefit,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     try {
       benefitService.delete(idBenefit);
@@ -182,10 +195,13 @@ public class BenefitController {
   /**
    * Обрабатывает GET запрос "/benefits/partial" на получение множества пособий,
    * в которых нет городов, учреждений или критерий.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @return множество пособий, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/benefits/partial")
+  @GetMapping(
+      value = "/benefits/partial",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<Set<ObjectShortInfo>> readAllPartial() {
 
     return ResponseEntity
@@ -196,10 +212,13 @@ public class BenefitController {
   /**
    * Обрабатывает GET запрос "/benefits/init-data" на получение дополнительных данных для пособия.
    * Данные содержат в себе множества кратких информаций о городах и полных критериях.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @return дополнительные данные для пособия, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/benefits/init-data")
+  @GetMapping(
+      value = "/benefits/init-data",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<BenefitInitData> getInitData() {
 
     return ResponseEntity
@@ -209,16 +228,21 @@ public class BenefitController {
 
   /**
    * Обрабатывает GET запрос "/benefits/user/{idUser}" на получение пособий пользователя.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_USER"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_USER"
    * @param idUser ID пользователя
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param userAuth данные пользователя из jwt, отправившего запрос, для получения ID пользователя
+   * @param request http запрос
    * @return информация о пособии, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/benefits/user/{idUser}")
+  @GetMapping(
+      value = "/benefits/user/{idUser}",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<Set<ObjectShortInfo>> readAllOfUser(@PathVariable(name = "idUser") String idUser,
-                                                            @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                                            @AuthenticationPrincipal JwtAuthenticationUserData userAuth,
+                                                            HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если пользователь пытается получить не свои пособия
     if (!userAuth.getIdUser().equals(idUser)) {

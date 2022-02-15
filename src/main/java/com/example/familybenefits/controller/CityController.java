@@ -5,15 +5,15 @@ import com.example.familybenefits.api_model.city.CitySave;
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import com.example.familybenefits.service.s_interface.CityService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Set;
 
 /**
@@ -46,7 +46,10 @@ public class CityController {
    * @param idBenefit ID пособия
    * @return множество городов, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/cities")
+  @GetMapping(
+      value = "/cities",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<Set<ObjectShortInfo>> readAllFilter(@RequestParam(name = "name", required = false) String name,
                                                             @RequestParam(name = "idBenefit", required = false) String idBenefit) {
 
@@ -56,16 +59,18 @@ public class CityController {
 
   /**
    * Обрабатывает POST запрос "/cities" на создание города.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param citySave объект запроса для сохранения города
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @PostMapping(value = "/cities")
+  @PostMapping(
+      value = "/cities",
+      consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<?> create(@RequestBody CitySave citySave,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если тело запроса пустое
     if (citySave == null) {
@@ -93,14 +98,17 @@ public class CityController {
    * Обрабатывает GET запрос "/cities/{id}" на получение информации о городе.
    * Выполнить запрос может любой клиент
    * @param idCity ID города
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return информация о городе, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/cities/{id}")
+  @GetMapping(
+      value = "/cities/{id}",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<CityInfo> read(@PathVariable(name = "id") String idCity,
-                                       @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                       HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     try {
       CityInfo cityInfo = cityService.read(idCity);
@@ -115,18 +123,20 @@ public class CityController {
 
   /**
    * Обрабатывает PUT запрос "/cities/{id}" на обновление города.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param idCity ID города
    * @param citySave объект запроса для сохранения города
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @PutMapping(value = "/cities/{id}")
+  @PutMapping(
+      value = "/cities/{id}",
+      consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<?> update(@PathVariable(name = "id") String idCity,
                                   @RequestBody CitySave citySave,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     // Если тело запроса пустое
     if (citySave == null) {
@@ -152,16 +162,17 @@ public class CityController {
 
   /**
    * Обрабатывает DELETE запрос "/cities/{id}" на удаление городе.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @param idCity ID города
-   * @param userAuth данные пользователя из jwt, отправившего запрос
+   * @param request http запрос
    * @return код ответа, результат обработки запроса
    */
-  @DeleteMapping(value = "/cities/{id}")
+  @DeleteMapping(
+      value = "/cities/{id}")
   public ResponseEntity<?> delete(@PathVariable(name = "id") String idCity,
-                                  @AuthenticationPrincipal JwtAuthenticationUserData userAuth) {
+                                  HttpServletRequest request) {
 
-    String userIp = userAuth.getIpAddress();
+    String userIp = request.getRemoteAddr();
 
     try {
       cityService.delete(idCity);
@@ -177,10 +188,13 @@ public class CityController {
   /**
    * Обрабатывает GET запрос "/cities/partial" на получение множества городов,
    * в которых нет учреждений или пособий.
-   * Для выполнения запроса клиент должен быть авторизован и иметь роль "ROLE_ADMIN"
+   * Для выполнения запроса клиент должен быть аутентифицирован и иметь роль "ROLE_ADMIN"
    * @return множество городов, если запрос выполнен успешно, и код ответа
    */
-  @GetMapping(value = "/cities/partial")
+  @GetMapping(
+      value = "/cities/partial",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  @ResponseBody
   public ResponseEntity<Set<ObjectShortInfo>> readAllPartial() {
 
     return ResponseEntity
