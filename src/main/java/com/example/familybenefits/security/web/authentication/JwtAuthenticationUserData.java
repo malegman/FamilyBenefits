@@ -3,6 +3,7 @@ package com.example.familybenefits.security.web.authentication;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,15 @@ public class JwtAuthenticationUserData {
    * IP-адрес, с которого пользователь вошел в систему
    */
   private String ipAddress;
+
+  /**
+   * Конструктор по умолчанию. Задает отсутствующие данные
+   */
+  public JwtAuthenticationUserData() {
+    idUser = null;
+    nameRoleSet = Collections.emptySet();
+    ipAddress = null;
+  }
 
   /**
    * Преобразует строку в объект данных авторизации в jwt
