@@ -1,6 +1,6 @@
 package com.example.familybenefits.security.web.config;
 
-import com.example.familybenefits.security.web.filter.CityAuthenticationFilterFB;
+import com.example.familybenefits.security.web.filter.CityAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,15 +18,15 @@ public class CityHttpRequestConfig extends WebSecurityConfigurerAdapter {
   /**
    * Фильтр для запросов, связанных с гордом, и с путем "/cities**"
    */
-  private final CityAuthenticationFilterFB cityAuthenticationFilterFB;
+  private final CityAuthenticationFilter cityAuthenticationFilter;
 
   /**
    * Конструктор для инициализации фильтра
-   * @param cityAuthenticationFilterFB фильтр для запросов, связанных с городом, и с путем "/cities**"
+   * @param cityAuthenticationFilter фильтр для запросов, связанных с городом, и с путем "/cities**"
    */
   @Autowired
-  public CityHttpRequestConfig(CityAuthenticationFilterFB cityAuthenticationFilterFB) {
-    this.cityAuthenticationFilterFB = cityAuthenticationFilterFB;
+  public CityHttpRequestConfig(CityAuthenticationFilter cityAuthenticationFilter) {
+    this.cityAuthenticationFilter = cityAuthenticationFilter;
   }
 
   /**
@@ -49,6 +49,6 @@ public class CityHttpRequestConfig extends WebSecurityConfigurerAdapter {
 
         .and()
 
-        .addFilter(cityAuthenticationFilterFB);
+        .addFilter(cityAuthenticationFilter);
   }
 }

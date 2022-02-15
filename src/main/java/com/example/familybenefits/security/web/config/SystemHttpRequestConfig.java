@@ -1,7 +1,6 @@
 package com.example.familybenefits.security.web.config;
 
-import com.example.familybenefits.security.web.filter.CityAuthenticationFilterFB;
-import com.example.familybenefits.security.web.filter.SystemAuthenticationFilterFB;
+import com.example.familybenefits.security.web.filter.SystemAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,15 +18,15 @@ public class SystemHttpRequestConfig extends WebSecurityConfigurerAdapter {
   /**
    * Фильтр для запросов, связанных с системой, входом / выходом
    */
-  private final SystemAuthenticationFilterFB systemAuthenticationFilterFB;
+  private final SystemAuthenticationFilter systemAuthenticationFilter;
 
   /**
    * Конструктор для инициализации фильтра
-   * @param systemAuthenticationFilterFB фильтр для запросов, связанных с системой, входом / выходом
+   * @param systemAuthenticationFilter фильтр для запросов, связанных с системой, входом / выходом
    */
   @Autowired
-  public SystemHttpRequestConfig(SystemAuthenticationFilterFB systemAuthenticationFilterFB) {
-    this.systemAuthenticationFilterFB = systemAuthenticationFilterFB;
+  public SystemHttpRequestConfig(SystemAuthenticationFilter systemAuthenticationFilter) {
+    this.systemAuthenticationFilter = systemAuthenticationFilter;
   }
 
   /**
@@ -46,6 +45,6 @@ public class SystemHttpRequestConfig extends WebSecurityConfigurerAdapter {
 
         .and()
 
-        .addFilter(systemAuthenticationFilterFB);
+        .addFilter(systemAuthenticationFilter);
   }
 }

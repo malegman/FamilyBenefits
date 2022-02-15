@@ -1,6 +1,6 @@
 package com.example.familybenefits.security.web.config;
 
-import com.example.familybenefits.security.web.filter.UserAuthenticationFilterFB;
+import com.example.familybenefits.security.web.filter.UserAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,15 +18,15 @@ public class UserHttpRequestConfig extends WebSecurityConfigurerAdapter {
   /**
    * Фильтр для запросов, связанных с пользователем, и с путем "/users**"
    */
-  private final UserAuthenticationFilterFB userAuthenticationFilterFB;
+  private final UserAuthenticationFilter userAuthenticationFilter;
 
   /**
    * Конструктор для инициализации фильтра
-   * @param userAuthenticationFilterFB фильтр для запросов, связанных с пользователем, и с путем "/users**"
+   * @param userAuthenticationFilter фильтр для запросов, связанных с пользователем, и с путем "/users**"
    */
   @Autowired
-  public UserHttpRequestConfig(UserAuthenticationFilterFB userAuthenticationFilterFB) {
-    this.userAuthenticationFilterFB = userAuthenticationFilterFB;
+  public UserHttpRequestConfig(UserAuthenticationFilter userAuthenticationFilter) {
+    this.userAuthenticationFilter = userAuthenticationFilter;
   }
 
   /**
@@ -48,6 +48,6 @@ public class UserHttpRequestConfig extends WebSecurityConfigurerAdapter {
 
         .and()
 
-        .addFilter(userAuthenticationFilterFB);
+        .addFilter(userAuthenticationFilter);
   }
 }

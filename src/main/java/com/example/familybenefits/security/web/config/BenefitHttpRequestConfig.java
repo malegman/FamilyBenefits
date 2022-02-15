@@ -1,7 +1,6 @@
 package com.example.familybenefits.security.web.config;
 
-import com.example.familybenefits.security.web.filter.BenefitAuthenticationFilterFB;
-import com.example.familybenefits.security.web.filter.CityAuthenticationFilterFB;
+import com.example.familybenefits.security.web.filter.BenefitAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,15 +18,15 @@ public class BenefitHttpRequestConfig extends WebSecurityConfigurerAdapter {
   /**
    * Фильтр для запросов, связанных с пособием, и с путем "/benefits**"
    */
-  private final BenefitAuthenticationFilterFB benefitAuthenticationFilterFB;
+  private final BenefitAuthenticationFilter benefitAuthenticationFilter;
 
   /**
    * Конструктор для инициализации фильтра
-   * @param benefitAuthenticationFilterFB фильтр для запросов, связанных с пособием, и с путем "/benefits**"
+   * @param benefitAuthenticationFilter фильтр для запросов, связанных с пособием, и с путем "/benefits**"
    */
   @Autowired
-  public BenefitHttpRequestConfig(BenefitAuthenticationFilterFB benefitAuthenticationFilterFB) {
-    this.benefitAuthenticationFilterFB = benefitAuthenticationFilterFB;
+  public BenefitHttpRequestConfig(BenefitAuthenticationFilter benefitAuthenticationFilter) {
+    this.benefitAuthenticationFilter = benefitAuthenticationFilter;
   }
 
   /**
@@ -52,6 +51,6 @@ public class BenefitHttpRequestConfig extends WebSecurityConfigurerAdapter {
 
         .and()
 
-        .addFilter(benefitAuthenticationFilterFB);
+        .addFilter(benefitAuthenticationFilter);
   }
 }

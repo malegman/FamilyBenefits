@@ -1,7 +1,6 @@
 package com.example.familybenefits.security.web.config;
 
-import com.example.familybenefits.security.web.filter.AdminAuthenticationFilterFB;
-import com.example.familybenefits.security.web.filter.UserAuthenticationFilterFB;
+import com.example.familybenefits.security.web.filter.AdminAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,15 +18,15 @@ public class AdminHttpRequestConfig extends WebSecurityConfigurerAdapter {
   /**
    * Фильтр для запросов, связанных с пользователем, и с путем "/admins**"
    */
-  private final AdminAuthenticationFilterFB adminAuthenticationFilterFB;
+  private final AdminAuthenticationFilter adminAuthenticationFilter;
 
   /**
    * Конструктор для инициализации фильтра
-   * @param adminAuthenticationFilterFB фильтр для запросов, связанных с администратором, и с путем "/admins**"
+   * @param adminAuthenticationFilter фильтр для запросов, связанных с администратором, и с путем "/admins**"
    */
   @Autowired
-  public AdminHttpRequestConfig(AdminAuthenticationFilterFB adminAuthenticationFilterFB) {
-    this.adminAuthenticationFilterFB = adminAuthenticationFilterFB;
+  public AdminHttpRequestConfig(AdminAuthenticationFilter adminAuthenticationFilter) {
+    this.adminAuthenticationFilter = adminAuthenticationFilter;
   }
 
   /**
@@ -48,6 +47,6 @@ public class AdminHttpRequestConfig extends WebSecurityConfigurerAdapter {
 
         .and()
 
-        .addFilter(adminAuthenticationFilterFB);
+        .addFilter(adminAuthenticationFilter);
   }
 }

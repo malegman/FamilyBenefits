@@ -1,7 +1,6 @@
 package com.example.familybenefits.security.web.config;
 
-import com.example.familybenefits.security.web.filter.CityAuthenticationFilterFB;
-import com.example.familybenefits.security.web.filter.InstitutionAuthenticationFilterFB;
+import com.example.familybenefits.security.web.filter.InstitutionAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,15 +18,15 @@ public class InstitutionHttpRequestConfig extends WebSecurityConfigurerAdapter {
   /**
    * Фильтр для запросов, связанных с учреждением, и с путем "/institutions**"
    */
-  private final InstitutionAuthenticationFilterFB institutionAuthenticationFilterFB;
+  private final InstitutionAuthenticationFilter institutionAuthenticationFilter;
 
   /**
    * Конструктор для инициализации фильтра
-   * @param institutionAuthenticationFilterFB фильтр для запросов, связанных с учреждением, и с путем "/institutions**"
+   * @param institutionAuthenticationFilter фильтр для запросов, связанных с учреждением, и с путем "/institutions**"
    */
   @Autowired
-  public InstitutionHttpRequestConfig(InstitutionAuthenticationFilterFB institutionAuthenticationFilterFB) {
-    this.institutionAuthenticationFilterFB = institutionAuthenticationFilterFB;
+  public InstitutionHttpRequestConfig(InstitutionAuthenticationFilter institutionAuthenticationFilter) {
+    this.institutionAuthenticationFilter = institutionAuthenticationFilter;
   }
 
   /**
@@ -50,6 +49,6 @@ public class InstitutionHttpRequestConfig extends WebSecurityConfigurerAdapter {
 
         .and()
 
-        .addFilter(institutionAuthenticationFilterFB);
+        .addFilter(institutionAuthenticationFilter);
   }
 }

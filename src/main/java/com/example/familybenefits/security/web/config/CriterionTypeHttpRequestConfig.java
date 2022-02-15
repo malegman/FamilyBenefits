@@ -1,6 +1,6 @@
 package com.example.familybenefits.security.web.config;
 
-import com.example.familybenefits.security.web.filter.CriterionTypeAuthenticationFilterFB;
+import com.example.familybenefits.security.web.filter.CriterionTypeAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,15 +18,15 @@ public class CriterionTypeHttpRequestConfig extends WebSecurityConfigurerAdapter
   /**
    * Фильтр для запросов, связанных с типом критерия, с путем "/criterion-types**"
    */
-  private final CriterionTypeAuthenticationFilterFB criterionTypeAuthenticationFilterFB;
+  private final CriterionTypeAuthenticationFilter criterionTypeAuthenticationFilter;
 
   /**
    * Конструктор для инициализации фильтра
-   * @param criterionTypeAuthenticationFilterFB фильтр для запросов, связанных с типом критерия, с путем "/criterion-types**"
+   * @param criterionTypeAuthenticationFilter фильтр для запросов, связанных с типом критерия, с путем "/criterion-types**"
    */
   @Autowired
-  public CriterionTypeHttpRequestConfig(CriterionTypeAuthenticationFilterFB criterionTypeAuthenticationFilterFB) {
-    this.criterionTypeAuthenticationFilterFB = criterionTypeAuthenticationFilterFB;
+  public CriterionTypeHttpRequestConfig(CriterionTypeAuthenticationFilter criterionTypeAuthenticationFilter) {
+    this.criterionTypeAuthenticationFilter = criterionTypeAuthenticationFilter;
   }
 
   /**
@@ -49,6 +49,6 @@ public class CriterionTypeHttpRequestConfig extends WebSecurityConfigurerAdapter
 
         .and()
 
-        .addFilter(criterionTypeAuthenticationFilterFB);
+        .addFilter(criterionTypeAuthenticationFilter);
   }
 }
