@@ -1,9 +1,12 @@
 package com.example.familybenefits.security.web.filter;
 
+import com.example.familybenefits.dto.repository.AccessTokenRepository;
 import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.web.authentication.JwtAuthenticationToken;
 import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import io.jsonwebtoken.Jwts;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -14,9 +17,6 @@ import javax.servlet.http.HttpFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -25,31 +25,52 @@ import java.util.stream.Collectors;
  * Метод используется при фильтрации.
  * В случае провала аутентификации, в ответ помещается статус 401.
  */
-public abstract class BasicJwtAuthenticationFilterFB extends HttpFilter {
+@Slf4j
+public abstract class BasicJwtAuthenticationFilter extends HttpFilter {
+
+  /**
+   * Репозиторий, работающий с моделью таблицы "access_token"
+   */
+  private final AccessTokenRepository accessTokenRepository;
+
+  /**
+   * Конструктор для инициализации репозитория
+   * @param accessTokenRepository репозиторий, работающий с моделью таблицы "access_token"
+   */
+  @Autowired
+  public BasicJwtAuthenticationFilter(AccessTokenRepository accessTokenRepository) {
+    this.accessTokenRepository = accessTokenRepository;
+  }
 
   @Override
   public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
     // Получение данных аутентификации
+    JwtAuthenticationUserData userAuth = new JwtAuthenticationUserData();
     String jwt = jwtFromRequest(request);
-    JwtAuthenticationUserData userAuth = authFromJwt(jwt).orElse(null);
+    // Если обнаружен токен доступа в заголовке запроса
+    if (jwt != null) {
+      try {
+        userAuth = authFromJwt(jwt);
 
-    // Проверка данных аутентификации. Если запрос не прошел аутентификацию, то 401
-    if (notAuthenticated(userAuth, request)) {
+      } catch (RuntimeException e) {
+        // Если не удалось извлечь из токена доступа jwt
+        log.error("{} {} \"{}\" : {}", request.getRemoteAddr(), request.getMethod(), request.getRequestURI(), e.getMessage());
+      }
+    }
+
+    // Проверка существования токена доступа и данных аутентификации. Если токена нет или запрос не прошел аутентификацию, то 401
+    if (!accessTokenRepository.existsById(userAuth.getIdUser()) || notAuthenticated(userAuth, request)) {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       return;
     }
 
-    // Установка данных авторизации в контекст, если они есть. Иначе пустая коллекция
-    Set<SimpleGrantedAuthority> grantedAuthorities = Collections.emptySet();
-    if (userAuth != null) {
-      grantedAuthorities = userAuth
-          .getNameRoleSet()
-          .stream()
-          .map(SimpleGrantedAuthority::new)
-          .collect(Collectors.toSet());
-    }
-    JwtAuthenticationToken auth = new JwtAuthenticationToken(userAuth, jwt, grantedAuthorities);
+    // Установка данных авторизации в контекст
+    JwtAuthenticationToken auth = new JwtAuthenticationToken(userAuth, jwt, userAuth
+        .getNameRoleSet()
+        .stream()
+        .map(SimpleGrantedAuthority::new)
+        .collect(Collectors.toSet()));
     SecurityContextHolder.getContext().setAuthentication(auth);
 
     // Передача запроса следующему фильтру в цепочке
@@ -91,37 +112,26 @@ public abstract class BasicJwtAuthenticationFilterFB extends HttpFilter {
     }
 
     String bearer = request.getHeader(R.AUTHORIZATION_HEADER);
-    if (StringUtils.hasText(bearer) && bearer.startsWith("Bearer ")) {
-      return bearer.substring(7);
-
-    } else {
-      return null;
+    if (StringUtils.hasText(bearer) && bearer.startsWith(R.ACCESS_TOKEN_PREFIX)) {
+      return bearer.substring(R.ACCESS_TOKEN_PREFIX.length());
     }
+
+    return null;
   }
 
   /**
    * Извлекает данные пользователя из jwt.
-   * Empty, если не удалось извлечь данные
    * @param jwt jwt пользователя
    * @return данные пользователя
+   * @throws RuntimeException если не удалось извлечь данные пользователя из токена
    */
-  private Optional<JwtAuthenticationUserData> authFromJwt(String jwt) {
+  private JwtAuthenticationUserData authFromJwt(String jwt) throws RuntimeException {
 
-    if (jwt == null) {
-      return Optional.empty();
-    }
-
-    try {
-      return Optional.of(
-          JwtAuthenticationUserData.fromString(
-              Jwts.parser()
-                  .setSigningKey(R.JWT_SECRET)
-                  .parseClaimsJws(jwt)
-                  .getBody()
-                  .getSubject()));
-
-    } catch (Exception e) {
-      return Optional.empty();
-    }
+    return JwtAuthenticationUserData.fromString(
+        Jwts.parser()
+            .setSigningKey(R.JWT_SECRET)
+            .parseClaimsJws(jwt)
+            .getBody()
+            .getSubject());
   }
 }
