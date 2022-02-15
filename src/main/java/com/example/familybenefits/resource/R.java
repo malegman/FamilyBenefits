@@ -30,18 +30,31 @@ public class R {
   /**
    * Почта начального супер-администратора
    */
-  public static final String DEFAULT_SUPER_ADMIN_EMAIL = "email";
-  /**
-   * Пароль начального супер-администратора
-   */
-  public static final String DEFAULT_SUPER_ADMIN_PASSWORD = "fbsupadm";
+  public static final String DEFAULT_SUPER_ADMIN_EMAIL = "smegovic@gmail.com";
 
   /**
    * Закрытый ключ, используемый для подписывания jwt
    */
-  public static final String JWT_SECRET = "familyben";
+  public static final String JWT_SECRET = "fj8fg7fhsm,v01fhb";
   /**
-   * Время жизни jwt в минутах
+   * Время жизни jwt (sec) (20 min)
    */
-  public static final int JWT_EXPIRATION_MIN = 15;
+  public static final int JWT_EXPIRATION_SEC = 60 * 20;
+  /**
+   * Время жизни login code (sec) (1 hour)
+   */
+  public static final int LOGIN_EXPIRATION_SEC = 60 * 60 * 1;
+
+  /**
+   * Название заголовка "Authorization", для хранения токена доступа jwt
+   */
+  public static final String AUTHORIZATION_HEADER = "Authorization";
+  /**
+   * Префикс токена доступа в заголовке "Authorization"
+   */
+  public static final String ACCESS_TOKEN_PREFIX = "Bearer ";
+  /**
+   * Шаблон содержимого заголовка "Authorization", с параметром jwt
+   */
+  public static final String AUTHORIZATION_VALUE_PATTERN = "Bearer %s";
 }
