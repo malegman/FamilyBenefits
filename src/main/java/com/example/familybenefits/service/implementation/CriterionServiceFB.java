@@ -15,9 +15,7 @@ import com.example.familybenefits.dto.repository.CriterionTypeRepository;
 import com.example.familybenefits.dto.repository.UserRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
-import com.example.familybenefits.security.service.s_interface.UserSecurityService;
 import com.example.familybenefits.service.s_interface.CriterionService;
 import com.example.familybenefits.service.s_interface.EntityDBService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,10 +48,6 @@ public class CriterionServiceFB implements CriterionService, EntityDBService<Cri
    * Интерфейс сервиса, отвечающего за целостность базы данных
    */
   private final DBIntegrityService dbIntegrityService;
-  /**
-   * Интерфейс сервиса, отвечающего за данные пользователя
-   */
-  private final UserSecurityService userSecurityService;
 
   /**
    * Конструктор для инициализации интерфейсов репозиториев и сервиса
@@ -61,19 +55,16 @@ public class CriterionServiceFB implements CriterionService, EntityDBService<Cri
    * @param userRepository репозиторий, работающий с моделью таблицы "user"
    * @param criterionTypeDBService интерфейс сервиса модели таблицы "criterion_type", целостность которой зависит от связанных таблиц
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
-   * @param userSecurityService интерфейс сервиса, отвечающего за данные пользователя
    */
   @Autowired
   public CriterionServiceFB(CriterionRepository criterionRepository,
                             UserRepository userRepository,
                             EntityDBService<CriterionTypeEntity, CriterionTypeRepository> criterionTypeDBService,
-                            DBIntegrityService dbIntegrityService,
-                            UserSecurityService userSecurityService) {
+                            DBIntegrityService dbIntegrityService) {
     this.criterionRepository = criterionRepository;
     this.userRepository = userRepository;
     this.criterionTypeDBService = criterionTypeDBService;
     this.dbIntegrityService = dbIntegrityService;
-    this.userSecurityService = userSecurityService;
   }
 
   /**
@@ -239,10 +230,6 @@ public class CriterionServiceFB implements CriterionService, EntityDBService<Cri
     UserEntity userEntityFromRequest = userRepository.findById(prepareIdUser)
         .orElseThrow(() -> new NotFoundException(String.format(
             "User with ID \"%s\" not found", idUser)));
-
-    // Проверка наличия роли "ROLE_USER" у пользователя
-    userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_USER, R.CLIENT_USER);
 
     return userEntityFromRequest.getCriterionEntitySet()
         .stream()

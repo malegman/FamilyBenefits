@@ -1,20 +1,21 @@
 package com.example.familybenefits.service.implementation;
 
-import com.example.familybenefits.api_model.benefit.BenefitSave;
 import com.example.familybenefits.api_model.benefit.BenefitInfo;
 import com.example.familybenefits.api_model.benefit.BenefitInitData;
+import com.example.familybenefits.api_model.benefit.BenefitSave;
 import com.example.familybenefits.api_model.common.ObjectShortInfo;
 import com.example.familybenefits.convert.BenefitDBConverter;
 import com.example.familybenefits.convert.CityDBConverter;
 import com.example.familybenefits.convert.CriterionDBConverter;
 import com.example.familybenefits.dto.entity.*;
-import com.example.familybenefits.dto.repository.*;
+import com.example.familybenefits.dto.repository.BenefitRepository;
+import com.example.familybenefits.dto.repository.CityRepository;
+import com.example.familybenefits.dto.repository.CriterionRepository;
+import com.example.familybenefits.dto.repository.UserRepository;
 import com.example.familybenefits.exception.AlreadyExistsException;
 import com.example.familybenefits.exception.DateTimeException;
 import com.example.familybenefits.exception.NotFoundException;
-import com.example.familybenefits.resource.R;
 import com.example.familybenefits.security.service.s_interface.DBIntegrityService;
-import com.example.familybenefits.security.service.s_interface.UserSecurityService;
 import com.example.familybenefits.service.s_interface.BenefitService;
 import com.example.familybenefits.service.s_interface.DateTimeService;
 import com.example.familybenefits.service.s_interface.EntityDBService;
@@ -59,10 +60,6 @@ public class BenefitServiceFB implements BenefitService, EntityDBService<Benefit
    * Интерфейс сервиса, отвечающего за целостность базы данных
    */
   private final DBIntegrityService dbIntegrityService;
-  /**
-   * Интерфейс сервиса, отвечающего за данные пользователя
-   */
-  private final UserSecurityService userSecurityService;
 
   /**
    * Конструктор для инициализации интерфейсов репозиториев и сервисов
@@ -72,7 +69,6 @@ public class BenefitServiceFB implements BenefitService, EntityDBService<Benefit
    * @param criterionDBService интерфейс сервиса модели таблицы "criterion", целостность которой зависит от связанных таблиц
    * @param dateTimeService интерфейс сервиса, который предоставляет методы для работы с датой и временем
    * @param dbIntegrityService интерфейс сервиса, отвечающего за целостность базы данных
-   * @param userSecurityService интерфейс сервиса, отвечающего за данные пользователя
    */
   @Autowired
   public BenefitServiceFB(BenefitRepository benefitRepository,
@@ -80,15 +76,13 @@ public class BenefitServiceFB implements BenefitService, EntityDBService<Benefit
                           @Lazy EntityDBService<CityEntity, CityRepository> cityDBService,
                           EntityDBService<CriterionEntity, CriterionRepository> criterionDBService,
                           DateTimeService dateTimeService,
-                          DBIntegrityService dbIntegrityService,
-                          UserSecurityService userSecurityService) {
+                          DBIntegrityService dbIntegrityService) {
     this.benefitRepository = benefitRepository;
     this.userRepository = userRepository;
     this.cityDBService = cityDBService;
     this.criterionDBService = criterionDBService;
     this.dateTimeService = dateTimeService;
     this.dbIntegrityService = dbIntegrityService;
-    this.userSecurityService = userSecurityService;
   }
 
   /**
@@ -274,10 +268,6 @@ public class BenefitServiceFB implements BenefitService, EntityDBService<Benefit
     UserEntity userEntityFromRequest = userRepository.findById(prepareIdUser)
         .orElseThrow(() -> new NotFoundException(String.format(
             "User with ID \"%s\" not found", idUser)));
-
-    // Проверка наличия роли "ROLE_USER" у пользователя
-    userSecurityService.checkHasRoleElseThrowNotFound(
-        userEntityFromRequest, R.ROLE_USER, R.CLIENT_USER);
 
     LocalDate localDateCriterion = userEntityFromRequest.getDateSelectCriterion();
     // Проверка разницы дат между текущей датой и датой последней установки критериев
