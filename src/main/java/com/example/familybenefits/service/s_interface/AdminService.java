@@ -18,10 +18,9 @@ public interface AdminService {
   void create(AdminSave adminSave) throws AlreadyExistsException, InvalidEmailException;
 
   /**
-   * Возвращает администратора об учреждении по его ID
+   * Возвращает администратора по его ID
    * @param idAdmin ID администратора
    * @return информация об администраторе
-   * @throws NotFoundException если администратор с данным ID не найден
    */
   AdminInfo read(String idAdmin) throws NotFoundException;
 
@@ -39,9 +38,8 @@ public interface AdminService {
    * Удаляет администратора по его ID или удаляет роль "ROLE_ADMIN" у пользователя
    * @param idAdmin ID администратора
    * @throws NotFoundException если администратор с указанным ID не найден
-   * @throws UserRoleException если администратор имеет роль "ROLE_SUPER_ADMIN"
    */
-  void delete(String idAdmin) throws NotFoundException, UserRoleException;
+  void delete(String idAdmin) throws NotFoundException;
 
   /**
    * Добавляет роль "ROLE_ADMIN" пользователю
@@ -63,7 +61,6 @@ public interface AdminService {
    * Передает роль "ROLE_SUPER_ADMIN" указанному администратору, удаляя данную роль у текущего администратора
    * @param idAdmin ID администратора
    * @throws NotFoundException если администратор с данным ID не найден
-   * @throws UserRoleException если администратор имеет роль "ROLE_SUPER_ADMIN"
    */
-  void toSuper(String idAdmin) throws NotFoundException, UserRoleException;
+  void toSuper(String idAdmin) throws NotFoundException;
 }
