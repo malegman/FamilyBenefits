@@ -1,5 +1,6 @@
 package com.example.familybenefits.security.web.filter;
 
+import com.example.familybenefits.dto.repository.AccessTokenRepository;
 import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +11,15 @@ import javax.servlet.http.HttpServletRequest;
  * Фильтрует запросы, связанные с пособием, и с путем "/benefits**"
  */
 @Component
-public class BenefitAuthenticationFilterFB extends BasicJwtAuthenticationFilterFB {
+public class BenefitAuthenticationFilter extends BasicJwtAuthenticationFilter {
+
+  /**
+   * Конструктор для инициализации репозитория
+   * @param accessTokenRepository репозиторий, работающий с моделью таблицы "access_token"
+   */
+  public BenefitAuthenticationFilter(AccessTokenRepository accessTokenRepository) {
+    super(accessTokenRepository);
+  }
 
   /**
    * Проверяет запрос на аутентификацию по запросу и данным пользователя из jwt

@@ -1,5 +1,6 @@
 package com.example.familybenefits.security.web.filter;
 
+import com.example.familybenefits.dto.repository.AccessTokenRepository;
 import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import org.springframework.stereotype.Component;
 
@@ -7,10 +8,18 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Реализация базового фильтра, основанного на токене формата jwt.
- * Фильтрует запросы, связанные с городом, и с путем "/cities**"
+ * Фильтрует запросы, связанные с пользователем, и с путем "/users**"
  */
 @Component
-public class CityAuthenticationFilterFB extends BasicJwtAuthenticationFilterFB {
+public class UserAuthenticationFilter extends BasicJwtAuthenticationFilter {
+
+  /**
+   * Конструктор для инициализации репозитория
+   * @param accessTokenRepository репозиторий, работающий с моделью таблицы "access_token"
+   */
+  public UserAuthenticationFilter(AccessTokenRepository accessTokenRepository) {
+    super(accessTokenRepository);
+  }
 
   /**
    * Проверяет запрос на аутентификацию по запросу и данным пользователя из jwt
@@ -27,8 +36,8 @@ public class CityAuthenticationFilterFB extends BasicJwtAuthenticationFilterFB {
     // Разрешение запросов, которые не требуют авторизации
     if (userAuth == null) {
       return !(
-          (requestMethod.equals("GET") && requestURI.equals("/cities")) ||
-          (requestMethod.equals("GET") && requestURI.equals("/cities/{id}"))
+          (requestMethod.equals("POST") && requestURI.equals("/users")) ||
+          (requestMethod.equals("GET")  && requestURI.equals("/users/init-data"))
       );
     }
 
