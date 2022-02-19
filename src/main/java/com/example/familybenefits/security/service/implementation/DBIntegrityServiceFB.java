@@ -60,6 +60,21 @@ public class DBIntegrityServiceFB implements DBIntegrityService {
   }
 
   /**
+   * Проверяет существование в базе данных объекта из множества по его уникальному строковому полю
+   * @param existFunc функция проверки, принимающая параметр типа {@link String} и возвращающая значение типа {@link Boolean}
+   * @param uniqueStr уникальное строковое поле объекта
+   * @throws NotFoundException если объект не найден
+   */
+  @Override
+  public void checkExistenceByUniqStr(Function<String, Boolean> existFunc, String uniqueStr) throws NotFoundException {
+
+    if (!existFunc.apply(uniqueStr)) {
+      throw new NotFoundException(String.format(
+          "Entity with ID \"%s\" not found in repository %s", uniqueStr, existFunc.getClass().getName()));
+    }
+  }
+
+  /**
    * Проверяет отсутствие в базе данных объекта по его уникальному строковому полю
    * @param existFunc функция проверки, принимающая параметр типа {@link String} и возвращающая значение типа {@link Boolean}
    * @param uniqueStr уникальное строковое поле объекта
@@ -70,7 +85,7 @@ public class DBIntegrityServiceFB implements DBIntegrityService {
 
     if (existFunc.apply(uniqueStr)) {
       throw new AlreadyExistsException(String.format(
-          "Entity with name \"%s\" already exists in repository %s", uniqueStr, existFunc.getClass().getName()));
+          "Entity with field \"%s\" already exists in repository %s", uniqueStr, existFunc.getClass().getName()));
     }
   }
 
@@ -86,7 +101,7 @@ public class DBIntegrityServiceFB implements DBIntegrityService {
 
     if (existBiFunc.apply(idThis, uniqueStr)) {
       throw new AlreadyExistsException(String.format(
-          "Entity with name \"%s\" already exists in repository %s", uniqueStr, existBiFunc.getClass().getName()));
+          "Entity with field \"%s\" already exists in repository %s", uniqueStr, existBiFunc.getClass().getName()));
     }
   }
 

@@ -40,6 +40,14 @@ public interface DBIntegrityService {
   <E extends ObjectEntity> void checkExistenceById(Function<String, Boolean> existFunc, Set<E> entitySet) throws NotFoundException;
 
   /**
+   * Проверяет существование в базе данных объекта из множества по его уникальному строковому полю
+   * @param existFunc функция проверки, принимающая параметр типа {@link String} и возвращающая значение типа {@link Boolean}
+   * @param uniqueStr уникальное строковое поле объекта
+   * @throws NotFoundException если объект из множества не найден
+   */
+  void checkExistenceByUniqStr(Function<String, Boolean> existFunc, String uniqueStr) throws NotFoundException;
+
+  /**
    * Проверяет отсутствие в базе данных объекта по его уникальному строковому полю
    * @param existFunc функция проверки, принимающая параметр типа {@link String} и возвращающая значение типа {@link Boolean}
    * @param uniqueStr уникальное строковое поле объекта
