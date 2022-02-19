@@ -35,15 +35,20 @@ public class R {
   /**
    * Закрытый ключ, используемый для подписывания jwt
    */
-  public static final String JWT_SECRET = "fj8fg7fhsm,v01fhb";
+  public static final String JWT_SECRET = "fj8fg7fhsmpv01fhb";
   /**
    * Время жизни jwt (sec) (20 min)
    */
-  public static final int JWT_EXPIRATION_SEC = 60 * 20;
+  public static final long JWT_EXPIRATION_SEC = 60 * 20;
   /**
    * Время жизни login code (sec) (1 hour)
    */
-  public static final int LOGIN_EXPIRATION_SEC = 60 * 60 * 1;
+  public static final long LOGIN_EXPIRATION_SEC = 60 * 60;
+
+  /**
+   * Длина кода для входа в систему
+   */
+  public static final int LOGIN_CODE_LENGTH = 6;
 
   /**
    * Название заголовка "Authorization", для хранения токена доступа jwt
