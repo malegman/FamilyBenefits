@@ -2,19 +2,18 @@ package com.example.familybenefits.security.service.implementation;
 
 import com.example.familybenefits.dto.entity.RoleEntity;
 import com.example.familybenefits.resource.R;
-import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
 import com.example.familybenefits.security.service.s_interface.TokenCodeService;
+import com.example.familybenefits.security.web.authentication.JwtAuthenticationUserData;
+import com.example.familybenefits.service.s_interface.DateTimeService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.SecureRandom;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,9 +24,18 @@ import java.util.stream.Collectors;
 public class TokenCodeServiceFB implements TokenCodeService {
 
   /**
-   * Длина кода для входа в систему
+   * Интерфейс сервиса, который предоставляет методы для работы с датой и временем
    */
-  public static final int LOGIN_CODE_LENGTH = 6;
+  private final DateTimeService dateTimeService;
+
+  /**
+   * Конструктор для инициализации сервиса
+   * @param dateTimeService интерфейс сервиса, который предоставляет методы для работы с датой и временем
+   */
+  @Autowired
+  public TokenCodeServiceFB(DateTimeService dateTimeService) {
+    this.dateTimeService = dateTimeService;
+  }
 
   /**
    * Генерирует jwt для пользователя на основе его ID, ролей и IP-адреса запроса на вход систему
@@ -38,8 +46,6 @@ public class TokenCodeServiceFB implements TokenCodeService {
    */
   @Override
   public String generateJwt(String id, Set<RoleEntity> roleEntitySet, HttpServletRequest request) {
-
-    Date expiration = Date.from(LocalDateTime.now().plusSeconds(R.JWT_EXPIRATION_SEC).toInstant(ZoneOffset.UTC));
 
     return Jwts.builder()
         .setSubject(JwtAuthenticationUserData
@@ -52,7 +58,21 @@ public class TokenCodeServiceFB implements TokenCodeService {
                         .ipAddress(request.getRemoteAddr())
                         .build()
                         .toString())
-        .setExpiration(expiration)
+        .setExpiration(dateTimeService.getExpiration(R.JWT_EXPIRATION_SEC))
+        .signWith(SignatureAlgorithm.HS512, R.JWT_SECRET)
+        .compact();
+  }
+
+  /**
+   * Генерирует jwt для пользователя на основе его ID, ролей и IP-адреса запроса на вход систему
+   * @param userAuth данные доступа из токена доступа jwt
+   * @return сгенерированный jwt
+   */
+  @Override
+  public String generateJwt(JwtAuthenticationUserData userAuth) {
+    return Jwts.builder()
+        .setSubject(userAuth.toString())
+        .setExpiration(dateTimeService.getExpiration(R.JWT_EXPIRATION_SEC))
         .signWith(SignatureAlgorithm.HS512, R.JWT_SECRET)
         .compact();
   }
@@ -88,7 +108,7 @@ public class TokenCodeServiceFB implements TokenCodeService {
   @Override
   public int generateLoginCode() {
 
-    byte[] randBytes = new byte[LOGIN_CODE_LENGTH];
+    byte[] randBytes = new byte[R.LOGIN_CODE_LENGTH];
     int loginCode = 0;
 
     // Для пропорционального приведения диапазона [0-255] к диапазону [0-9]
@@ -98,7 +118,7 @@ public class TokenCodeServiceFB implements TokenCodeService {
     (new SecureRandom()).nextBytes(randBytes);
 
     // "Заполнение" числа цифрами
-    for (int randI = 0, tempVal = 1; randI < LOGIN_CODE_LENGTH; randI++, tempVal *= 10) {
+    for (int randI = 0, tempVal = 1; randI < R.LOGIN_CODE_LENGTH; randI++, tempVal *= 10) {
       loginCode += tempVal * (int) Math.floor((randBytes[randI] + 127) * part);
     }
 

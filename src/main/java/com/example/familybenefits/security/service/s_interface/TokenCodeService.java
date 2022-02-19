@@ -23,6 +23,13 @@ public interface TokenCodeService {
   String generateJwt(String id, Set<RoleEntity> roleEntitySet, HttpServletRequest request);
 
   /**
+   * Генерирует jwt для пользователя на основе его ID, ролей и IP-адреса запроса на вход систему
+   * @param userAuth данные доступа из токена доступа jwt
+   * @return сгенерированный jwt
+   */
+  String generateJwt(JwtAuthenticationUserData userAuth);
+
+  /**
    * Преобразует строковый токен в объект токена jwt
    * @param token конвертируемый строковый токен
    * @return объект токена jwt
