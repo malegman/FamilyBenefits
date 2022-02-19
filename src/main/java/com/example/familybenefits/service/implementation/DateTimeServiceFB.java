@@ -8,7 +8,10 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.TemporalAccessor;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 
@@ -22,6 +25,20 @@ public class DateTimeServiceFB implements DateTimeService {
    * Формат даты для преобразования строки в дату и дату в строку
    */
   private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy", Locale.US);
+
+  /**
+   * Возвращает дату истечения срока жизни. Дата формируется из текущего времени и прибавленных секунд
+   * @param expireSec число секунд, по окончанию которых истечет срок
+   * @return дата истечения срока жизни
+   */
+  @Override
+  public Date getExpiration(long expireSec) {
+
+    return Date.from(LocalDateTime
+                         .now()
+                         .plusSeconds(expireSec)
+                         .toInstant(ZoneOffset.UTC));
+  }
 
   /**
    * Преобразует строку формата "dd.mm.yyyy" в дату

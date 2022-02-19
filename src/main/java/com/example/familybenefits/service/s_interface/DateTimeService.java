@@ -4,12 +4,20 @@ import com.example.familybenefits.exception.DateFormatException;
 import com.example.familybenefits.exception.DateTimeException;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.Set;
 
 /**
  * Интерфейс сервиса, который предоставляет методы для работы с датой и временем
  */
 public interface DateTimeService {
+
+  /**
+   * Возвращает дату истечения срока жизни. Дата формируется из текущего времени и прибавленных секунд
+   * @param expireSec число секунд, по окончанию которых истечет срок
+   * @return дата истечения срока жизни
+   */
+  Date getExpiration(long expireSec);
 
   /**
    * Преобразует строку формата "dd.mm.yyyy" в дату
