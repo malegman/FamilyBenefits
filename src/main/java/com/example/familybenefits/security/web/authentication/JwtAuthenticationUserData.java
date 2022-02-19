@@ -33,12 +33,17 @@ public class JwtAuthenticationUserData {
   private String ipAddress;
 
   /**
-   * Конструктор по умолчанию. Задает отсутствующие данные
+   * Возвращает объект с пустыми данными пользователя, с null значениями и пустой коллекцией
+   * @return объект с пустыми данными пользователя
    */
-  public JwtAuthenticationUserData() {
-    idUser = null;
-    nameRoleSet = Collections.emptySet();
-    ipAddress = null;
+  public static JwtAuthenticationUserData emptyUserData() {
+
+    return JwtAuthenticationUserData
+        .builder()
+        .idUser(null)
+        .nameRoleSet(Collections.emptySet())
+        .ipAddress(null)
+        .build();
   }
 
   /**
