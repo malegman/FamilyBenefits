@@ -1,9 +1,14 @@
-package com.example.familybenefits.exception;
+package com.example.familybenefits.exceptions;
 
 /**
  * Исключение, связанное с некорректным форматом даты
  */
 public class DateFormatException extends Exception {
+
+  /**
+   * Код варианта ошибки в api
+   */
+  public static final int API_VARIANT_CODE = 2;
 
   /**
    * Конструктор, создает исключение с описанием исключения

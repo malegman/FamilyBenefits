@@ -1,9 +1,14 @@
-package com.example.familybenefits.exception;
+package com.example.familybenefits.exceptions;
 
 /**
  * Исключение, связанное с ошибками со временем
  */
 public class DateTimeException extends Exception {
+
+  /**
+   * Код варианта ошибки в api
+   */
+  public static final int API_VARIANT_CODE = 3;
 
   /**
    * Конструктор, создает исключение с описанием исключения

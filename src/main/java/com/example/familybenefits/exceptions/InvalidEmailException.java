@@ -1,9 +1,14 @@
-package com.example.familybenefits.exception;
+package com.example.familybenefits.exceptions;
 
 /**
  * Исключение, связанное с некорректным форматом email
  */
 public class InvalidEmailException extends Exception {
+
+  /**
+   * Код варианта ошибки в api
+   */
+  public static final int API_VARIANT_CODE = 4;
 
   /**
    * Конструктор, создает исключение с описанием исключения
