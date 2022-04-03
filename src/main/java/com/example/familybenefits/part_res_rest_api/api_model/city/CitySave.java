@@ -1,4 +1,4 @@
-package com.example.familybenefits.api_model.city;
+package com.example.familybenefits.part_res_rest_api.api_model.city;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -7,19 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Информация о городе
+ * Объект запроса для сохранения города, создания или обновления
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CityInfo {
-
-  /**
-   * ID города
-   */
-  @JsonProperty("id")
-  private String id;
+public class CitySave {
 
   /**
    * Название города

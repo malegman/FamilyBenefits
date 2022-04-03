@@ -1,4 +1,4 @@
-package com.example.familybenefits.api_model.institution;
+package com.example.familybenefits.part_res_rest_api.api_model.institution;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

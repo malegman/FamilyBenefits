@@ -1,4 +1,4 @@
-package com.example.familybenefits.api_model.criterion;
+package com.example.familybenefits.part_res_rest_api.api_model.criterion;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -7,19 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Информация о критерии для подбора пособий
+ * Объект запроса для сохранения критерия, создания или обновления
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CriterionInfo {
-
-  /**
-   * ID критерия
-   */
-  @JsonProperty("id")
-  private String id;
+public class CriterionSave {
 
   /**
    * Название критерия
@@ -34,8 +28,8 @@ public class CriterionInfo {
   private String info;
 
   /**
-   * Название типа критерия данного критерия
+   * ID типа критерия данного критерия
    */
-  @JsonProperty("nameCriterionType")
-  private String nameCriterionType;
+  @JsonProperty("idCriterionType")
+  private String idCriterionType;
 }

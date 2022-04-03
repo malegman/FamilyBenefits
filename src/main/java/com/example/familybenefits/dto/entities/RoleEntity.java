@@ -1,4 +1,4 @@
-package com.example.familybenefits.dto.entity;
+package com.example.familybenefits.dto.entities;
 
 import lombok.*;
 import org.springframework.lang.NonNull;
