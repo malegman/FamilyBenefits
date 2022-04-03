@@ -3,7 +3,7 @@ CREATE TABLE family_benefit.benefit (
   "id" TEXT NOT NULL DEFAULT family_benefit.generate_id(20),
   "name" TEXT NOT NULL,
   "info" TEXT NOT NULL,
-  "documents" TEXT NULL,
+  "documents" TEXT NOT NULL,
 
   CONSTRAINT benefit_pk PRIMARY KEY ("id"),
   CONSTRAINT benefit_uniq_name UNIQUE ("name")

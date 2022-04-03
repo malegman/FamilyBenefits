@@ -2,11 +2,11 @@ CREATE TABLE family_benefit.institution (
 
   "id" TEXT NOT NULL DEFAULT family_benefit.generate_id(20),
   "name" TEXT NOT NULL,
-  "info" TEXT NULL,
+  "info" TEXT NOT NULL,
   "address" TEXT NOT NULL,
-  "phone" TEXT NULL,
+  "phone" TEXT NOT NULL,
   "email" TEXT NULL,
-  "schedule" TEXT NULL,
+  "schedule" TEXT NOT NULL,
   "id_city" TEXT NOT NULL,
 
   CONSTRAINT institution_pk PRIMARY KEY ("id"),
