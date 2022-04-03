@@ -1,14 +1,14 @@
-package com.example.familybenefits.dto.entity;
+package com.example.familybenefits.dto.entities;
 
 import lombok.*;
+import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.math.BigInteger;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * Модель записи таблицы "login_code"
@@ -34,14 +34,26 @@ public class LoginCodeEntity extends ObjectEntity {
   /**
    * Код для входа в систему
    */
-  @NonNull
   @Column(name = "code")
-  private BigInteger code;
+  private int code;
 
   /**
    * Время истечения срока кода
    */
   @NonNull
   @Column(name = "date_expiration")
-  private Date dateExpiration;
+  private LocalDateTime dateExpiration;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+    LoginCodeEntity loginCodeEntity = (LoginCodeEntity) o;
+    return idUser.equals(loginCodeEntity.idUser) && code == loginCodeEntity.code;
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
+  }
 }
