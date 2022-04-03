@@ -1,11 +1,14 @@
-package com.example.familybenefits.dto.entity;
+package com.example.familybenefits.dto.entities;
 
 import lombok.*;
+import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
-import javax.persistence.*;
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.util.Objects;
 
 /**
  * Модель записи таблицы "cityEntity"
@@ -38,25 +41,8 @@ public class CityEntity extends ObjectEntity {
   /**
    * Информация города
    */
-  @Nullable
   @Column(name = "info")
   private String info;
-
-  /**
-   * Множество учреждений города
-   */
-  @NonNull
-  @ToString.Exclude
-  @OneToMany(mappedBy = "cityEntity")
-  private Set<InstitutionEntity> institutionEntitySet;
-
-  /**
-   * Множество пособий города
-   */
-  @NonNull
-  @ToString.Exclude
-  @ManyToMany(mappedBy = "cityEntitySet")
-  private Set<BenefitEntity> benefitEntitySet;
 
   /**
    * Конструктор для создания модели по ID
@@ -64,5 +50,18 @@ public class CityEntity extends ObjectEntity {
    */
   public CityEntity(@NonNull String id) {
     this.id = id;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+    CityEntity that = (CityEntity) o;
+    return Objects.equals(id, that.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }

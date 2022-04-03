@@ -1,10 +1,14 @@
-package com.example.familybenefits.dto.entity;
+package com.example.familybenefits.dto.entities;
 
 import lombok.*;
+import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
 
-import javax.persistence.*;
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.util.Objects;
 
 /**
  * Модель записи таблицы "criterion"
@@ -42,20 +46,10 @@ public class CriterionEntity extends ObjectEntity {
   private String info;
 
   /**
-   * Тип критерия критерия
+   * ID типа критерия данного критерия
    */
-  @NonNull
-  @ManyToOne
-  @JoinColumn(name = "id_type", referencedColumnName = "id")
-  private CriterionTypeEntity criterionTypeEntity;
-
-  /**
-   * Множество пособий критерия
-   */
-  @NonNull
-  @ToString.Exclude
-  @ManyToMany(mappedBy = "criterionEntitySet")
-  private Set<BenefitEntity> benefitEntitySet;
+  @Column(name = "id_type")
+  private String idCriterionType;
 
   /**
    * Конструктор для создания модели по ID
@@ -63,5 +57,18 @@ public class CriterionEntity extends ObjectEntity {
    */
   public CriterionEntity(@NonNull String id) {
     this.id = id;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+    CriterionEntity that = (CriterionEntity) o;
+    return Objects.equals(id, that.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }

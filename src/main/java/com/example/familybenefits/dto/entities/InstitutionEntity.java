@@ -1,11 +1,14 @@
-package com.example.familybenefits.dto.entity;
+package com.example.familybenefits.dto.entities;
 
 import lombok.*;
+import org.hibernate.Hibernate;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
-import javax.persistence.*;
-import java.util.Set;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.util.Objects;
 
 /**
  * Модель записи таблицы "institution"
@@ -38,7 +41,7 @@ public class InstitutionEntity extends ObjectEntity {
   /**
    * Информация учреждения
    */
-  @Nullable
+  @NonNull
   @Column(name = "info")
   private String info;
 
@@ -52,39 +55,28 @@ public class InstitutionEntity extends ObjectEntity {
   /**
    * Телефон учреждения
    */
-  @Nullable
+  @NonNull
   @Column(name = "phone")
   private String phone;
 
   /**
    * Электронная почта учреждения
    */
-  @Nullable
   @Column(name = "email")
   private String email;
 
   /**
    * График работы учреждения
    */
-  @Nullable
+  @NonNull
   @Column(name = "schedule")
   private String schedule;
 
   /**
-   * Город учреждения
+   * ID города учреждения
    */
-  @NonNull
-  @ManyToOne
-  @JoinColumn(name = "id_city", referencedColumnName = "id")
-  private CityEntity cityEntity;
-
-  /**
-   * Множество пособий учреждения
-   */
-  @NonNull
-  @ToString.Exclude
-  @ManyToMany(mappedBy = "institutionEntitySet")
-  private Set<BenefitEntity> benefitEntitySet;
+  @Column(name = "id_city")
+  private String idCity;
 
   /**
    * Конструктор для создания модели по ID
@@ -92,5 +84,18 @@ public class InstitutionEntity extends ObjectEntity {
    */
   public InstitutionEntity(@NonNull String id) {
     this.id = id;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+    InstitutionEntity that = (InstitutionEntity) o;
+    return Objects.equals(id, that.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }
