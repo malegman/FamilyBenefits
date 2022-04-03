@@ -1,7 +1,7 @@
-package com.example.familybenefits.service.implementation;
+package com.example.familybenefits.part_auth;
 
-import com.example.familybenefits.resource.RMail;
-import com.example.familybenefits.service.s_interface.MailService;
+import com.example.familybenefits.resources.RMail;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -12,8 +12,8 @@ import java.util.Properties;
 /**
  * Реализация сервиса для отправки сообщений на электронную почту
  */
-@Service
-public class MailServiceFB implements MailService {
+@Slf4j
+public class MailSenderProvider {
 
   /**
    * Почтовый сервис
@@ -43,10 +43,10 @@ public class MailServiceFB implements MailService {
    * @param loginCode код для входа в систему
    * @throws MailException если не удалось отправить сообщение
    */
-  @Override
-  public void sendLoginCode(String to, String nameUser, int loginCode) throws MailException {
+  public static void sendLoginCode(String to, String nameUser, int loginCode) throws MailException {
 
     send(to, RMail.LOGIN_MESSAGE_SUBJECT, String.format(RMail.LOGIN_MESSAGE_TEXT_PATTERN, nameUser, loginCode));
+    log.info("Message with login code \"{}\" was sent to \"{}\"", loginCode, to);
   }
 
   /**
@@ -56,8 +56,7 @@ public class MailServiceFB implements MailService {
    * @param text текст сообщения
    * @throws MailException если не удалось отправить сообщение
    */
-  @Override
-  public void send(String to, String subject, String text) throws MailException {
+  public static void send(String to, String subject, String text) throws MailException {
 
     SimpleMailMessage message = new SimpleMailMessage();
     message.setTo(to);
@@ -67,3 +66,4 @@ public class MailServiceFB implements MailService {
     mailSender.send(message);
   }
 }
+
