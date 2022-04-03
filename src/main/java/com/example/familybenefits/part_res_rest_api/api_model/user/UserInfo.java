@@ -1,4 +1,4 @@
-package com.example.familybenefits.api_model.user;
+package com.example.familybenefits.part_res_rest_api.api_model.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -6,16 +6,22 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 /**
- * Объект запроса для сохранения пользователя, создания или обновления
+ * Информация о пользователе
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSave {
+public class UserInfo {
+
+  /**
+   * ID пользователя
+   */
+  @JsonProperty("id")
+  private String id;
 
   /**
    * Имя пользователя
@@ -30,10 +36,10 @@ public class UserSave {
   private String email;
 
   /**
-   * Множество дат рождений детей пользователя
+   * Список дат рождений детей пользователя
    */
   @JsonProperty("birthDateChildren")
-  private Set<String> birthDateChildren;
+  private List<String> birthDateChildren;
 
   /**
    * Дата рождения пользователя
@@ -42,14 +48,14 @@ public class UserSave {
   private String dateBirth;
 
   /**
-   * ID города пользователя
+   * Список названий ролей пользователя
    */
-  @JsonProperty("idCity")
-  private String idCity;
+  @JsonProperty("nameRoleList")
+  private List<String> nameRoleList;
 
   /**
-   * Множество ID критерий пользователя
+   * Название города пользователя
    */
-  @JsonProperty("idCriterionSet")
-  private Set<String> idCriterionSet;
+  @JsonProperty("nameCity")
+  private String nameCity;
 }

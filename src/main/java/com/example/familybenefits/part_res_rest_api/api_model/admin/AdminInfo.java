@@ -1,4 +1,4 @@
-package com.example.familybenefits.api_model.admin;
+package com.example.familybenefits.part_res_rest_api.api_model.admin;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Информация об администраторе
@@ -36,8 +36,8 @@ public class AdminInfo {
   private String email;
 
   /**
-   * Множество названий ролей администратора
+   * Список названий ролей администратора
    */
-  @JsonProperty("nameRoleSet")
-  private Set<String> nameRoleSet;
+  @JsonProperty("nameRoleList")
+  private List<String> nameRoleList;
 }

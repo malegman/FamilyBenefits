@@ -1,4 +1,4 @@
-package com.example.familybenefits.api_model.system;
+package com.example.familybenefits.part_auth.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Объект ответа на вход в систему
@@ -30,8 +30,8 @@ public class LoginResponse {
   private String nameUser;
 
   /**
-   * Множество названий ролей пользователя
+   * Список названий ролей пользователя
    */
-  @JsonProperty("nameRoleUserSet")
-  private Set<String> nameRoleUserSet;
+  @JsonProperty("nameRoleUserList")
+  private List<String> nameRoleUserList;
 }

@@ -1,4 +1,4 @@
-package com.example.familybenefits.api_model.institution;
+package com.example.familybenefits.part_res_rest_api.api_model.institution;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * Объект запроса для сохранения учреждения, создания или обновления
@@ -60,8 +60,8 @@ public class InstitutionSave {
   private String idCity;
 
   /**
-   * Множество ID пособий учреждения
+   * Список ID пособий учреждения
    */
-  @JsonProperty("idBenefitSet")
-  private Set<String> idBenefitSet;
+  @JsonProperty("idBenefitList")
+  private List<String> idBenefitList;
 }
