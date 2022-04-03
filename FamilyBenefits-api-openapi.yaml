@@ -1,19 +1,21 @@
 openapi: 3.0.3
 info:
   title: Family Benefits
-  description: rest-api для приложения "Пособия для семьи с детьми"
+  description: API сервиса "Пособия для семьи с детьми"
   version: 1.0.0
   contact:
     email: smegovic@gmail.com
 servers:
-  - url: https://localhost
+  - url: http://localhost
 tags:
-  - name: system
-    description: Операции, связанные с системой и безопасностью
+  - name: auth
+    description: Операции, связанные с аутентификацией и авторизацией пользователя в системе
   - name: user
     description: Получение и изменение пользователя
   - name: admin
     description: Получение и изменение администратора
+  - name: super admin
+    description: Операции супер-администратора
   - name: city
     description: Получение и изменение города
   - name: institution
@@ -27,41 +29,56 @@ tags:
 
 
 paths:
-  /pre-login:
+  /api/auth/pre-login:
     post:
       tags:
-        - system
+        - auth
       summary: Отправляет на указанную почту код для входа в систему
       description:
         Отправляет на указанную почту код для входа в систему.
         Для анонимного клиента.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PreLoginRequest'
+      parameters:
+        - in: query
+          name: e
+          description: email пользователя
+          schema:
+            type: string
+            example: example@email.com
+          required: true
       responses:
         '200':
           description: Вход в систему выполнен
+          content: { }
+        '400':
+          description: Вход в систему уже выполнен
           content: { }
         '404':
           description: Пользователь с указанным email не найден
           content: { }
       security: [ ]
-  /login:
+  /api/auth/login:
     post:
       tags:
-        - system
+        - auth
       summary: Вход в систему
       description:
         Вход в систему.
         Для анонимного клиента.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
-        required: true
+      parameters:
+        - in: query
+          name: e
+          description: email пользователя
+          schema:
+            type: string
+            example: example@email.com
+          required: true
+        - in: query
+          name: lc
+          description: код входа пользователя
+          schema:
+            type: integer
+            example: 123456
+          required: true
       responses:
         '200':
           description: Вход в систему выполнен
@@ -70,53 +87,44 @@ paths:
               schema:
                 description: Токен доступа в формате jwt
                 type: string
-                example: jwt=d6tefy0.fh3653.26r3fyg
+                example: Bearer d6tefy0.fh3653.26r3fyg
+            Set-Cookie:
+              schema:
+                description: Токен восстановления
+                type: string
+                example: refresh=ldkfj4h728fhd
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Вход в систему уже выполнен
+          content: { }
         '404':
           description: Пользователь с указанными данными не найден
           content: { }
       security: [ ]
-  /logout:
+  /api/auth/logout/{id}:
     post:
       tags:
-        - system
+        - auth
       summary: Выход из системы
       description:
         Выход из системы.
         О запросившем клиенте.
         Для администратора. Для пользователя.
-        Необходима аутентификация.
+        Необходима авторизация.
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя
+          schema:
+            type: string
+            example: td56387fhj
+          required: true
       responses:
         '200':
           description: Выход из системы выполнен
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-        '404':
-          description: Пользователь с указанными данными не найден
-          content: { }
-      security:
-        - bearerAuth: [ ]
-  /refresh:
-    post:
-      tags:
-        - system
-      summary: Обновление токена доступа
-      description: 
-        Обновление токена доступа.
-        О запросившем клиенте.
-        Для администратора. Для пользователя.
-        Необходима аутентификация.
-      responses:
-        '200':
-          description: Токен доступа обновлен
           content: { }
         '401':
           description: Клиент не авторизован
@@ -129,9 +137,10 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
 
 
-  /users:
+  /api/users:
     post:
       tags:
         - user
@@ -151,16 +160,21 @@ paths:
           content: { }
         '400':
           description:
-            Варианты -
-            1) администратор или пользователь с данным email уже существует;
-            2) указанный "email" не является email;
-            3) даты рождения пользователя или детей не соответствуют формату "dd.mm.yyyy";
-            4) даты рождения пользователя или детей позже текущей даты.
+            (Код варианта) Вариант
+            (1) Администратор или пользователь с данным email уже существует
+            (2) Даты рождения пользователя или детей не соответствуют формату "dd.mm.yyyy"
+            (3) Даты рождения пользователя или детей позже текущей даты
+            (4) Указанный "email" не является email
+            (5) Некорректное строковое поле
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
         '404':
           description: Город или критерии с указанными ID не найдены
           content: { }
       security: [ ]
-  /users/{id}:
+  /api/users/{id}:
     get:
       tags:
         - user
@@ -169,7 +183,7 @@ paths:
         Возвращает информацию о пользователе по ID.
         О запросившем клиенте.
         Для пользователя.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -186,7 +200,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserInfo'
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -196,6 +210,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
     put:
       tags:
         - user
@@ -204,7 +219,7 @@ paths:
         Обновляет данные пользователя.
         О запросившем клиенте.
         Для пользователя.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -225,26 +240,26 @@ paths:
           content: { }
         '400':
           description:
-            Варианты -
-            1) указанный "email" не является email;
-            2) даты рождения пользователя или детей не соответствуют формату "dd.mm.yyyy";
-            3) даты рождения пользователя или детей позже текущей даты;
-            4) пользователь с отличным ID и данным email уже существует.
+            (Код варианта) Вариант
+            (1) Пользователь с данным email уже существует
+            (2) Даты рождения пользователя или детей не соответствуют формату "dd.mm.yyyy"
+            (3) Даты рождения пользователя или детей позже текущей даты
+            (4) Указанный "email" не является email
+            (5) Некорректное строковое поле
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
         '404':
           description:
-            Варианты -
-            1) пользователь с указанным ID не найден;
-            2) город или критерии с указанными ID не найдены.
+            Пользователь, город или критерии с указанными ID не найдены
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
     delete:
       tags:
         - user
@@ -253,7 +268,7 @@ paths:
         Удаляет пользователя по ID. Если пользователь имеет роль админа, то удаляются роль пользователя и пользовательские данные.
         О запросившем клиенте.
         Для пользователя.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -267,7 +282,7 @@ paths:
           description: Пользователь удален
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -277,14 +292,15 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /users/init-data:
+        - apiKey: [ ]
+  /api/users/init-data:
     get:
       tags:
         - user
       summary: Возвращает дополнительные данные для пользователя
       description:
         Возвращает дополнительные данные для создания или обновления пользователя.
-        Данные содержат в себе множества кратких информаций о городах и полных критериях.
+        Данные содержат в себе списки кратких информаций о городах и полных критериях.
       responses:
         '200':
           description: Дополнительные данные пользователя получены
@@ -295,40 +311,7 @@ paths:
       security: [ ]
 
 
-  /admins:
-    post:
-      tags:
-        - admin
-      summary: Создает администратора
-      description:
-        Создает администратора.
-        Для супер-администратора.
-        Необходима аутентификация.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AdminSave'
-        required: true
-      responses:
-        '201':
-          description: Администратор создан
-          content: { }
-        '400':
-          description:
-            Варианты -
-            1) администратор или пользователь с данным email уже существует;
-            2) указанный "email" не является email.
-          content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
-        '403':
-          description: Нет доступа
-          content: { }
-      security:
-        - bearerAuth: [ ]
-  /admins/{id}:
+  /api/admins/{id}:
     get:
       tags:
         - admin
@@ -337,7 +320,7 @@ paths:
         Возвращает информацию об администраторе по ID.
         О запросившем клиенте.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -354,7 +337,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AdminInfo'
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -364,6 +347,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
     put:
       tags:
         - admin
@@ -372,7 +356,7 @@ paths:
         Обновляет данные администратора по ID.
         О запросившем клиенте.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -393,12 +377,13 @@ paths:
           content: { }
         '400':
           description:
-            Варианты -
-            1) администратор или пользователь с отличным ID и данным email уже существует;
-            2) указанный "email" не является email.
+            (Код варианта) Вариант
+            (1) Администратор или пользователь с данным email уже существует
+            (4) Указанный "email" не является email
+            (5) Некорректное строковое поле
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -408,14 +393,53 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
+
+
+  /api/sa/admins:
+    post:
+      tags:
+        - super admin
+      summary: Создает администратора
+      description:
+        Создает администратора.
+        Для супер-администратора.
+        Необходима авторизация.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSave'
+        required: true
+      responses:
+        '201':
+          description: Администратор создан
+          content: { }
+        '400':
+          description:
+            (Код варианта) Вариант
+            (1) Администратор или пользователь с данным email уже существует
+            (4) Указанный "email" не является email
+            (5) Некорректное строковое поле
+          content: { }
+        '401':
+          description: Клиент не авторизован
+          content: { }
+        '403':
+          description: Нет доступа
+          content: { }
+      security:
+        - bearerAuth: [ ]
+        - apiKey: [ ]
+  /api/sa/admins/{id}:
     delete:
       tags:
-        - admin
+        - super admin
       summary: Удаляет администратора по ID
       description:
         Удаляет администратора по ID.
         Для супер администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -432,7 +456,7 @@ paths:
           description: Невозможно удалить администратора с ролью супер администратора
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -442,17 +466,18 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /admins/from-user/{idUser}:
+        - apiKey: [ ]
+  /api/sa/from-user/{id}:
     post:
       tags:
-        - admin
+        - super admin
       summary: Добавляет роль администратора пользователю
       description:
         Добавляет роль администратора пользователю.
         Для супер администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
-        - name: idUser
+        - name: id
           in: path
           description: ID пользователя
           schema:
@@ -464,10 +489,10 @@ paths:
           description: Роль администратора добавлена
           content: { }
         '400':
-          description: Указанный пользователь не имеет роли пользователя или имеет роль администратора
+          description: Указанный пользователь не имеет роли пользователя или уже имеет роль администратора
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -477,15 +502,16 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /admins/{id}/to-user:
+        - apiKey: [ ]
+  /api/sa/to-user/{id}:
     post:
       tags:
-        - admin
+        - super admin
       summary: Добавляет роль пользователя администратору
       description:
         Добавляет роль пользователя администратору.
         Для супер администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -499,10 +525,10 @@ paths:
           description: Роль пользователя добавлена
           content: { }
         '400':
-          description: Указанный администратор не имеет роли администратора или имеет роль пользователя
+          description: Указанный администратор не имеет роли администратора или уже имеет роль пользователя
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -512,15 +538,16 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /admins/{id}/to-super:
+        - apiKey: [ ]
+  /api/sa/to-super/{id}:
     post:
       tags:
-        - admin
+        - super admin
       summary: Передает роль супера администратора другому администратору
       description:
         Передает роль супер администратора другому администратору.
         Для супер администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -534,10 +561,10 @@ paths:
           description: Роль супер администратора передана
           content: { }
         '400':
-          description: Администратор имеет роль супер администратора
+          description: Администратор уже имеет роль супер администратора
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -547,18 +574,18 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
 
 
-  /cities:
+  /api/cities:
     get:
       tags:
         - city
       summary:
-        Возвращает множество городов, в которых есть учреждения и пособия.
-        Фильтр по названию или ID пособия.
+        Возвращает список городов, в которых есть учреждения и пособия, по фильтру
       description:
-        Возвращает множество городов, в которых есть учреждения и пособия.
-        Фильтр по названию или ID пособия.
+        Возвращает список городов, в которых есть учреждения и пособия.
+        Фильтр по названию или ID пособия или учреждения.
       parameters:
         - name: name
           in: query
@@ -574,18 +601,22 @@ paths:
             type: string
             example: td56387fhj
           required: false
+        - name: idInst
+          in: query
+          description: ID учреждения
+          schema:
+            type: string
+            example: td56387fhj
+          required: false
       responses:
         '200':
-          description: Множество городов получено
+          description: Список городов получен
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Город с указанным названием или пособие с указанным ID не найдены
-          content: { }
       security: [ ]
     post:
       tags:
@@ -594,7 +625,7 @@ paths:
       description:
         Создает город.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       requestBody:
         content:
           application/json:
@@ -606,17 +637,21 @@ paths:
           description: Город добавлен
           content: { }
         '400':
-          description: Город с указанными данными уже существует
+          description:
+            (Код варианта) Вариант
+            (1) Город с указанными данными уже существует
+            (5) Некорректное строковое поле
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
       security:
         - bearerAuth: [ ]
-  /cities/{id}:
+        - apiKey: [ ]
+  /api/cities/{id}:
     get:
       tags:
         - city
@@ -649,7 +684,7 @@ paths:
       description:
         Обновляет город по ID.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -669,10 +704,13 @@ paths:
           description: Город обновлен
           content: { }
         '400':
-          description: Город с отличным ID и данным названием уже существует
+          description:
+            (Код варианта) Вариант
+            (1) Город с данным названием уже существует
+            (5) Некорректное строковое поле
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -682,6 +720,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
     delete:
       tags:
         - city
@@ -689,7 +728,7 @@ paths:
       description:
         Удаляет город по ID.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -703,7 +742,7 @@ paths:
           description: Город удален
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -713,18 +752,19 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /cities/partial:
+        - apiKey: [ ]
+  /api/cities/partial:
     get:
       tags:
         - city
-      summary: Возвращает множество городов, в которых нет учреждений или пособий
+      summary: Возвращает список городов, в которых нет учреждений или пособий
       description:
-        Возвращает множество городов, в которых нет учреждений или пособий.
+        Возвращает список городов, в которых нет учреждений или пособий.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       responses:
         '200':
-          description: Множество городов получено
+          description: Список городов получен
           content:
             application/json:
               schema:
@@ -732,26 +772,33 @@ paths:
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
 
 
-  /institutions:
+  /api/institutions:
     get:
       tags:
         - institution
       summary:
-        Возвращает множество учреждений, в которых есть пособия.
-        Фильтр по ID города или пособия.
+        Возвращает список учреждений, в которых есть пособия, по фильтру
       description:
-        Возвращает множество учреждений, в которых есть пособия.
-        Фильтр по ID города или пособия.
+        Возвращает список учреждений, в которых есть пособия.
+        Фильтр по названию или ID города или пособия.
       parameters:
+        - name: name
+          in: query
+          description: Название учреждения
+          schema:
+            type: string
+            example: name
+          required: false
         - name: idCity
           in: query
           description: ID города
@@ -768,16 +815,13 @@ paths:
           required: false
       responses:
         '200':
-          description: Множество учреждений получено
+          description: Список учреждений получен
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Не найдены город или пособие с указанным ID
-          content: { }
       security: [ ]
     post:
       tags:
@@ -786,7 +830,7 @@ paths:
       description:
         Создает учреждение.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       requestBody:
         content:
           application/json:
@@ -797,18 +841,25 @@ paths:
         '201':
           description: Учреждение создано
           content: { }
-        '401':
-          description: Клиент не авторизован или токен не действительный
-          content: { }
         '400':
-          description: Учреждение с указанными данными уже существует
+          description:
+            (Код варианта) Вариант
+            (1) Учреждение с указанными данными уже существует
+            (5) Некорректное строковое поле
+          content: { }
+        '401':
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
+        '404':
+          description: Не найдены город или пособия
+          content: { }
       security:
         - bearerAuth: [ ]
-  /institutions/{id}:
+        - apiKey: [ ]
+  /api/institutions/{id}:
     get:
       tags:
         - institution
@@ -841,7 +892,7 @@ paths:
       description:
         Обновляет учреждение по ID.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -861,10 +912,13 @@ paths:
           description: Учреждение обновлено
           content: { }
         '400':
-          description: Учреждение с отличным ID и данным названием уже существует
+          description:
+            (Код варианта) Вариант
+            (1) Учреждение с данным названием уже существует
+            (5) Некорректное строковое поле
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -874,6 +928,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
     delete:
       tags:
         - institution
@@ -881,7 +936,7 @@ paths:
       description:
         Удаляет учреждение по ID.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -895,7 +950,7 @@ paths:
           description: Учреждение удалено
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -905,18 +960,19 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
-  /institutions/partial:
+        - apiKey: [ ]
+  /api/institutions/partial:
     get:
       tags:
         - institution
-      summary: Возвращает множество учреждений, в которых нет пособий
+      summary: Возвращает список учреждений, в которых нет пособий
       description:
-        Возвращает множество учреждений, в которых нет пособий
+        Возвращает список учреждений, в которых нет пособий
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       responses:
         '200':
-          description: Множество учреждений получено
+          description: Список учреждений получен
           content:
             application/json:
               schema:
@@ -924,24 +980,24 @@ paths:
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
       security:
         - bearerAuth: [ ]
-  /institutions/init-data:
+        - apiKey: [ ]
+  /api/institutions/init-data:
     get:
       tags:
         - institution
       summary: Возвращает дополнительные данные для учреждения
       description:
         Возвращает дополнительные данные для добавления или обновления учреждения.
-        Данные содержат в себе множество кратких информаций о городах и пособиях.
+        Данные содержат в себе список кратких информаций о городах и пособиях.
         Для администратора.
-        Необходима аутентификация.
-      operationId: getInstitutionInitData
+        Необходима авторизация.
       responses:
         '200':
           description: Дополнительные данные учреждения получены
@@ -950,26 +1006,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/InstitutionInitData'
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
 
 
-  /benefits:
+  /api/benefits:
     get:
       tags:
         - benefit
       summary:
-        Возвращает множество пособий, в которых есть города, учреждения и критерии.
-        Фильтр по ID города, учреждения или критерия.
+        Возвращает список пособий, в которых есть города, учреждения и критерии, по фильтру
       description:
-        Возвращает множество пособий, в которых есть города, учреждения и критерии.
-        Фильтр по ID города, учреждения или критерия.
+        Возвращает список пособий, в которых есть города, учреждения и критерии.
+        Фильтр по названию или ID города, учреждения или критерия.
       parameters:
+        - name: name
+          in: query
+          description: Название пособия
+          schema:
+            type: string
+            example: name
+          required: false
         - name: idCity
           in: query
           description: ID города
@@ -993,16 +1056,13 @@ paths:
           required: false
       responses:
         '200':
-          description: Множество пособий получено
+          description: Список пособий получен
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Не найдены город, учреждение или критерий с указанным ID
-          content: { }
       security: [ ]
     post:
       tags:
@@ -1011,7 +1071,7 @@ paths:
       description:
         Создает пособие.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       requestBody:
         content:
           application/json:
@@ -1023,17 +1083,21 @@ paths:
           description: Пособие создано
           content: { }
         '400':
-          description: Пособие с указанными данными уже существует
+          description:
+            (Код варианта) Вариант
+            (1) Пособие с указанными данными уже существует
+            (5) Некорректное строковое поле
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
       security:
         - bearerAuth: [ ]
-  /benefits/{id}:
+        - apiKey: [ ]
+  /api/benefits/{id}:
     get:
       tags:
         - benefit
@@ -1066,7 +1130,7 @@ paths:
       description:
         Обновляет пособие по ID.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -1086,19 +1150,23 @@ paths:
           description: Пособие обновлено
           content: { }
         '400':
-          description: Пособие с отличным ID и данным названием уже существует
+          description:
+            (Код варианта) Вариант
+            (1) Пособие с данным названием уже существует
+            (5) Некорректное строковое поле
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
         '404':
-          description: Пособие с указанными данными не найдено
+          description: Не найдено пособие с указанным ID
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
     delete:
       tags:
         - benefit
@@ -1106,7 +1174,7 @@ paths:
       description:
         Удаляет пособие по ID.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -1120,28 +1188,29 @@ paths:
           description: Пособие удалено
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
         '404':
-          description: Пособие с указанным ID не найдено
+          description: Не найдено пособие с указанным ID
           content: { }
       security:
         - bearerAuth: [ ]
-  /benefits/partial:
+        - apiKey: [ ]
+  /api/benefits/partial:
     get:
       tags:
         - benefit
-      summary: Возвращает множество пособий, в которых нет городов, учреждений или критерий
+      summary: Возвращает список пособий, в которых нет городов, учреждений или критерий
       description:
-        Возвращает множество пособий, в которых нет городов, учреждений или критерий.
+        Возвращает список пособий, в которых нет городов, учреждений или критерий.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       responses:
         '200':
-          description: Множество пособий получено
+          description: Список пособий получен
           content:
             application/json:
               schema:
@@ -1149,23 +1218,24 @@ paths:
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
       security:
         - bearerAuth: [ ]
-  /benefits/init-data:
+        - apiKey: [ ]
+  /api/benefits/init-data:
     get:
       tags:
         - benefit
       summary: Возвращает дополнительные данные для пособия
       description:
         Возвращает дополнительные данные для добавления или обновления пособия.
-        Данные содержат в себе множества кратких информаций о городах и полных критериях
+        Данные содержат в себе списки кратких информаций о городах, учреждениях и полных критериях
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       responses:
         '200':
           description: Дополнительные данные пособия получены
@@ -1174,22 +1244,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/BenefitInitData'
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
       security:
         - bearerAuth: [ ]
-  /benefits/user/{idUser}:
+        - apiKey: [ ]
+  /api/benefits/user/{idUser}:
     get:
       tags:
         - benefit
-      summary: Возвращает множество предложенных пособий пользователя по его ID
+      summary: Возвращает список предложенных пособий пользователя по его ID
       description:
-        Возвращает множество предложенных пособий пользователя по его ID.
+        Возвращает список предложенных пособий пользователя по его ID.
         Для пользователя.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: idUser
           in: path
@@ -1200,7 +1271,7 @@ paths:
           required: true
       responses:
         '200':
-          description: Множество предложенных пособий получено
+          description: Список предложенных пособий получено
           content:
             application/json:
               schema:
@@ -1211,7 +1282,7 @@ paths:
           description: Критерии пользователя устарели
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -1221,19 +1292,26 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
 
 
-  /criteria:
+  /api/criteria:
     get:
       tags:
         - criterion
       summary:
-        Возвращает множество критерий, в которых есть пособия.
-        Фильтр по ID пособия или типа критерия.
+        Возвращает список критерий, в которых есть пособия, по фильтру
       description:
-        Возвращает множество критерий, в которых есть пособия.
-        Фильтр по ID пособия или типа критерия.
+        Возвращает список критерий, в которых есть пособия.
+        Фильтр по названию или ID пособия или типа критерия.
       parameters:
+        - name: name
+          in: query
+          description: Название критерия
+          schema:
+            type: string
+            example: name
+          required: false
         - name: idBenefit
           in: query
           description: ID пособия
@@ -1250,16 +1328,13 @@ paths:
           required: false
       responses:
         '200':
-          description: Множество всех критерий получено
+          description: Список всех критерий получен
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Не найдены пособие или тип критерия с указанным ID
-          content: { }
       security: [ ]
     post:
       tags:
@@ -1268,7 +1343,7 @@ paths:
       description:
         Создает критерий.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       requestBody:
         content:
           application/json:
@@ -1280,17 +1355,21 @@ paths:
           description: Критерий добавлен
           content: { }
         '400':
-          description: Критерий с указанными данными уже существует
+          description:
+            (Код варианта) Вариант
+            (1) Критерий с указанными данными уже существует
+            (5) Некорректное строковое поле
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
       security:
         - bearerAuth: [ ]
-  /criteria/{id}:
+        - apiKey: [ ]
+  /api/criteria/{id}:
     get:
       tags:
         - criterion
@@ -1323,7 +1402,7 @@ paths:
       description:
         Обновляет критерий по ID.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -1343,10 +1422,13 @@ paths:
           description: Критерий обновлен
           content: { }
         '400':
-          description: Критерий с отличным ID и данным названием уже существует
+          description:
+            (Код варианта) Вариант
+            (1) Критерий с данным названием уже существует
+            (5) Некорректное строковое поле
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -1356,6 +1438,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
     delete:
       tags:
         - criterion
@@ -1363,7 +1446,7 @@ paths:
       description:
         Удаляет критерий по ID.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -1377,28 +1460,29 @@ paths:
           description: Критерий удален
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
         '404':
-          description: Критерий с указанными данным ID не найден
+          description: Не найден критерий с указанным ID
           content: { }
       security:
         - bearerAuth: [ ]
-  /criteria/partial:
+        - apiKey: [ ]
+  /api/criteria/partial:
     get:
       tags:
         - criterion
-      summary: Возвращает множество критерий, в которых нет пособий
+      summary: Возвращает список критерий, в которых нет пособий
       description:
-        Возвращает множество критерий, в которых нет пособий.
+        Возвращает список критерий, в которых нет пособий.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       responses:
         '200':
-          description: Множество всех критерий получено
+          description: Список всех критерий получено
           content:
             application/json:
               schema:
@@ -1406,14 +1490,15 @@ paths:
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
       security:
         - bearerAuth: [ ]
-  /criteria/init-data:
+        - apiKey: [ ]
+  /api/criteria/init-data:
     get:
       tags:
         - criterion
@@ -1422,7 +1507,7 @@ paths:
         Возвращает дополнительные данные для добавления или обновления критерия.
         Данные содержат в себе множетсво кратких информаций о типах критерий.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       responses:
         '200':
           description: Дополнительные данные критерия получены
@@ -1431,22 +1516,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/CriterionInitData'
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
       security:
         - bearerAuth: [ ]
-  /criteria/user/{idUser}:
+        - apiKey: [ ]
+  /api/criteria/user/{idUser}:
     get:
       tags:
         - criterion
-      summary: Возвращает множество критерий пользователя по его ID
+      summary: Возвращает список критерий пользователя по его ID
       description:
-        Возвращает множество критерий пользователя по его ID.
+        Возвращает список критерий пользователя по его ID.
         Для пользователя.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: idUser
           in: path
@@ -1457,7 +1543,7 @@ paths:
           required: true
       responses:
         '200':
-          description: Множество критерий получено
+          description: Список критерий получено
           content:
             application/json:
               schema:
@@ -1465,7 +1551,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -1475,16 +1561,18 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
 
 
-  /criterion-types:
+  /api/criterion-types:
     get:
       tags:
         - criterion type
       summary:
-        Возвращает множество типов критерия, в которых есть критерии.
+        Возвращает список типов критерия, в которых есть критерии, по фильтру
       description:
-        Возвращает множество типов критерия, в которых есть критерии.
+        Возвращает список типов критерия, в которых есть критерии.
+        Фильтр по названию.
       parameters:
         - name: name
           in: query
@@ -1495,16 +1583,13 @@ paths:
           required: false
       responses:
         '200':
-          description: Множество типов критерия получено
+          description: Список типов критерия получено
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
-        '404':
-          description: Тип критерия с указанным названием не найден
-          content: { }
       security: [ ]
     post:
       tags:
@@ -1513,7 +1598,7 @@ paths:
       description:
         Создает тип критерия.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       requestBody:
         content:
           application/json:
@@ -1525,17 +1610,21 @@ paths:
           description: Тип критерия создан
           content: { }
         '400':
-          description: Тип критерия с указанными данными уже существует
+          description:
+            (Код варианта) Вариант
+            (1) Тип критерия с указанными данными уже существует
+            (5) Некорректное строковое поле
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
       security:
         - bearerAuth: [ ]
-  /criterion-types/{id}:
+        - apiKey: [ ]
+  /api/criterion-types/{id}:
     get:
       tags:
         - criterion type
@@ -1568,7 +1657,7 @@ paths:
       description:
         Обновляет тип критерия по ID.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -1588,10 +1677,13 @@ paths:
           description: Тип критерия обновлен
           content: { }
         '400':
-          description: Тип критерия с отличным ID и данным названием уже существует
+          description:
+            (Код варианта) Вариант
+            (1) Тип критерия с данным названием уже существует
+            (5) Некорректное строковое поле
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
@@ -1601,6 +1693,7 @@ paths:
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
     delete:
       tags:
         - criterion type
@@ -1608,7 +1701,7 @@ paths:
       description:
         Удаляет тип критерия по ID.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       parameters:
         - name: id
           in: path
@@ -1622,28 +1715,29 @@ paths:
           description: Тип критерия удален
           content: { }
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
         '404':
-          description: Тип критерия с указанным ID не найден
+          description: Не найден тип критерия с указанным ID
           content: { }
       security:
         - bearerAuth: [ ]
-  /criterion-types/partial:
+        - apiKey: [ ]
+  /api/criterion-types/partial:
     get:
       tags:
         - criterion type
-      summary: Возвращает множество типов критерия, в которых нет критерий
+      summary: Возвращает список типов критерия, в которых нет критерий
       description:
-        Возвращает множество типов критерия, в которых нет критерий.
+        Возвращает список типов критерия, в которых нет критерий.
         Для администратора.
-        Необходима аутентификация.
+        Необходима авторизация.
       responses:
         '200':
-          description: Множество типов критерия получено
+          description: Список типов критерия получено
           content:
             application/json:
               schema:
@@ -1651,13 +1745,14 @@ paths:
                 items:
                   $ref: '#/components/schemas/ObjectShortInfo'
         '401':
-          description: Клиент не авторизован или токен не действительный
+          description: Клиент не авторизован
           content: { }
         '403':
           description: Нет доступа
           content: { }
       security:
         - bearerAuth: [ ]
+        - apiKey: [ ]
 
 
 components:
@@ -1667,6 +1762,10 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    apiKey:
+      type: apiKey
+      in: cookie
+      name: refresh
 
   schemas:
     UserInfo:
@@ -1685,7 +1784,7 @@ components:
           type: string
           example: exmaple@mail.com
         birthDateChildren:
-          description: Множество дат рождений детей пользователя
+          description: Список дат рождений детей пользователя
           type: array
           items:
             type: string
@@ -1696,8 +1795,8 @@ components:
           type: string
           format: date
           example: 01.01.2022
-        nameRoleSet:
-          description: Множество названий ролей пользователя
+        nameRoleList:
+          description: Список названий ролей пользователя
           type: array
           items:
             description: Название роли
@@ -1719,7 +1818,7 @@ components:
           type: string
           example: exmaple@mail.com
         birthDateChildren:
-          description: Множество дат рождений детей пользователя
+          description: Список дат рождений детей пользователя
           type: array
           items:
             description: Дата рождения ребенка
@@ -1735,8 +1834,8 @@ components:
           description: ID города пользователя
           type: string
           example: td56387fhj
-        idCriterionSet:
-          description: Множество ID критерий пользователя
+        idCriterionList:
+          description: Список ID критерий пользователя
           type: array
           items:
             description: ID критерия
@@ -1744,38 +1843,20 @@ components:
             example: td56387fhj
     UserInitData:
       description: Дополнительные данные для создания или обновления пользователя.
-        Содержат в себе множества кратких информаций о городах и полных инф. о критериях
+        Содержат в себе списки кратких информаций о городах и полных инф. о критериях
       properties:
-        shortCitySet:
-          description: Множество кратких информаций о городах
+        shortCityList:
+          description: Список кратких информаций о городах
           type: array
           items:
             $ref: '#/components/schemas/ObjectShortInfo'
-        criterionSet:
-          description: Множество информаций о критериях
+        criterionList:
+          description: Список информаций о критериях
           type: array
           items:
             $ref: '#/components/schemas/CriterionInfo'
 
 
-    PreLoginRequest:
-      description: Объект запроса пользователя для получения кода для входа в систему
-      properties:
-        email:
-          description: Электронная почта пользователя
-          type: string
-          example: example@mail.com
-    LoginRequest:
-      description: Объект запроса пользователя для входа в систему
-      properties:
-        email:
-          description: Электронная почта пользователя
-          type: string
-          example: example@mail.com
-        loginCode:
-          description: Код пользователя для входа в систему
-          type: integer
-          example: 111222
     LoginResponse:
       description: Объект ответа на вход в систему
       properties:
@@ -1787,8 +1868,8 @@ components:
           description: Имя пользователя
           type: string
           example: name
-        nameRoleUserSet:
-          description: Множество названий ролей пользователя
+        nameRoleUserList:
+          description: Список названий ролей пользователя
           type: array
           items:
             description: Роль пользователя
@@ -1811,8 +1892,8 @@ components:
           description: Электронная почта администратора
           type: string
           example: exmaple@mail.com
-        nameRoleSet:
-          description: Множество названий ролей администратора
+        nameRoleList:
+          description: Список названий ролей администратора
           type: array
           items:
             description: Название роли
@@ -1895,10 +1976,10 @@ components:
           example: td56387fhj
     CriterionInitData:
       description: Дополнительные данные для создания или обновления критерия
-        Содержат в себе множество кратких информаций о типах критериях
+        Содержат в себе список кратких информаций о типах критериях
       properties:
-        shortCriterionTypeSet:
-          description: Множество кратких информаций о типах критерия
+        shortCriterionTypeList:
+          description: Список кратких информаций о типах критерия
           type: array
           items:
             $ref: '#/components/schemas/ObjectShortInfo'
@@ -1990,8 +2071,8 @@ components:
           description: ID города учреждения
           type: string
           example: td56387fhj
-        idBenefitSet:
-          description: Множество ID пособий учреждения
+        idBenefitList:
+          description: Список ID пособий учреждения
           type: array
           items:
             description: ID пособия
@@ -1999,15 +2080,15 @@ components:
             example: td56387fhj
     InstitutionInitData:
       description: Дополнительные данные для создания или обновления учреждения
-        Содержат в себе множество кратких информаций о городах и пособиях
+        Содержат в себе список кратких информаций о городах и пособиях
       properties:
-        shortCitySet:
-          description: Множество кратких информаций о городах
+        shortCityList:
+          description: Список кратких информаций о городах
           type: array
           items:
             $ref: '#/components/schemas/ObjectShortInfo'
-        shortBenefitSet:
-          description: Множество кратких информаций о пособиях
+        shortBenefitList:
+          description: Список кратких информаций о пособиях
           type: array
           items:
             $ref: '#/components/schemas/ObjectShortInfo'
@@ -2047,22 +2128,22 @@ components:
           description: Документы для получения пособия
           type: string
           example: documents
-        idCitySet:
-          description: Множество ID городов пособия
+        idCityList:
+          description: Список ID городов пособия
           type: array
           items:
             description: ID города
             type: string
             example: td56387fhj
-        idInstitutionSet:
-          description: Множество ID учреждений пособия
+        idInstitutionList:
+          description: Список ID учреждений пособия
           type: array
           items:
             description: ID учреждения
             type: string
             example: td56387fhj
-        idCriterionSet:
-          description: Множество ID критерий пособия
+        idCriterionList:
+          description: Список ID критерий пособия
           type: array
           items:
             description: ID критерия
@@ -2070,18 +2151,23 @@ components:
             example: td56387fhj
     BenefitInitData:
       description: Дополнительные данные для создания или обновления пособия
-        Содержат в себе множества кратких информаций о городах и полных критериях
+        Содержат в себе списки кратких информаций о городах, учреждениях и полных критериях
       properties:
-        shortCitySet:
-          description: Множество кратких информаций о городах
+        shortCityList:
+          description: Список кратких информаций о городах
           type: array
           items:
             $ref: '#/components/schemas/ObjectShortInfo'
-        criterionSet:
-          description: Множество информаций о критериях
+        criterionList:
+          description: Список информаций о критериях
           type: array
           items:
             $ref: '#/components/schemas/CriterionInfo'
+        shortInsitutionsList:
+          description: Список кратких информаций об учреждениях
+          type: array
+          items:
+            $ref: '#/components/schemas/ObjectShortInfo'
 
 
     ObjectShortInfo:
