@@ -1,4 +1,4 @@
-package com.example.familybenefits.dto.entity;
+package com.example.familybenefits.dto.entities;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,17 +21,4 @@ public abstract class ObjectEntity {
    * ID объекта
    */
   private String id;
-
-  @Override
-  public boolean equals(@Nullable Object o) {
-    if (this == o) return true;
-    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-    ObjectEntity objectEntity = (ObjectEntity) o;
-    return Objects.equals(id, objectEntity.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
-  }
 }
