@@ -1,9 +1,12 @@
-package com.example.familybenefits.convert;
+package com.example.familybenefits.part_res_rest_api.converters;
 
-import com.example.familybenefits.api_model.city.CityInfo;
-import com.example.familybenefits.api_model.city.CitySave;
-import com.example.familybenefits.api_model.common.ObjectShortInfo;
-import com.example.familybenefits.dto.entity.CityEntity;
+import com.example.familybenefits.exceptions.InvalidStringException;
+import com.example.familybenefits.part_res_rest_api.api_model.city.CityInfo;
+import com.example.familybenefits.part_res_rest_api.api_model.city.CitySave;
+import com.example.familybenefits.part_res_rest_api.api_model.common.ObjectShortInfo;
+import com.example.familybenefits.dto.entities.CityEntity;
+import com.example.familybenefits.resources.R;
+import com.example.familybenefits.security.RandomValue;
 
 import java.util.function.Function;
 
@@ -14,11 +17,13 @@ public class CityDBConverter {
 
   /**
    * Преобразует объект запроса на сохранение города в модель таблицы "city", обрабатывая строковые поля для БД
+   * @param idCity ID города. Если {@code null}, значение ID генерируется.
    * @param citySave объект запроса на сохранение города
    * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "city"
+   * @throws InvalidStringException если строковое поле объекта запроса не содержит букв или цифр
    */
-  static public CityEntity fromSave(CitySave citySave, Function<String, String> prepareDBFunc) {
+  public static CityEntity fromSave(String idCity, CitySave citySave, Function<String, String> prepareDBFunc) throws InvalidStringException {
 
     if (citySave == null) {
       return new CityEntity();
@@ -26,8 +31,11 @@ public class CityDBConverter {
 
     return CityEntity
         .builder()
-        .name(prepareDBFunc.apply(citySave.getName()))
-        .info(prepareDBFunc.apply(citySave.getInfo()))
+        .id(idCity != null
+                ? idCity
+                : RandomValue.randomString(R.ID_LENGTH))
+        .name(prepareDBFunc.apply(FieldConverter.withSymbolsField(citySave.getName(), "name", true)))
+        .info(prepareDBFunc.apply(FieldConverter.withSymbolsField(citySave.getInfo(), "info", false)))
         .build();
   }
 
@@ -36,7 +44,7 @@ public class CityDBConverter {
    * @param cityEntity модель таблицы "city"
    * @return информация о городе
    */
-  static public CityInfo toInfo(CityEntity cityEntity) {
+  public static CityInfo toInfo(CityEntity cityEntity) {
 
     if (cityEntity == null) {
       return new CityInfo();
@@ -55,7 +63,7 @@ public class CityDBConverter {
    * @param cityEntity модель таблицы "city"
    * @return краткая информация о городе
    */
-  static public ObjectShortInfo toShortInfo(CityEntity cityEntity) {
+  public static ObjectShortInfo toShortInfo(CityEntity cityEntity) {
 
     if (cityEntity == null) {
       return new ObjectShortInfo();

@@ -1,9 +1,12 @@
-package com.example.familybenefits.convert;
+package com.example.familybenefits.part_res_rest_api.converters;
 
-import com.example.familybenefits.api_model.common.ObjectShortInfo;
-import com.example.familybenefits.api_model.criterion_type.CriterionTypeInfo;
-import com.example.familybenefits.api_model.criterion_type.CriterionTypeSave;
-import com.example.familybenefits.dto.entity.CriterionTypeEntity;
+import com.example.familybenefits.exceptions.InvalidStringException;
+import com.example.familybenefits.part_res_rest_api.api_model.common.ObjectShortInfo;
+import com.example.familybenefits.part_res_rest_api.api_model.criterion_type.CriterionTypeInfo;
+import com.example.familybenefits.part_res_rest_api.api_model.criterion_type.CriterionTypeSave;
+import com.example.familybenefits.dto.entities.CriterionTypeEntity;
+import com.example.familybenefits.resources.R;
+import com.example.familybenefits.security.RandomValue;
 
 import java.util.function.Function;
 
@@ -14,11 +17,13 @@ public class CriterionTypeDBConverter {
 
   /**
    * Преобразует объект запроса на сохранение типа критерия в модель таблицы "criterion_type", обрабатывая строковые поля для БД
+   * @param idCriterionType ID типа критерия. Если {@code null}, значение ID генерируется.
    * @param criterionTypeSave объект запроса на сохранение типа критерия
    * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "criterion_type"
+   * @throws InvalidStringException если строковое поле объекта запроса не содержит букв или цифр
    */
-  static public CriterionTypeEntity fromSave(CriterionTypeSave criterionTypeSave, Function<String, String> prepareDBFunc) {
+  public static CriterionTypeEntity fromSave(String idCriterionType, CriterionTypeSave criterionTypeSave, Function<String, String> prepareDBFunc) throws InvalidStringException {
 
     if (criterionTypeSave == null) {
       return new CriterionTypeEntity();
@@ -26,8 +31,11 @@ public class CriterionTypeDBConverter {
 
     return CriterionTypeEntity
         .builder()
-        .name(prepareDBFunc.apply(criterionTypeSave.getName()))
-        .info(prepareDBFunc.apply(criterionTypeSave.getInfo()))
+        .id(idCriterionType != null
+                ? idCriterionType
+                : RandomValue.randomString(R.ID_LENGTH))
+        .name(prepareDBFunc.apply(FieldConverter.withSymbolsField(criterionTypeSave.getName(), "name", true)))
+        .info(prepareDBFunc.apply(FieldConverter.withSymbolsField(criterionTypeSave.getInfo(), "info", true)))
         .build();
   }
 
@@ -36,7 +44,7 @@ public class CriterionTypeDBConverter {
    * @param criterionTypeEntity модель таблицы "criterion_type"
    * @return информация о типе критерия
    */
-  static public CriterionTypeInfo toInfo(CriterionTypeEntity criterionTypeEntity) {
+  public static CriterionTypeInfo toInfo(CriterionTypeEntity criterionTypeEntity) {
 
     if (criterionTypeEntity == null) {
       return new CriterionTypeInfo();
@@ -55,7 +63,7 @@ public class CriterionTypeDBConverter {
    * @param criterionTypeEntity модель таблицы "criterion_type"
    * @return краткая информация о типе критерия
    */
-  static public ObjectShortInfo toShortInfo(CriterionTypeEntity criterionTypeEntity) {
+  public static ObjectShortInfo toShortInfo(CriterionTypeEntity criterionTypeEntity) {
 
     if (criterionTypeEntity == null) {
       return new ObjectShortInfo();

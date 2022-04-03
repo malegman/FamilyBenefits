@@ -1,14 +1,14 @@
-package com.example.familybenefits.convert;
+package com.example.familybenefits.part_res_rest_api.converters;
 
-import com.example.familybenefits.api_model.common.ObjectShortInfo;
-import com.example.familybenefits.api_model.institution.InstitutionSave;
-import com.example.familybenefits.api_model.institution.InstitutionInfo;
-import com.example.familybenefits.dto.entity.BenefitEntity;
-import com.example.familybenefits.dto.entity.CityEntity;
-import com.example.familybenefits.dto.entity.InstitutionEntity;
+import com.example.familybenefits.dto.entities.InstitutionEntity;
+import com.example.familybenefits.exceptions.InvalidStringException;
+import com.example.familybenefits.part_res_rest_api.api_model.common.ObjectShortInfo;
+import com.example.familybenefits.part_res_rest_api.api_model.institution.InstitutionInfo;
+import com.example.familybenefits.part_res_rest_api.api_model.institution.InstitutionSave;
+import com.example.familybenefits.resources.R;
+import com.example.familybenefits.security.RandomValue;
 
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Класс преобразования модели таблицы "institution" в другие объекты и получения из других объектов, обрабатывая строковые поля для БД.
@@ -17,11 +17,13 @@ public class InstitutionDBConverter {
 
   /**
    * Преобразует объект запроса на сохранение учреждения в модель таблицы "institution", обрабатывая строковые поля для БД
+   * @param idInstitution ID учреждения. Если {@code null}, значение ID генерируется.
    * @param institutionSave объект запроса на сохранение учреждения
    * @param prepareDBFunc функция обработки строки для БД
    * @return модель таблицы "institution"
+   * @throws InvalidStringException если строковое поле объекта запроса не содержит букв или цифр
    */
-  static public InstitutionEntity fromSave(InstitutionSave institutionSave, Function<String, String> prepareDBFunc) {
+  public static InstitutionEntity fromSave(String idInstitution, InstitutionSave institutionSave, Function<String, String> prepareDBFunc) throws InvalidStringException {
 
     if (institutionSave == null) {
       return new InstitutionEntity();
@@ -29,26 +31,26 @@ public class InstitutionDBConverter {
 
     return InstitutionEntity
         .builder()
-        .name(prepareDBFunc.apply(institutionSave.getName()))
-        .address(prepareDBFunc.apply(institutionSave.getAddress()))
-        .info(prepareDBFunc.apply(institutionSave.getInfo()))
-        .phone(prepareDBFunc.apply(institutionSave.getPhone()))
-        .email(prepareDBFunc.apply(institutionSave.getEmail()))
-        .schedule(prepareDBFunc.apply(institutionSave.getSchedule()))
-        .cityEntity(new CityEntity(prepareDBFunc.apply(institutionSave.getIdCity())))
-        .benefitEntitySet(institutionSave.getIdBenefitSet()
-                              .stream()
-                              .map(id -> new BenefitEntity(prepareDBFunc.apply(id)))
-                              .collect(Collectors.toSet()))
+        .id(idInstitution != null
+                ? idInstitution
+                : RandomValue.randomString(R.ID_LENGTH))
+        .name(prepareDBFunc.apply(FieldConverter.withSymbolsField(institutionSave.getName(), "name", true)))
+        .address(prepareDBFunc.apply(FieldConverter.withSymbolsField(institutionSave.getAddress(), "address", true)))
+        .info(prepareDBFunc.apply(FieldConverter.withSymbolsField(institutionSave.getInfo(), "info", true)))
+        .phone(prepareDBFunc.apply(FieldConverter.withSymbolsField(institutionSave.getPhone(), "phone", true)))
+        .email(prepareDBFunc.apply(FieldConverter.withSymbolsField(institutionSave.getEmail(), "email", false)))
+        .schedule(prepareDBFunc.apply(FieldConverter.withSymbolsField(institutionSave.getSchedule(), "schedule", true)))
+        .idCity(prepareDBFunc.apply(FieldConverter.withSymbolsField(institutionSave.getIdCity(), "idCity", true)))
         .build();
   }
 
   /**
    * Преобразует модель таблицы "institution" в объект информации об учреждении
    * @param institutionEntity модель таблицы "institution"
+   * @param nameCity название города учреждения
    * @return информация об учреждении
    */
-  static public InstitutionInfo toInfo(InstitutionEntity institutionEntity) {
+  public static InstitutionInfo toInfo(InstitutionEntity institutionEntity, String nameCity) {
 
     if (institutionEntity == null) {
       return new InstitutionInfo();
@@ -63,7 +65,7 @@ public class InstitutionDBConverter {
         .phone(institutionEntity.getPhone())
         .email(institutionEntity.getEmail())
         .schedule(institutionEntity.getSchedule())
-        .nameCity(institutionEntity.getCityEntity().getName())
+        .nameCity(nameCity)
         .build();
   }
 
@@ -72,7 +74,7 @@ public class InstitutionDBConverter {
    * @param institutionEntity модель таблицы "institution"
    * @return краткая информация об учреждении
    */
-  static public ObjectShortInfo toShortInfo(InstitutionEntity institutionEntity) {
+  public static ObjectShortInfo toShortInfo(InstitutionEntity institutionEntity) {
 
     if (institutionEntity == null) {
       return new ObjectShortInfo();
