@@ -40,7 +40,7 @@ public class InstitutionDBConverter {
         .phone(prepareDBFunc.apply(FieldConverter.withSymbolsField(institutionSave.getPhone(), "phone", true)))
         .email(prepareDBFunc.apply(FieldConverter.withSymbolsField(institutionSave.getEmail(), "email", false)))
         .schedule(prepareDBFunc.apply(FieldConverter.withSymbolsField(institutionSave.getSchedule(), "schedule", true)))
-        .idCity(prepareDBFunc.apply(FieldConverter.withSymbolsField(institutionSave.getIdCity(), "idCity", true)))
+        .idCity(institutionSave.getIdCity())
         .build();
   }
 

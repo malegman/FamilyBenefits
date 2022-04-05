@@ -41,7 +41,7 @@ public class UserDBConverter {
                 : RandomValue.randomString(R.ID_LENGTH))
         .name(prepareDBFunc.apply(FieldConverter.withSymbolsField(userSave.getName(), "name", true)))
         .email(prepareDBFunc.apply(FieldConverter.withSymbolsField(userSave.getEmail(), "email", true)))
-        .idCity(prepareDBFunc.apply(FieldConverter.withSymbolsField(userSave.getIdCity(), "idCity", true)))
+        .idCity(userSave.getIdCity())
         .build();
   }
 

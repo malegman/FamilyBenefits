@@ -36,7 +36,7 @@ public class CriterionDBConverter {
                 : RandomValue.randomString(R.ID_LENGTH))
         .name(prepareDBFunc.apply(FieldConverter.withSymbolsField(criterionSave.getName(), "name", true)))
         .info(prepareDBFunc.apply(FieldConverter.withSymbolsField(criterionSave.getInfo(), "info", true)))
-        .idCriterionType(prepareDBFunc.apply(FieldConverter.withSymbolsField(criterionSave.getIdCriterionType(), "idCriterionType", true)))
+        .idCriterionType(criterionSave.getIdCriterionType())
         .build();
   }
 
