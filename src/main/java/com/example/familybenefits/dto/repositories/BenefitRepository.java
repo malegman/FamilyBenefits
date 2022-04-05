@@ -32,8 +32,7 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, String> 
    * @return список пособий
    */
   @Query(nativeQuery = true,
-      value =
-          "SELECT family_benefit.benefit.id, family_benefit.benefit.name, family_benefit.benefit.info, family_benefit.benefit.documents " +
+      value = "SELECT family_benefit.benefit.id, family_benefit.benefit.name, family_benefit.benefit.info, family_benefit.benefit.documents " +
           "FROM family_benefit.users_benefits " +
           "INNER JOIN family_benefit.benefit ON family_benefit.users_benefits.id_benefit = family_benefit.benefit.id " +
           "WHERE family_benefit.users_benefits.id_user = ?;")
@@ -45,8 +44,7 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, String> 
    * @return список пособий
    */
   @Query(nativeQuery = true,
-      value =
-          "SELECT family_benefit.benefit.id, family_benefit.benefit.name, family_benefit.benefit.info, family_benefit.benefit.documents " +
+      value = "SELECT family_benefit.benefit.id, family_benefit.benefit.name, family_benefit.benefit.info, family_benefit.benefit.documents " +
           "FROM family_benefit.benefits_cities " +
           "INNER JOIN family_benefit.benefit ON family_benefit.benefits_cities.id_benefit = family_benefit.benefit.id " +
           "WHERE family_benefit.benefits_cities.id_city = ?;")
@@ -58,8 +56,7 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, String> 
    * @return список пособий
    */
   @Query(nativeQuery = true,
-      value =
-          "SELECT family_benefit.benefit.id, family_benefit.benefit.name, family_benefit.benefit.info, family_benefit.benefit.documents " +
+      value = "SELECT family_benefit.benefit.id, family_benefit.benefit.name, family_benefit.benefit.info, family_benefit.benefit.documents " +
           "FROM family_benefit.benefits_criteria " +
           "INNER JOIN family_benefit.benefit ON family_benefit.benefits_criteria.id_benefit = family_benefit.benefit.id " +
           "WHERE family_benefit.benefits_criteria.id_criterion = ?;")
@@ -71,10 +68,9 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, String> 
    * @return список пособий
    */
   @Query(nativeQuery = true,
-      value =
-          "SELECT family_benefit.benefit.id, family_benefit.benefit.name, family_benefit.benefit.info, family_benefit.benefit.documents " +
-              "FROM family_benefit.benefits_institutions " +
-              "INNER JOIN family_benefit.benefit ON family_benefit.benefits_institutions.id_benefit = family_benefit.benefit.id " +
-              "WHERE family_benefit.benefits_institutions.id_institution = ?;")
+      value = "SELECT family_benefit.benefit.id, family_benefit.benefit.name, family_benefit.benefit.info, family_benefit.benefit.documents " +
+          "FROM family_benefit.benefits_institutions " +
+          "INNER JOIN family_benefit.benefit ON family_benefit.benefits_institutions.id_benefit = family_benefit.benefit.id " +
+          "WHERE family_benefit.benefits_institutions.id_institution = ?;")
   List<BenefitEntity> findAllByIdInstitution(String idInstitution);
 }

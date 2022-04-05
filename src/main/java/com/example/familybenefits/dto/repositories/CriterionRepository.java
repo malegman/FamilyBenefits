@@ -32,8 +32,7 @@ public interface CriterionRepository extends JpaRepository<CriterionEntity, Stri
    * @return список критерий
    */
   @Query(nativeQuery = true,
-      value =
-          "SELECT family_benefit.criterion.id, family_benefit.criterion.name, family_benefit.criterion.info, family_benefit.criterion.id_type " +
+      value = "SELECT family_benefit.criterion.id, family_benefit.criterion.name, family_benefit.criterion.info, family_benefit.criterion.id_type " +
           "FROM family_benefit.users_criteria " +
           "INNER JOIN family_benefit.criterion ON family_benefit.users_criteria.id_criterion = family_benefit.criterion.id " +
           "WHERE family_benefit.users_criteria.id_user = ?;")
@@ -45,8 +44,7 @@ public interface CriterionRepository extends JpaRepository<CriterionEntity, Stri
    * @return список критерий
    */
   @Query(nativeQuery = true,
-      value =
-          "SELECT family_benefit.criterion.id, family_benefit.criterion.name, family_benefit.criterion.info, family_benefit.criterion.id_type " +
+      value = "SELECT family_benefit.criterion.id, family_benefit.criterion.name, family_benefit.criterion.info, family_benefit.criterion.id_type " +
           "FROM family_benefit.benefits_criteria " +
           "INNER JOIN family_benefit.criterion ON family_benefit.benefits_criteria.id_criterion = family_benefit.criterion.id " +
           "WHERE family_benefit.benefits_criteria.id_benefit = ?;")

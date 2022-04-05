@@ -32,8 +32,7 @@ public interface CriterionTypeRepository extends JpaRepository<CriterionTypeEnti
    * @return тип критерия указанного критерия, или {@code empty} если не найден тип критерия указанного критерия
    */
   @Query(nativeQuery = true,
-      value =
-          "SELECT family_benefit.criterion_type.id, family_benefit.criterion_type.name, family_benefit.criterion_type.info " +
+      value = "SELECT family_benefit.criterion_type.id, family_benefit.criterion_type.name, family_benefit.criterion_type.info " +
           "FROM family_benefit.criterion " +
           "INNER JOIN family_benefit.criterion_type ON family_benefit.criterion.id_type = family_benefit.criterion_type.id " +
           "WHERE family_benefit.criterion.id = ?;")

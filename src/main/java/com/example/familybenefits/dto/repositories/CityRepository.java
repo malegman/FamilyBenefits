@@ -33,8 +33,7 @@ public interface CityRepository extends JpaRepository<CityEntity, String> {
    * @return город пользователя, или {@code empty} если не найден город указанного пользователя
    */
   @Query(nativeQuery = true,
-      value =
-          "SELECT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
+      value = "SELECT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
           "FROM family_benefit.user " +
           "INNER JOIN family_benefit.city ON family_benefit.user.id_city = family_benefit.city.id " +
           "WHERE family_benefit.user.id = ?;")
@@ -46,8 +45,7 @@ public interface CityRepository extends JpaRepository<CityEntity, String> {
    * @return город учреждения, или {@code empty} если не найден город указанного учреждения
    */
   @Query(nativeQuery = true,
-      value =
-          "SELECT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
+      value = "SELECT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
           "FROM family_benefit.institution " +
           "INNER JOIN family_benefit.city ON family_benefit.institution.id_city = family_benefit.city.id " +
           "WHERE family_benefit.institution.id = ?;")
@@ -59,10 +57,24 @@ public interface CityRepository extends JpaRepository<CityEntity, String> {
    * @return список городов
    */
   @Query(nativeQuery = true,
-      value =
-          "SELECT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
+      value = "SELECT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
           "FROM family_benefit.benefits_cities " +
           "INNER JOIN family_benefit.city ON family_benefit.benefits_cities.id_city = family_benefit.city.id " +
           "WHERE family_benefit.benefits_cities.id_benefit = ?;")
   List<CityEntity> findAllByIdBenefit(String idBenefit);
+
+  /**
+   * Возвращает список полных городов по фильтру: название города, ID пособия, ID учреждения.
+   * Если в качестве параметра указан {@code null}, то параметр бд сравнивается {@code != null}
+   * @param name название города
+   * @param idBenefit ID пособия
+   * @param idInstitution ID учреждения
+   * @return список городов, удовлетворяющих параметрам
+   */
+  @Query(nativeQuery = true,
+      value = "SELECT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
+          "FROM family_benefit.benefits_cities " +
+          "INNER JOIN family_benefit.city ON family_benefit.benefits_cities.id_city = family_benefit.city.id " +
+          "WHERE family_benefit.benefits_cities.id_benefit = ?;")
+  List<CityEntity> findAllFilter(String name, String idBenefit, String idInstitution);
 }

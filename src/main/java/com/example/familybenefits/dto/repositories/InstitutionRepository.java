@@ -32,9 +32,8 @@ public interface InstitutionRepository extends JpaRepository<InstitutionEntity, 
    * @return список критерий
    */
   @Query(nativeQuery = true,
-      value =
-          "SELECT family_benefit.institution.id, family_benefit.institution.name, family_benefit.institution.info, family_benefit.institution.address, " +
-            "family_benefit.institution.phone, family_benefit.institution.email, family_benefit.institution.schedule, family_benefit.institution.id_city " +
+      value = "SELECT family_benefit.institution.id, family_benefit.institution.name, family_benefit.institution.info, family_benefit.institution.address, " +
+          "family_benefit.institution.phone, family_benefit.institution.email, family_benefit.institution.schedule, family_benefit.institution.id_city " +
           "FROM family_benefit.benefits_institutions " +
           "INNER JOIN family_benefit.institution ON family_benefit.benefits_institutions.id_institution = family_benefit.institution.id " +
           "WHERE family_benefit.benefits_institutions.id_benefit = ?;")
