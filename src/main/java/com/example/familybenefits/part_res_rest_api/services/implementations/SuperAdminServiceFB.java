@@ -52,16 +52,15 @@ public class SuperAdminServiceFB implements SuperAdminService {
     // Проверка строки email на соответствие формату email
     MailSecuritySupport.checkEmailElseThrow(adminSave.getEmail());
 
+    // Проверка на существование пользователя или администратора по email
+    DBSecuritySupport.checkAbsenceByUniqStr(userRepository::existsByEmail, adminSave.getEmail());
+
     // Получение модели таблицы из запроса с подготовкой строковых значений для БД
     UserEntity userEntityFromSave = AdminDBConverter
         .fromSave(null, adminSave, DBSecuritySupport::preparePostgreSQLString);
 
-    // Проверка на существование пользователя или администратора по email
-    DBSecuritySupport.checkAbsenceByUniqStr(
-        userRepository::existsByEmail, userEntityFromSave.getEmail());
-
     userRepository.save(userEntityFromSave);
-    userRepository.addRoleToUser(userEntityFromSave.getId(), RDB.ID_ROLE_ADMIN);
+    userRepository.addRole(userEntityFromSave.getId(), RDB.ID_ROLE_ADMIN);
     log.info("DB. Administrator with email \"{}\" created.", adminSave.getEmail());
   }
 
@@ -75,18 +74,17 @@ public class SuperAdminServiceFB implements SuperAdminService {
   public void delete(String idAdmin) throws NotFoundException {
 
     // Проверка на существование пользователя или администратора по ID
-    String preparedIdAdmin = DBSecuritySupport.preparePostgreSQLString(idAdmin);
-    DBSecuritySupport.checkExistenceById(userRepository::existsById, preparedIdAdmin);
+    DBSecuritySupport.checkExistenceById(userRepository::existsById, idAdmin);
 
     // Проверка наличия роли "ROLE_ADMIN" у пользователя
-    checkHasRoleElseThrowNotFound(preparedIdAdmin, RDB.ID_ROLE_ADMIN);
+    checkHasRoleElseThrowNotFound(idAdmin, RDB.ID_ROLE_ADMIN);
 
     // Если есть роль "ROLE_USER", удаление роли "ROLE_ADMIN", иначе удаление пользователя и его токена восстановления с кодом входа
-    if (userRepository.hasUserRole(preparedIdAdmin, RDB.ID_ROLE_ADMIN)) {
-      userRepository.deleteRoleFromUser(preparedIdAdmin, RDB.ID_ROLE_ADMIN);
+    if (userRepository.hasUserRole(idAdmin, RDB.ID_ROLE_ADMIN)) {
+      userRepository.deleteRole(idAdmin, RDB.ID_ROLE_ADMIN);
       log.info("DB. Administrator with ID \"{}\" updated. Removed role \"{}\".", idAdmin, RDB.NAME_ROLE_ADMIN);
     } else {
-      userRepository.deleteById(preparedIdAdmin);
+      userRepository.deleteById(idAdmin);
       log.info("DB. Administrator with ID \"{}\" deleted.", idAdmin);
     }
   }
@@ -102,15 +100,14 @@ public class SuperAdminServiceFB implements SuperAdminService {
   public void fromUser(String idUser) throws NotFoundException, AlreadyExistsException {
 
     // Проверка существования пользователя по ID
-    String preparedIdUser = DBSecuritySupport.preparePostgreSQLString(idUser);
-    DBSecuritySupport.checkExistenceById(userRepository::existsById, preparedIdUser);
+    DBSecuritySupport.checkExistenceById(userRepository::existsById, idUser);
 
     // Проверка наличия роли "ROLE_USER" у пользователя
-    checkHasRoleElseThrowNotFound(preparedIdUser, RDB.ID_ROLE_USER);
+    checkHasRoleElseThrowNotFound(idUser, RDB.ID_ROLE_USER);
     // Проверка отсутствия роли "ROLE_ADMIN" у пользователя
-    checkNotHasRoleElseThrowUserRole(preparedIdUser, RDB.ID_ROLE_ADMIN);
+    checkNotHasRoleElseThrowUserRole(idUser, RDB.ID_ROLE_ADMIN);
 
-    userRepository.addRoleToUser(preparedIdUser, RDB.ID_ROLE_ADMIN);
+    userRepository.addRole(idUser, RDB.ID_ROLE_ADMIN);
     log.info("DB. User with ID \"{}\" updated. Added role \"{}\"", idUser, RDB.NAME_ROLE_ADMIN);
   }
 
@@ -125,15 +122,14 @@ public class SuperAdminServiceFB implements SuperAdminService {
   public void toUser(String idAdmin) throws NotFoundException, AlreadyExistsException {
 
     // Проверка существования пользователя по ID
-    String preparedIdAdmin = DBSecuritySupport.preparePostgreSQLString(idAdmin);
-    DBSecuritySupport.checkExistenceById(userRepository::existsById, preparedIdAdmin);
+    DBSecuritySupport.checkExistenceById(userRepository::existsById, idAdmin);
 
     // Проверка наличия роли "ROLE_ADMIN" у пользователя
-    checkHasRoleElseThrowNotFound(preparedIdAdmin, RDB.ID_ROLE_ADMIN);
+    checkHasRoleElseThrowNotFound(idAdmin, RDB.ID_ROLE_ADMIN);
     // Проверка отсутствия роли "ROLE_USER" у пользователя
-    checkNotHasRoleElseThrowUserRole(preparedIdAdmin, RDB.ID_ROLE_USER);
+    checkNotHasRoleElseThrowUserRole(idAdmin, RDB.ID_ROLE_USER);
 
-    userRepository.addRoleToUser(preparedIdAdmin, RDB.ID_ROLE_USER);
+    userRepository.addRole(idAdmin, RDB.ID_ROLE_USER);
     log.info("DB. Administrator with ID \"{}\" updated. Added role \"{}\"", idAdmin, RDB.NAME_ROLE_USER);
   }
 
@@ -147,16 +143,15 @@ public class SuperAdminServiceFB implements SuperAdminService {
   public void toSuper(String idAdmin) throws NotFoundException {
 
     // Проверка существования пользователя по ID
-    String preparedIdAdmin = DBSecuritySupport.preparePostgreSQLString(idAdmin);
-    DBSecuritySupport.checkExistenceById(userRepository::existsById, preparedIdAdmin);
+    DBSecuritySupport.checkExistenceById(userRepository::existsById, idAdmin);
 
     // Проверка наличия роли "ROLE_ADMIN" у пользователя
-    checkHasRoleElseThrowNotFound(preparedIdAdmin, RDB.ID_ROLE_ADMIN);
+    checkHasRoleElseThrowNotFound(idAdmin, RDB.ID_ROLE_ADMIN);
 
     // Передача роли "ROLE_SUPER_ADMIN"
     UserEntity userEntitySuperAdmin = userRepository.getSuperAdmin();
-    userRepository.deleteRoleFromUser(userEntitySuperAdmin.getId(), RDB.ID_ROLE_SUPER_ADMIN);
-    userRepository.addRoleToUser(preparedIdAdmin, RDB.ID_ROLE_SUPER_ADMIN);
+    userRepository.deleteRole(userEntitySuperAdmin.getId(), RDB.ID_ROLE_SUPER_ADMIN);
+    userRepository.addRole(idAdmin, RDB.ID_ROLE_SUPER_ADMIN);
 
     log.info("DB. Administrator with ID \"{}\" updated. Added role \"{}\"", idAdmin, RDB.ROLE_SUPER_ADMIN);
   }
