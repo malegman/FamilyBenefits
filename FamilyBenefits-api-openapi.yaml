@@ -1572,7 +1572,7 @@ paths:
         Возвращает список типов критерия, в которых есть критерии, по фильтру
       description:
         Возвращает список типов критерия, в которых есть критерии.
-        Фильтр по названию.
+        Фильтр по названию или ID критерия.
       parameters:
         - name: name
           in: query
@@ -1580,6 +1580,13 @@ paths:
           schema:
             type: string
             example: name
+          required: false
+        - name: idCriterion
+          in: query
+          description: ID кртерия
+          schema:
+            type: string
+            example: td56387fhj
           required: false
       responses:
         '200':

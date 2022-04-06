@@ -38,17 +38,21 @@ public class CriterionTypeController {
   /**
    * Обрабатывает GET запрос "/api/criterion-types/all" на получение списка типов критерия,
    * в которых есть критерии.
+   * Фильтр по названию или ID критерия.
    * Выполнить запрос может любой клиент
+   * @param name название типа критерия
+   * @param idCriterion ID критерия
    * @return список типов критерий и код ответа
    */
   @GetMapping(
       value = "/api/criterion-types",
       produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseBody
-  public ResponseEntity<List<ObjectShortInfo>> readAllFilter(@RequestParam(name = "name", required = false) String name) {
+  public ResponseEntity<List<ObjectShortInfo>> readAllFilter(@RequestParam(name = "name", required = false) String name,
+                                                             @RequestParam(name = "idCriterion", required = false) String idCriterion) {
 
     return ResponseEntity.status(HttpStatus.OK)
-        .body(criterionTypeService.readAllFilter(name));
+        .body(criterionTypeService.readAllFilter(name, idCriterion));
   }
 
   /**
