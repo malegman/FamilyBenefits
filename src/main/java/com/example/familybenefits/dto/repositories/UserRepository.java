@@ -39,30 +39,31 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
    * @return пользователь с ролью "ROLE_SUPER_ADMIN"
    */
   @Query(nativeQuery = true,
-      value = "SELECT * FROM family_benefit.user " +
+      value = "SELECT * " +
+          "FROM family_benefit.user " +
           "INNER JOIN family_benefit.users_roles ON family_benefit.user.id = family_benefit.users_roles.id_user " +
           "INNER JOIN family_benefit.role ON family_benefit.users_roles.id_role = family_benefit.role.id " +
           "WHERE family_benefit.role.name LIKE 'ROLE_SUPER_ADMIN';")
   UserEntity getSuperAdmin();
 
   /**
-   * Создает связь между существующими рождением ребенка и пользователем, по их ID
+   * Создает связь между существующими датой рождения ребенка и пользователем, по их ID
    * @param idUser ID пользователя
    * @param idChildBirth ID рождения ребенка
    */
   @Modifying
   @Query(nativeQuery = true,
-      value = "INSERT INTO family_benefit.users_children (id_user, id_child_birth) VALUES (?1, ?2);")
-  void addChildToUser(String idUser, String idChildBirth);
+      value = "INSERT INTO family_benefit.users_child_births (id_user, id_child_birth) VALUES (?1, ?2);")
+  void addChild(String idUser, String idChildBirth);
 
   /**
-   * Удаляет связь между пользователем и детьми, по его ID
+   * Удаляет связь между датами рождениями детей и пользователем по его ID
    * @param idUser ID пользователя
    */
   @Modifying
   @Query(nativeQuery = true,
       value = "DELETE FROM family_benefit.users_children WHERE (id_user = ?1);")
-  void deleteAllChildrenFromUser(String idUser);
+  void deleteAllChildBirths(String idUser);
 
   /**
    * Проверяет наличие роли у пользователя по их ID
@@ -82,7 +83,7 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
   @Modifying
   @Query(nativeQuery = true,
       value = "INSERT INTO family_benefit.users_roles (id_user, id_role) VALUES (?1, ?2);")
-  void addRoleToUser(String idUser, String idRole);
+  void addRole(String idUser, String idRole);
 
   /**
    * Удаляет связь между существующими ролью и пользователем, по их ID
@@ -92,5 +93,43 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
   @Modifying
   @Query(nativeQuery = true,
       value = "DELETE FROM family_benefit.users_roles WHERE (id_user = ?1 AND id_role = ?2);")
-  void deleteRoleFromUser(String idUser, String idRole);
+  void deleteRole(String idUser, String idRole);
+
+  /**
+   * Создает связь между существующими пособием и пользователем, по их ID
+   * @param idUser ID пользователя
+   * @param idBenefit ID пособия
+   */
+  @Modifying
+  @Query(nativeQuery = true,
+      value = "INSERT INTO family_benefit.users_benefits (id_user, id_benefit) VALUES (?1, ?2);")
+  void addBenefit(String idUser, String idBenefit);
+
+  /**
+   * Удаляет связь между пособиями и пользователем по его ID
+   * @param idUser ID пользователя
+   */
+  @Modifying
+  @Query(nativeQuery = true,
+      value = "DELETE FROM family_benefit.users_benefits WHERE id_user = ?1;")
+  void deleteAllBenefits(String idUser);
+
+  /**
+   * Создает связь между существующими критерием и пользователем, по их ID
+   * @param idUser ID пользователя
+   * @param idCriterion ID критерия
+   */
+  @Modifying
+  @Query(nativeQuery = true,
+      value = "INSERT INTO family_benefit.users_criteria (id_user, id_criterion) VALUES (?1, ?2);")
+  void addCriterion(String idUser, String idCriterion);
+
+  /**
+   * Удаляет связь между критериями и пользователем по его ID
+   * @param idUser ID пользователя
+   */
+  @Modifying
+  @Query(nativeQuery = true,
+      value = "DELETE FROM family_benefit.users_criteria WHERE id_user = ?1;")
+  void deleteAllCriteria(String idUser);
 }
