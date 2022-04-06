@@ -1,17 +1,16 @@
 package com.example.familybenefits.security;
 
+import com.example.familybenefits.dto.entities.ChildBirthEntity;
 import com.example.familybenefits.exceptions.DateFormatException;
 import com.example.familybenefits.exceptions.DateTimeException;
 import com.example.familybenefits.resources.R;
-import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.TemporalAccessor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Предоставляет статические методы для упрощенной работы с датой и временем
@@ -112,6 +111,19 @@ public class DateTimeSupport {
     if (dateBirth.plusYears(LocalDate.now().getYear() - dateBirth.getYear()).isAfter(dateCheck)) {
       throw new DateTimeException(String.format(
           "The day of birthday of date \"%s\" was after check date \"%s\"", dateBirth, dateCheck));
+    }
+  }
+
+  /**
+   * Проверяет список, был ли день рождения из списка рождений детей после проверяемой даты
+   * @param childBirthEntityList список дат рождения детей
+   * @param dateCheck проверяемая дата
+   * @throws DateTimeException если день рождения был после проверяемой даты
+   */
+  public static void checkChildBirthdayBefore(List<ChildBirthEntity> childBirthEntityList, LocalDate dateCheck) throws DateTimeException {
+
+    for (ChildBirthEntity childBirthEntity : childBirthEntityList) {
+      checkBirthdayBefore(childBirthEntity.getDateBirth(), dateCheck);
     }
   }
 }
