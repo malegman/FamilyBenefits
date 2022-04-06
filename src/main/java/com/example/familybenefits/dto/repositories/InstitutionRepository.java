@@ -27,22 +27,33 @@ public interface InstitutionRepository extends JpaRepository<InstitutionEntity, 
   boolean existsByIdIsNotAndName(String id, String name);
 
   /**
-   * Возвращает список учреждений по ID пособия
+   * Возвращает список учреждений по фильтру: название учреждения, ID города, ID пособия.
+   * Если в качестве параметра указан {@code null}, то параметр бд сравнивается {@code != null}
+   * @param name название учреждения
+   * @param idCity ID города
    * @param idBenefit ID пособия
-   * @return список критерий
+   * @return список учреждений, удовлетворяющих параметрам
    */
   @Query(nativeQuery = true,
       value = "SELECT family_benefit.institution.id, family_benefit.institution.name, family_benefit.institution.info, family_benefit.institution.address, " +
           "family_benefit.institution.phone, family_benefit.institution.email, family_benefit.institution.schedule, family_benefit.institution.id_city " +
-          "FROM family_benefit.benefits_institutions " +
-          "INNER JOIN family_benefit.institution ON family_benefit.benefits_institutions.id_institution = family_benefit.institution.id " +
-          "WHERE family_benefit.benefits_institutions.id_benefit = ?;")
-  List<InstitutionEntity> findAllByIdBenefit(String idBenefit);
+          "FROM family_benefit.institution " +
+          "INNER JOIN family_benefit.benefits_institutions ON family_benefit.benefits_institutions.id_institution = family_benefit.institution.id " +
+          "WHERE (?1 IS NULL OR family_benefit.institution.name = ?1) " +
+          "AND (?2 IS NULL OR family_benefit.institution.id_city = ?2) " +
+          "AND (?3 IS NULL OR family_benefit.benefits_criteria.id_benefit = ?3);")
+  List<InstitutionEntity> findAllFilter(String name, String idCity, String idBenefit);
 
   /**
-   * Возвращает список учреждений по ID города
-   * @param idCity ID города
-   * @return список учреждений
+   * Возвращает список неполных учреждений: без пособия
+   * @return список неполных учреждений
    */
-  List<InstitutionEntity> findAllByIdCity(String idCity);
+  @Query(nativeQuery = true,
+      value = "SELECT family_benefit.institution.id, family_benefit.institution.name, family_benefit.institution.info, family_benefit.institution.address, " +
+          "family_benefit.institution.phone, family_benefit.institution.email, family_benefit.institution.schedule, family_benefit.institution.id_city " +
+          "FROM family_benefit.institution " +
+          "LEFT JOIN family_benefit.benefits_institutions ON family_benefit.benefits_institutions.id_institution = family_benefit.institution.id " +
+          "WHERE family_benefit.benefits_institutions.id_benefit IS NULL;")
+  List<InstitutionEntity> findAllPartial();
+
 }

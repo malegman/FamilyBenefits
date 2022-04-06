@@ -33,44 +33,44 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, String> 
    */
   @Query(nativeQuery = true,
       value = "SELECT family_benefit.benefit.id, family_benefit.benefit.name, family_benefit.benefit.info, family_benefit.benefit.documents " +
-          "FROM family_benefit.users_benefits " +
-          "INNER JOIN family_benefit.benefit ON family_benefit.users_benefits.id_benefit = family_benefit.benefit.id " +
+          "FROM family_benefit.benefit " +
+          "INNER JOIN family_benefit.users_benefits ON family_benefit.users_benefits.id_benefit = family_benefit.benefit.id " +
           "WHERE family_benefit.users_benefits.id_user = ?;")
   List<BenefitEntity> findAllByIdUser(String idUser);
 
   /**
-   * Возвращает список пособий по ID города
+   * Возвращает список пособий по фильтру: название пособия, ID города, ID критерия, ID учреждения.
+   * Если в качестве параметра указан {@code null}, то параметр бд сравнивается {@code != null}
+   * @param name название пособия
    * @param idCity ID города
-   * @return список пособий
-   */
-  @Query(nativeQuery = true,
-      value = "SELECT family_benefit.benefit.id, family_benefit.benefit.name, family_benefit.benefit.info, family_benefit.benefit.documents " +
-          "FROM family_benefit.benefits_cities " +
-          "INNER JOIN family_benefit.benefit ON family_benefit.benefits_cities.id_benefit = family_benefit.benefit.id " +
-          "WHERE family_benefit.benefits_cities.id_city = ?;")
-  List<BenefitEntity> findAllByIdCity(String idCity);
-
-  /**
-   * Возвращает список пособий по ID критерия
    * @param idCriterion ID критерия
-   * @return список пособий
+   * @param idInstitution ID учреждения
+   * @return список пособий, удовлетворяющих параметрам
    */
   @Query(nativeQuery = true,
       value = "SELECT family_benefit.benefit.id, family_benefit.benefit.name, family_benefit.benefit.info, family_benefit.benefit.documents " +
-          "FROM family_benefit.benefits_criteria " +
-          "INNER JOIN family_benefit.benefit ON family_benefit.benefits_criteria.id_benefit = family_benefit.benefit.id " +
-          "WHERE family_benefit.benefits_criteria.id_criterion = ?;")
-  List<BenefitEntity> findAllByIdCriterion(String idCriterion);
+          "FROM family_benefit.benefit " +
+          "INNER JOIN family_benefit.benefits_cities ON family_benefit.benefits_cities.id_benefit = family_benefit.benefit.id " +
+          "INNER JOIN family_benefit.benefits_criteria ON family_benefit.benefits_criteria.id_benefit = family_benefit.benefit.id " +
+          "INNER JOIN family_benefit.benefits_institutions ON family_benefit.benefits_institutions.id_benefit = family_benefit.benefit.id " +
+          "WHERE (?1 IS NULL OR family_benefit.benefit.name = ?1) " +
+          "AND (?2 IS NULL OR family_benefit.benefits_cities.id_city = ?2) " +
+          "AND (?3 IS NULL OR family_benefit.benefits_criteria.id_criterion = ?3) " +
+          "AND (?4 IS NULL OR family_benefit.benefits_institutions.id_institution = ?4);")
+  List<BenefitEntity> findAllFilter(String name, String idCity, String idCriterion, String idInstitution);
 
   /**
-   * Возвращает список пособий по ID учреждения
-   * @param idInstitution ID учреждения
-   * @return список пособий
+   * Возвращает список неполных пособий: без города, критерия или учреждения
+   * @return список неполных критерий
    */
   @Query(nativeQuery = true,
       value = "SELECT family_benefit.benefit.id, family_benefit.benefit.name, family_benefit.benefit.info, family_benefit.benefit.documents " +
-          "FROM family_benefit.benefits_institutions " +
-          "INNER JOIN family_benefit.benefit ON family_benefit.benefits_institutions.id_benefit = family_benefit.benefit.id " +
-          "WHERE family_benefit.benefits_institutions.id_institution = ?;")
-  List<BenefitEntity> findAllByIdInstitution(String idInstitution);
+          "FROM family_benefit.benefit " +
+          "LEFT JOIN family_benefit.benefits_cities ON family_benefit.benefits_cities.id_benefit = family_benefit.benefit.id " +
+          "LEFT JOIN family_benefit.benefits_criteria ON family_benefit.benefits_criteria.id_benefit = family_benefit.benefit.id " +
+          "LEFT JOIN family_benefit.benefits_institutions ON family_benefit.benefits_institutions.id_benefit = family_benefit.benefit.id " +
+          "WHERE family_benefit.benefits_cities.id_city IS NULL " +
+          "OR family_benefit.benefits_criteria.id_criterion IS NULL " +
+          "OR family_benefit.benefits_institutions.id_institution IS NULL;")
+  List<BenefitEntity> findAllPartial();
 }

@@ -28,43 +28,7 @@ public interface CityRepository extends JpaRepository<CityEntity, String> {
   boolean existsByIdIsNotAndName(String id, String name);
 
   /**
-   * Возвращает город пользователя по его ID
-   * @param idUser ID пользователя
-   * @return город пользователя, или {@code empty} если не найден город указанного пользователя
-   */
-  @Query(nativeQuery = true,
-      value = "SELECT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
-          "FROM family_benefit.user " +
-          "INNER JOIN family_benefit.city ON family_benefit.user.id_city = family_benefit.city.id " +
-          "WHERE family_benefit.user.id = ?;")
-  Optional<CityEntity> findByIdUser(String idUser);
-
-  /**
-   * Возвращает город учреждения по его ID
-   * @param idInstitution ID учреждения
-   * @return город учреждения, или {@code empty} если не найден город указанного учреждения
-   */
-  @Query(nativeQuery = true,
-      value = "SELECT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
-          "FROM family_benefit.institution " +
-          "INNER JOIN family_benefit.city ON family_benefit.institution.id_city = family_benefit.city.id " +
-          "WHERE family_benefit.institution.id = ?;")
-  Optional<CityEntity> findByIdInstitution(String idInstitution);
-
-  /**
-   * Возвращает список городов по ID пособия
-   * @param idBenefit ID пособия
-   * @return список городов
-   */
-  @Query(nativeQuery = true,
-      value = "SELECT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
-          "FROM family_benefit.benefits_cities " +
-          "INNER JOIN family_benefit.city ON family_benefit.benefits_cities.id_city = family_benefit.city.id " +
-          "WHERE family_benefit.benefits_cities.id_benefit = ?;")
-  List<CityEntity> findAllByIdBenefit(String idBenefit);
-
-  /**
-   * Возвращает список полных городов по фильтру: название города, ID пособия, ID учреждения.
+   * Возвращает список городов по фильтру: название города, ID пособия, ID учреждения.
    * Если в качестве параметра указан {@code null}, то параметр бд сравнивается {@code != null}
    * @param name название города
    * @param idBenefit ID пособия
@@ -72,9 +36,24 @@ public interface CityRepository extends JpaRepository<CityEntity, String> {
    * @return список городов, удовлетворяющих параметрам
    */
   @Query(nativeQuery = true,
-      value = "SELECT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
-          "FROM family_benefit.benefits_cities " +
-          "INNER JOIN family_benefit.city ON family_benefit.benefits_cities.id_city = family_benefit.city.id " +
-          "WHERE family_benefit.benefits_cities.id_benefit = ?;")
+      value = "SELECT DISTINCT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
+          "FROM family_benefit.city " +
+          "INNER JOIN family_benefit.benefits_cities ON family_benefit.benefits_cities.id_city = family_benefit.city.id " +
+          "INNER JOIN family_benefit.institution ON family_benefit.institution.id_city = family_benefit.city.id " +
+          "WHERE (?1 IS NULL OR family_benefit.city.name = ?1) " +
+          "AND (?2 IS NULL OR family_benefit.benefits_cities.id_benefit = ?2) " +
+          "AND (?3 IS NULL OR family_benefit.institution.id = ?3);")
   List<CityEntity> findAllFilter(String name, String idBenefit, String idInstitution);
+
+  /**
+   * Возвращает список неполных городов: без пособия или без учреждения
+   * @return список городов
+   */
+  @Query(nativeQuery = true,
+      value = "SELECT family_benefit.city.id, family_benefit.city.name, family_benefit.city.info " +
+          "FROM family_benefit.city " +
+          "LEFT JOIN family_benefit.benefits_cities ON family_benefit.benefits_cities.id_city = family_benefit.city.id " +
+          "LEFT JOIN family_benefit.institution ON family_benefit.institution.id_city = family_benefit.city.id " +
+          "WHERE family_benefit.benefits_cities.id_benefit IS NULL OR family_benefit.institution.id IS NULL;")
+  List<CityEntity> findAllPartial();
 }
