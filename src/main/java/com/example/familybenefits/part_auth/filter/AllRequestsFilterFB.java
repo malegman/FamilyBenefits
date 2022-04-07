@@ -19,25 +19,41 @@ import java.io.IOException;
 public class AllRequestsFilterFB extends OncePerRequestFilter {
 
   /**
-   * Обрабатывает запросы вида "/api/admins" на основе их данных аутентификации и авторизации.
+   * Обрабатывает запросы вида "/api/admins**" на основе их данных аутентификации и авторизации.
    */
   private final AdminRequestHandler adminRequestHandler;
   /**
-   * Обрабатывает запросы вида "/api/auth" на основе их данных аутентификации и авторизации.
+   * Обрабатывает запросы вида "/api/auth**" на основе их данных аутентификации и авторизации.
    */
   private final AuthRequestHandler authRequestHandler;
   /**
-   * Обрабатывает запросы вида "/api/cities" на основе их данных аутентификации и авторизации.
+   * Обрабатывает запросы вида "/api/cities**" на основе их данных аутентификации и авторизации.
    */
   private final CityRequestHandler cityRequestHandler;
   /**
-   * Обрабатывает запросы вида "/api/sa" на основе их данных аутентификации и авторизации.
+   * Обрабатывает запросы вида "/api/sa**" на основе их данных аутентификации и авторизации.
    */
   private final SuperAdminRequestHandler superAdminRequestHandler;
   /**
-   * Обрабатывает запросы вида "/api/users" на основе их данных аутентификации и авторизации.
+   * Обрабатывает запросы вида "/api/users**" на основе их данных аутентификации и авторизации.
    */
   private final UserRequestHandler userRequestHandler;
+  /**
+   * Обрабатывает запросы вида "/api/benefits**" на основе их данных аутентификации и авторизации.
+   */
+  private final BenefitRequestHandler benefitRequestHandler;
+  /**
+   * Обрабатывает запросы вида "/api/criteria**" на основе их данных аутентификации и авторизации.
+   */
+  private final CriterionRequestHandler criterionRequestHandler;
+  /**
+   * Обрабатывает запросы вида "/api/criterion-types**" на основе их данных аутентификации и авторизации.
+   */
+  private final CriterionTypeRequestHandler criterionTypeRequestHandler;
+  /**
+   * Обрабатывает запросы вида "/api/institutions**" на основе их данных аутентификации и авторизации.
+   */
+  private final InstitutionRequestHandler institutionRequestHandler;
 
   /**
    * Конструктор для инициализации сервисов
@@ -46,18 +62,30 @@ public class AllRequestsFilterFB extends OncePerRequestFilter {
    * @param cityRequestHandler обрабатывает запросы вида "/api/cities" на основе их данных аутентификации и авторизации
    * @param superAdminRequestHandler обрабатывает запросы вида "/api/sa" на основе их данных аутентификации и авторизации
    * @param userRequestHandler обрабатывает запросы вида "/api/users" на основе их данных аутентификации и авторизации
+   * @param benefitRequestHandler обрабатывает запросы вида "/api/benefits**" на основе их данных аутентификации и авторизации.
+   * @param criterionRequestHandler обрабатывает запросы вида "/api/criteria**" на основе их данных аутентификации и авторизации.
+   * @param criterionTypeRequestHandler обрабатывает запросы вида "/api/criterion-types**" на основе их данных аутентификации и авторизации.
+   * @param institutionRequestHandler обрабатывает запросы вида "/api/institutions**" на основе их данных аутентификации и авторизации.
    */
   @Autowired
   public AllRequestsFilterFB(AdminRequestHandler adminRequestHandler,
                              AuthRequestHandler authRequestHandler,
                              CityRequestHandler cityRequestHandler,
                              SuperAdminRequestHandler superAdminRequestHandler,
-                             UserRequestHandler userRequestHandler) {
+                             UserRequestHandler userRequestHandler,
+                             BenefitRequestHandler benefitRequestHandler,
+                             CriterionRequestHandler criterionRequestHandler,
+                             CriterionTypeRequestHandler criterionTypeRequestHandler,
+                             InstitutionRequestHandler institutionRequestHandler) {
     this.adminRequestHandler = adminRequestHandler;
     this.authRequestHandler = authRequestHandler;
     this.cityRequestHandler = cityRequestHandler;
     this.superAdminRequestHandler = superAdminRequestHandler;
     this.userRequestHandler = userRequestHandler;
+    this.benefitRequestHandler = benefitRequestHandler;
+    this.criterionRequestHandler = criterionRequestHandler;
+    this.criterionTypeRequestHandler = criterionTypeRequestHandler;
+    this.institutionRequestHandler = institutionRequestHandler;
   }
 
   @Override
@@ -76,6 +104,14 @@ public class AllRequestsFilterFB extends OncePerRequestFilter {
       isSuccess = authRequestHandler.handle(request, response);
     } else if (requestURI.startsWith("/api/sa")){
       isSuccess = superAdminRequestHandler.handle(request, response);
+    } else if (requestURI.startsWith("/api/benefits")){
+      isSuccess = benefitRequestHandler.handle(request, response);
+    } else if (requestURI.startsWith("/api/criteria")){
+      isSuccess = criterionRequestHandler.handle(request, response);
+    } else if (requestURI.startsWith("/api/criterion-types")){
+      isSuccess = criterionTypeRequestHandler.handle(request, response);
+    } else if (requestURI.startsWith("/api/institutions")){
+      isSuccess = institutionRequestHandler.handle(request, response);
     }
 
     if (isSuccess) {

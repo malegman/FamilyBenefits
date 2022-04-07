@@ -14,16 +14,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Обрабатывает запросы вида "/api/admins**" на основе их данных аутентификации и авторизации.
+ * Обрабатывает запросы вида "/api/institutions**" на основе их данных аутентификации и авторизации.
  */
 @Component
-public class AdminRequestHandler {
+public class InstitutionRequestHandler {
 
   /**
-   * Шаблон для проверки соответствия и извлечения параметра (id) из запроса "/api/admins/(id)"
+   * Шаблон для проверки соответствия запросу "/api/institutions/(id)"
    */
-  private static final Pattern PATTERN_ADMINS_ID = Pattern.compile(String.format(
-      "^/api/admins/(?<id>[A-Za-z0-9]{%s})$", R.ID_LENGTH));
+  private static final Pattern PATTERN_INSTITUTIONS_ID = Pattern.compile(String.format(
+      "^/api/institutions/(?<id>[A-Za-z0-9]{%s})$", R.ID_LENGTH));
 
   /**
    * Интерфейс сервиса, отвечающего за аутентификацию и авторизацию в системе
@@ -34,12 +34,12 @@ public class AdminRequestHandler {
    * Конструктор для инициализации сервисов
    * @param authService интерфейс сервиса, отвечающего за аутентификацию и авторизацию в системе
    */
-  public AdminRequestHandler(AuthService authService) {
+  public InstitutionRequestHandler(AuthService authService) {
     this.authService = authService;
   }
 
   /**
-   * Обрабатывает http запрос вида "/api/admins**" и изменяет http ответ. Ответ может быть изменен в следующих случаях:
+   * Обрабатывает http запрос вида "/api/benefits**" и изменяет http ответ. Ответ может быть изменен в следующих случаях:
    * <ol>
    *   <li>Запрос не прошел проверку на аутентификацию и авторизацию. В ответ записывается 401 или 403 код статуса.</li>
    *   <li>Запрос на вход или выход. Необходимо установить или удалить токены.</li>
@@ -56,11 +56,22 @@ public class AdminRequestHandler {
     String requestURI = request.getRequestURI();
     String requestMethod = request.getMethod();
 
-    Matcher matcherAdminsId = PATTERN_ADMINS_ID.matcher(requestURI);
+    Matcher matcherInstitutionsId = PATTERN_INSTITUTIONS_ID.matcher(requestURI);
 
-    // Проверка аутентификации и авторизации для запросов, которые для авторизованных пользователей
-    if ((requestMethod.equals("GET") || requestMethod.equals("PUT")) &&
-        matcherAdminsId.matches()) {
+    // Разрешение запросов, которые доступны всем
+    if (requestMethod.equals("GET") &&
+        (requestURI.equals("/api/institutions") || matcherInstitutionsId.matches())) {
+      return true;
+    }
+
+    // Проверка аутентификации и авторизации для запросов, предназначенных для авторизованных пользователей
+    if (((requestMethod.equals("PUT") || requestMethod.equals("DELETE")) &&
+        matcherInstitutionsId.matches())
+        ||
+        (requestMethod.equals("POST") && (requestURI.equals("/api/institutions")))
+        ||
+        (requestMethod.equals("GET") &&
+            (requestURI.equals("/api/institutions/partial"))) || requestURI.equals("/api/institutions/init-data")) {
 
       // Проверка аутентификации по токенам доступа (jwt) и восстановления из запроса
       Optional<JwtUserData> optUserData = authService.authenticate(request, response);
@@ -70,9 +81,8 @@ public class AdminRequestHandler {
       }
       JwtUserData userData = optUserData.get();
 
-      // Проверка авторизации по наличию необходимых ролей и ID
-      if (!userData.hasRole(List.of(RDB.ROLE_ADMIN)) ||
-          !userData.getIdUser().equals(matcherAdminsId.group("id"))) {
+      // Проверка авторизации по наличию необходимых ролей
+      if (!userData.hasRole(List.of(RDB.ROLE_ADMIN))) {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         return false;
       }
@@ -83,4 +93,3 @@ public class AdminRequestHandler {
     return false;
   }
 }
-

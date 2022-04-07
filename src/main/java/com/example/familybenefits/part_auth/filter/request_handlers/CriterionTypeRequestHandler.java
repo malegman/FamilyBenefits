@@ -14,16 +14,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Обрабатывает запросы вида "/api/admins**" на основе их данных аутентификации и авторизации.
+ * Обрабатывает запросы вида "/api/criterion-types**" на основе их данных аутентификации и авторизации.
  */
 @Component
-public class AdminRequestHandler {
+public class CriterionTypeRequestHandler {
 
   /**
-   * Шаблон для проверки соответствия и извлечения параметра (id) из запроса "/api/admins/(id)"
+   * Шаблон для проверки соответствия запросу "/api/criterion-types/(id)"
    */
-  private static final Pattern PATTERN_ADMINS_ID = Pattern.compile(String.format(
-      "^/api/admins/(?<id>[A-Za-z0-9]{%s})$", R.ID_LENGTH));
+  private static final Pattern PATTERN_CRITERION_TYPES_ID = Pattern.compile(String.format(
+      "^/api/criterion-types/(?<id>[A-Za-z0-9]{%s})$", R.ID_LENGTH));
 
   /**
    * Интерфейс сервиса, отвечающего за аутентификацию и авторизацию в системе
@@ -34,12 +34,12 @@ public class AdminRequestHandler {
    * Конструктор для инициализации сервисов
    * @param authService интерфейс сервиса, отвечающего за аутентификацию и авторизацию в системе
    */
-  public AdminRequestHandler(AuthService authService) {
+  public CriterionTypeRequestHandler(AuthService authService) {
     this.authService = authService;
   }
 
   /**
-   * Обрабатывает http запрос вида "/api/admins**" и изменяет http ответ. Ответ может быть изменен в следующих случаях:
+   * Обрабатывает http запрос вида "/api/criterion-types**" и изменяет http ответ. Ответ может быть изменен в следующих случаях:
    * <ol>
    *   <li>Запрос не прошел проверку на аутентификацию и авторизацию. В ответ записывается 401 или 403 код статуса.</li>
    *   <li>Запрос на вход или выход. Необходимо установить или удалить токены.</li>
@@ -56,11 +56,21 @@ public class AdminRequestHandler {
     String requestURI = request.getRequestURI();
     String requestMethod = request.getMethod();
 
-    Matcher matcherAdminsId = PATTERN_ADMINS_ID.matcher(requestURI);
+    Matcher matcherCriterionTypesId = PATTERN_CRITERION_TYPES_ID.matcher(requestURI);
 
-    // Проверка аутентификации и авторизации для запросов, которые для авторизованных пользователей
-    if ((requestMethod.equals("GET") || requestMethod.equals("PUT")) &&
-        matcherAdminsId.matches()) {
+    // Разрешение запросов, которые доступны всем
+    if (requestMethod.equals("GET") &&
+        (requestURI.equals("/api/criterion-types") || matcherCriterionTypesId.matches())) {
+      return true;
+    }
+
+    // Проверка аутентификации и авторизации для запросов, предназначенных для авторизованных пользователей
+    if (((requestMethod.equals("PUT") || requestMethod.equals("DELETE")) &&
+        matcherCriterionTypesId.matches())
+        ||
+        (requestMethod.equals("POST") && (requestURI.equals("/api/criterion-types")))
+        ||
+        (requestMethod.equals("GET") && (requestURI.equals("/api/criterion-types/partial")))) {
 
       // Проверка аутентификации по токенам доступа (jwt) и восстановления из запроса
       Optional<JwtUserData> optUserData = authService.authenticate(request, response);
@@ -70,9 +80,8 @@ public class AdminRequestHandler {
       }
       JwtUserData userData = optUserData.get();
 
-      // Проверка авторизации по наличию необходимых ролей и ID
-      if (!userData.hasRole(List.of(RDB.ROLE_ADMIN)) ||
-          !userData.getIdUser().equals(matcherAdminsId.group("id"))) {
+      // Проверка авторизации по наличию необходимых ролей
+      if (!userData.hasRole(List.of(RDB.ROLE_ADMIN))) {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         return false;
       }
@@ -83,4 +92,3 @@ public class AdminRequestHandler {
     return false;
   }
 }
-

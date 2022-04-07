@@ -14,13 +14,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Обрабатывает запросы вида "/api/cities" на основе их данных аутентификации и авторизации.
+ * Обрабатывает запросы вида "/api/cities**" на основе их данных аутентификации и авторизации.
  */
 @Component
 public class CityRequestHandler {
 
   /**
-   * Шаблон для проверки соответствия и извлечения параметра (id) из запроса "/api/cities/(id)"
+   * Шаблон для проверки соответствия запросу "/api/cities/(id)"
    */
   private static final Pattern PATTERN_CITIES_ID = Pattern.compile(String.format(
       "^/api/cities/(?<id>[A-Za-z0-9]{%s})$", R.ID_LENGTH));
@@ -39,7 +39,7 @@ public class CityRequestHandler {
   }
 
   /**
-   * Обрабатывает http запрос и изменяет http ответ. Ответ может быть изменен в следующих случаях:
+   * Обрабатывает http запрос вида "/api/cities**" и изменяет http ответ. Ответ может быть изменен в следующих случаях:
    * <ol>
    *   <li>Запрос не прошел проверку на аутентификацию и авторизацию. В ответ записывается 401 или 403 код статуса.</li>
    *   <li>Запрос на вход или выход. Необходимо установить или удалить токены.</li>
@@ -68,7 +68,9 @@ public class CityRequestHandler {
     if (((requestMethod.equals("PUT") || requestMethod.equals("DELETE")) &&
         matcherCitiesId.matches())
         ||
-        (requestMethod.equals("POST") && (requestURI.equals("/api/cities")))) {
+        (requestMethod.equals("POST") && (requestURI.equals("/api/cities")))
+        ||
+        (requestMethod.equals("GET") && (requestURI.equals("/api/cities/partial")))) {
 
       // Проверка аутентификации по токенам доступа (jwt) и восстановления из запроса
       Optional<JwtUserData> optUserData = authService.authenticate(request, response);
