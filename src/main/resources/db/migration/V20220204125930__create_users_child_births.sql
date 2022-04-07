@@ -9,7 +9,7 @@ CREATE TABLE family_benefit.users_child_births(
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT users_child_births_fk_child FOREIGN KEY ("id_child_birth")
-    REFERENCES family_benefit.child("id")
+    REFERENCES family_benefit.child_birth("id")
     ON DELETE RESTRICT
     ON UPDATE CASCADE
 );
