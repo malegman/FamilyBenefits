@@ -15,6 +15,7 @@ import com.example.familybenefits.part_res_rest_api.services.interfaces.CityServ
 import com.example.familybenefits.part_res_rest_api.services.interfaces.InstitutionService;
 import com.example.familybenefits.security.DBSecuritySupport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,7 +50,7 @@ public class InstitutionServiceFB implements InstitutionService {
   @Autowired
   public InstitutionServiceFB(InstitutionRepository institutionRepository,
                               CityService cityService,
-                              BenefitService benefitService) {
+                              @Lazy BenefitService benefitService) {
     this.institutionRepository = institutionRepository;
     this.cityService = cityService;
     this.benefitService = benefitService;

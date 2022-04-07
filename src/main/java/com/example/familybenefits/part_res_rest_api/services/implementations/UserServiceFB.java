@@ -21,6 +21,7 @@ import com.example.familybenefits.security.MailSecuritySupport;
 import com.example.familybenefits.security.RandomValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -69,7 +70,7 @@ public class UserServiceFB implements UserService {
                        ChildBirthRepository childBirthRepository,
                        RoleRepository roleRepository,
                        CityService cityService,
-                       CriterionService criterionService) {
+                       @Lazy CriterionService criterionService) {
     this.userRepository = userRepository;
     this.childBirthRepository = childBirthRepository;
     this.roleRepository = roleRepository;

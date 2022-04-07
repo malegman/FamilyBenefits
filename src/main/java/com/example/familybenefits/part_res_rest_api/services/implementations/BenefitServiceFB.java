@@ -72,9 +72,9 @@ public class BenefitServiceFB implements BenefitService {
   public BenefitServiceFB(BenefitRepository benefitRepository,
                           UserRepository userRepository,
                           ChildBirthRepository childBirthRepository,
-                          @Lazy CityService cityService,
+                          CityService cityService,
                           CriterionService criterionService,
-                          InstitutionService institutionService) {
+                          @Lazy InstitutionService institutionService) {
     this.benefitRepository = benefitRepository;
     this.userRepository = userRepository;
     this.childBirthRepository = childBirthRepository;

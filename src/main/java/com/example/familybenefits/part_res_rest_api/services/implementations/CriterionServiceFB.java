@@ -15,6 +15,7 @@ import com.example.familybenefits.part_res_rest_api.services.interfaces.Criterio
 import com.example.familybenefits.part_res_rest_api.services.interfaces.UserService;
 import com.example.familybenefits.security.DBSecuritySupport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,7 +50,7 @@ public class CriterionServiceFB implements CriterionService {
   @Autowired
   public CriterionServiceFB(CriterionRepository criterionRepository,
                             CriterionTypeService criterionTypeService,
-                            UserService userService) {
+                            @Lazy UserService userService) {
     this.criterionRepository = criterionRepository;
     this.criterionTypeService = criterionTypeService;
     this.userService = userService;
