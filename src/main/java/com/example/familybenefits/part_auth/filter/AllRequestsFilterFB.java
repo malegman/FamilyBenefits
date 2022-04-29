@@ -112,6 +112,8 @@ public class AllRequestsFilterFB extends OncePerRequestFilter {
       isSuccess = criterionTypeRequestHandler.handle(request, response);
     } else if (requestURI.startsWith("/api/institutions")){
       isSuccess = institutionRequestHandler.handle(request, response);
+    } else {
+      response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
     if (isSuccess) {
