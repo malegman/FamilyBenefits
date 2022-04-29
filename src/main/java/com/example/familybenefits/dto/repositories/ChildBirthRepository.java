@@ -27,8 +27,8 @@ public interface ChildBirthRepository extends JpaRepository<ChildBirthEntity, St
    */
   @Query(nativeQuery = true,
       value = "SELECT family_benefit.child_birth.id, family_benefit.child_birth.date_birth " +
-          "FROM family_benefit.users_children " +
-          "INNER JOIN family_benefit.child_birth ON family_benefit.users_children.id_child_birth = family_benefit.child_birth.id " +
-          "WHERE family_benefit.users_children.id_user = ?;")
+          "FROM family_benefit.users_child_births " +
+          "INNER JOIN family_benefit.child_birth ON family_benefit.users_child_births.id_child_birth = family_benefit.child_birth.id " +
+          "WHERE family_benefit.users_child_births.id_user = ?;")
   List<ChildBirthEntity> findAllByIdUser(String idUser);
 }

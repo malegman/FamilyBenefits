@@ -37,8 +37,8 @@ public interface CriterionTypeRepository extends JpaRepository<CriterionTypeEnti
       value = "SELECT DISTINCT family_benefit.criterion_type.id, family_benefit.criterion_type.name, family_benefit.criterion_type.info " +
           "FROM family_benefit.criterion_type " +
           "INNER JOIN family_benefit.criterion ON family_benefit.criterion.id_type = family_benefit.criterion_type.id " +
-          "WHERE (?1 IS NULL OR family_benefit.criterion_type.name = ?1) " +
-          "AND (?2 IS NULL OR family_benefit.criterion.id = ?2);")
+          "WHERE (?1 = '' OR family_benefit.criterion_type.name = ?1) " +
+          "AND (?2 = '' OR family_benefit.criterion.id = ?2);")
   List<CriterionTypeEntity> findAllFilter(String name, String idCriterion);
 
   /**
@@ -49,6 +49,6 @@ public interface CriterionTypeRepository extends JpaRepository<CriterionTypeEnti
       value = "SELECT family_benefit.criterion_type.id, family_benefit.criterion_type.name, family_benefit.criterion_type.info " +
           "FROM family_benefit.criterion_type " +
           "LEFT JOIN family_benefit.criterion ON family_benefit.criterion.id_type = family_benefit.criterion_type.id " +
-          "WHERE family_benefit.criterion.id IS NULL;")
+          "WHERE family_benefit.criterion.id = '';")
   List<CriterionTypeEntity> findAllPartial();
 }

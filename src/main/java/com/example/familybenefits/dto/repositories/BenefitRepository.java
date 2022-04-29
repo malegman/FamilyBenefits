@@ -53,10 +53,10 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, String> 
           "INNER JOIN family_benefit.benefits_cities ON family_benefit.benefits_cities.id_benefit = family_benefit.benefit.id " +
           "INNER JOIN family_benefit.benefits_criteria ON family_benefit.benefits_criteria.id_benefit = family_benefit.benefit.id " +
           "INNER JOIN family_benefit.benefits_institutions ON family_benefit.benefits_institutions.id_benefit = family_benefit.benefit.id " +
-          "WHERE (?1 IS NULL OR family_benefit.benefit.name = ?1) " +
-          "AND (?2 IS NULL OR family_benefit.benefits_cities.id_city = ?2) " +
-          "AND (?3 IS NULL OR family_benefit.benefits_criteria.id_criterion = ?3) " +
-          "AND (?4 IS NULL OR family_benefit.benefits_institutions.id_institution = ?4);")
+          "WHERE (?1 = '' OR family_benefit.benefit.name = ?1) " +
+          "AND (?2 = '' OR family_benefit.benefits_cities.id_city = ?2) " +
+          "AND (?3 = '' OR family_benefit.benefits_criteria.id_criterion = ?3) " +
+          "AND (?4 = '' OR family_benefit.benefits_institutions.id_institution = ?4);")
   List<BenefitEntity> findAllFilter(String name, String idCity, String idCriterion, String idInstitution);
 
   /**
@@ -69,8 +69,8 @@ public interface BenefitRepository extends JpaRepository<BenefitEntity, String> 
           "LEFT JOIN family_benefit.benefits_cities ON family_benefit.benefits_cities.id_benefit = family_benefit.benefit.id " +
           "LEFT JOIN family_benefit.benefits_criteria ON family_benefit.benefits_criteria.id_benefit = family_benefit.benefit.id " +
           "LEFT JOIN family_benefit.benefits_institutions ON family_benefit.benefits_institutions.id_benefit = family_benefit.benefit.id " +
-          "WHERE family_benefit.benefits_cities.id_city IS NULL " +
-          "OR family_benefit.benefits_criteria.id_criterion IS NULL " +
-          "OR family_benefit.benefits_institutions.id_institution IS NULL;")
+          "WHERE family_benefit.benefits_cities.id_city = '' " +
+          "OR family_benefit.benefits_criteria.id_criterion = '' " +
+          "OR family_benefit.benefits_institutions.id_institution = '';")
   List<BenefitEntity> findAllPartial();
 }

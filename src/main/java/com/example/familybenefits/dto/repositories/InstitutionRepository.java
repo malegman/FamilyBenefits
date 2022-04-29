@@ -39,9 +39,9 @@ public interface InstitutionRepository extends JpaRepository<InstitutionEntity, 
           "family_benefit.institution.phone, family_benefit.institution.email, family_benefit.institution.schedule, family_benefit.institution.id_city " +
           "FROM family_benefit.institution " +
           "INNER JOIN family_benefit.benefits_institutions ON family_benefit.benefits_institutions.id_institution = family_benefit.institution.id " +
-          "WHERE (?1 IS NULL OR family_benefit.institution.name = ?1) " +
-          "AND (?2 IS NULL OR family_benefit.institution.id_city = ?2) " +
-          "AND (?3 IS NULL OR family_benefit.benefits_criteria.id_benefit = ?3);")
+          "WHERE (?1 = '' OR family_benefit.institution.name = ?1) " +
+          "AND (?2 = '' OR family_benefit.institution.id_city = ?2) " +
+          "AND (?3 = '' OR family_benefit.benefits_institutions.id_benefit = ?3);")
   List<InstitutionEntity> findAllFilter(String name, String idCity, String idBenefit);
 
   /**
@@ -53,7 +53,7 @@ public interface InstitutionRepository extends JpaRepository<InstitutionEntity, 
           "family_benefit.institution.phone, family_benefit.institution.email, family_benefit.institution.schedule, family_benefit.institution.id_city " +
           "FROM family_benefit.institution " +
           "LEFT JOIN family_benefit.benefits_institutions ON family_benefit.benefits_institutions.id_institution = family_benefit.institution.id " +
-          "WHERE family_benefit.benefits_institutions.id_benefit IS NULL;")
+          "WHERE family_benefit.benefits_institutions.id_benefit = '';")
   List<InstitutionEntity> findAllPartial();
 
 }

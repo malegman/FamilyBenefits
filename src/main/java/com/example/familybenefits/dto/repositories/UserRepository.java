@@ -62,7 +62,7 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
    */
   @Modifying
   @Query(nativeQuery = true,
-      value = "DELETE FROM family_benefit.users_children WHERE (id_user = ?1);")
+      value = "DELETE FROM family_benefit.users_child_births WHERE (id_user = ?1);")
   void deleteAllChildBirths(String idUser);
 
   /**

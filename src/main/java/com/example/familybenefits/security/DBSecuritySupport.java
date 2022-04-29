@@ -76,7 +76,7 @@ public class DBSecuritySupport {
   public static String preparePostgreSQLString(String content) {
 
     if (content == null) {
-      return null;
+      return "";
     }
 
     return content.replace("'", "''");

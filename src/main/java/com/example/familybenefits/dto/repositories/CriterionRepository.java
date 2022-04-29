@@ -50,9 +50,9 @@ public interface CriterionRepository extends JpaRepository<CriterionEntity, Stri
       value = "SELECT DISTINCT family_benefit.criterion.id, family_benefit.criterion.name, family_benefit.criterion.info, family_benefit.criterion.id_type " +
           "FROM family_benefit.criterion " +
           "INNER JOIN family_benefit.benefits_criteria ON family_benefit.benefits_criteria.id_criterion = family_benefit.criterion.id " +
-          "WHERE (?1 IS NULL OR family_benefit.criterion.name = ?1) " +
-          "AND (?2 IS NULL OR family_benefit.benefits_criteria.id_benefit = ?2) " +
-          "AND (?3 IS NULL OR family_benefit.criterion.id_type = ?3);")
+          "WHERE (?1 = '' OR family_benefit.criterion.name = ?1) " +
+          "AND (?2 = '' OR family_benefit.benefits_criteria.id_benefit = ?2) " +
+          "AND (?3 = '' OR family_benefit.criterion.id_type = ?3);")
   List<CriterionEntity> findAllFilter(String name, String idBenefit, String idCriterionType);
 
   /**
@@ -63,6 +63,6 @@ public interface CriterionRepository extends JpaRepository<CriterionEntity, Stri
       value = "SELECT family_benefit.criterion.id, family_benefit.criterion.name, family_benefit.criterion.info, family_benefit.criterion.id_type " +
           "FROM family_benefit.criterion " +
           "LEFT JOIN family_benefit.benefits_criteria ON family_benefit.benefits_criteria.id_criterion = family_benefit.city.id " +
-          "WHERE family_benefit.benefits_criteria.id_benefit IS NULL;")
+          "WHERE family_benefit.benefits_criteria.id_benefit = '';")
   List<CriterionEntity> findAllPartial();
 }
